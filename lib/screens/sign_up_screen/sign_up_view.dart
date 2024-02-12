@@ -1,3 +1,4 @@
+import 'package:admin_menu_mobile/config/config.dart';
 import 'package:admin_menu_mobile/features/register/cubit/register_cubit.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -139,7 +140,7 @@ class _ButtonSignIn extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          context.pop();
+          context.go(RouteName.login);
         },
         child: CommonLineText(
             title: AppText.haveAnAccount,

@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_inputs/form_inputs.dart';
 import 'package:formz/formz.dart';
 
+import '../data/register_repo.dart';
+
 part 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
@@ -27,12 +29,16 @@ class RegisterCubit extends Cubit<RegisterState> {
         isValid: Formz.validate([state.email, state.password])));
   }
 
+  void resetStatus() {
+    emit(state.copyWith(status: FormzSubmissionStatus.initial));
+  }
+
   Future<void> signUpFormSubmitted() async {
     if (!state.isValid) return;
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
-      await _authenticationRepository.signUp(
-          email: state.email.value, password: state.password.value);
+      await RegisterRepo(authenticationRepository: _authenticationRepository)
+          .register(email: state.email.value, password: state.password.value);
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on SignUpWithEmailAndPasswordFailure catch (e) {
       emit(state.copyWith(

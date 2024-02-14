@@ -1,6 +1,9 @@
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/auth/bloc/auth_bloc.dart';
+import '../screens/home_screen/home_screen.dart';
 import '../screens/login_screen/login_screen.dart';
 
 class RouteName {
@@ -21,16 +24,16 @@ final router = GoRouter(
     if (RouteName.publicRoutes.contains(state.fullPath)) {
       return null;
     }
-    // if (context.read<AuthBloc>().state is AuthAuthenticateSuccess) {
-    //   return null;
-    // }
+    if (context.read<AuthBloc>().state.status == AuthStatus.authenticated) {
+      return null;
+    }
     return RouteName.login;
   },
   routes: [
-    // GoRoute(
-    //   path: RouteName.home,
-    //   builder: (context, state) => HomeScreen(),
-    // ),
+    GoRoute(
+      path: RouteName.home,
+      builder: (context, state) => const HomeScreen(),
+    ),
     GoRoute(
       path: RouteName.login,
       builder: (context, state) => const LoginScreen(),

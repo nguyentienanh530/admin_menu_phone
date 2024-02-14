@@ -54,10 +54,9 @@ class AppAlerts {
       Function()? btnOkOnPress}) {
     AwesomeDialog(
       dismissOnTouchOutside: false,
-      titleTextStyle: CommonTextStyle.bold(
-          textColor: kBlackColor, fontSize: kTextSizeLarge),
-      descTextStyle: CommonTextStyle.light(
-          textColor: kBlackColor, fontSize: kTextSizeSmall),
+      titleTextStyle:
+          context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold),
+      descTextStyle: context.textStyleSmall,
       context: context,
       dialogType: DialogType.success,
       animType: AnimType.rightSlide,
@@ -76,10 +75,10 @@ class AppAlerts {
       Function()? btnOkOnPress}) {
     AwesomeDialog(
       dismissOnTouchOutside: false,
-      titleTextStyle: CommonTextStyle.bold(
-          textColor: kBlackColor, fontSize: kTextSizeLarge),
-      descTextStyle: CommonTextStyle.light(
-          textColor: kBlackColor, fontSize: kTextSizeSmall),
+      dialogBackgroundColor: context.colorScheme.background,
+      titleTextStyle:
+          context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold),
+      descTextStyle: context.textStyleSmall,
       context: context,
       dialogType: DialogType.error,
       animType: AnimType.rightSlide,
@@ -102,7 +101,7 @@ class AppAlerts {
       btnCancelText: textCancel ?? 'Cancel',
       btnOkText: textOk ?? 'Ok',
       titleTextStyle:
-          context.titleStyleLarge!.copyWith(fontWeight: FontWeight.bold),
+          context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold),
       descTextStyle: context.textStyleSmall,
       context: context,
       dialogType: DialogType.warning,

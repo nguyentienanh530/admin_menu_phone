@@ -1,9 +1,12 @@
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/login/cubit/login_cubit.dart';
+import 'package:admin_menu_mobile/utils/app_alerts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../utils/utils.dart';
@@ -26,8 +29,28 @@ class LoginView extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: defaultPadding),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(defaultBorderRadius),
-                  color: context.colorScheme.secondary),
-              child: Form(
+                  color: context.colorScheme.background),
+              child: BlocListener<LoginCubit, LoginState>(
+                  listener: (context, state) {
+                    switch (state.status) {
+                      case FormzSubmissionStatus.inProgress:
+                        AppAlerts.loadingDialog(context);
+                        break;
+                      case FormzSubmissionStatus.failure:
+                        AppAlerts.failureDialog(context,
+                            title: AppText.errorTitle,
+                            desc: state.errorMessage, btnCancelOnPress: () {
+                          context.read<LoginCubit>().resetStatus();
+
+                          context.pop();
+                        });
+                        break;
+                      case FormzSubmissionStatus.success:
+                        AppAlerts.successDialog(context);
+                        break;
+                      default:
+                    }
+                  },
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -35,7 +58,7 @@ class LoginView extends StatelessWidget {
                         SizedBox(height: defaultPadding),
                         const _Email(),
                         SizedBox(height: defaultPadding / 2),
-                        _Password(),
+                        const _Password(),
                         SizedBox(height: defaultPadding),
                         const _ButtonLogin(),
                         SizedBox(height: defaultPadding / 2),
@@ -75,40 +98,46 @@ class _Email extends StatelessWidget {
       return CommonTextField(
           keyboardType: TextInputType.emailAddress,
           hintText: AppText.email,
-          // errorText: state.email.displayError != null ? 'invalid email' : null,
-          onChanged: (value) {
-//  context.read<RegisterCubit>().emailChanged(value));
-          });
+          errorText: state.email.displayError != null ? 'invalid email' : null,
+          onChanged: (value) => context.read<LoginCubit>().emailChanged(value));
     });
   }
 }
 
 class _Password extends StatelessWidget {
-  _Password();
+  const _Password();
 
   @override
   Widget build(BuildContext context) {
-    return CommonTextField(
-      hintText: AppText.password,
-      onChanged: (value) {},
-
-      // obscureText: !showPass,
-      // suffixIcon: GestureDetector(
-      //     onTap: () =>
-      //         ref.read(_showPassProvider.notifier).state = _toggle(showPass),
-      //     child:
-      //         Icon(!showPass ? Icons.visibility_off : Icons.remove_red_eye))
-    );
+    return BlocBuilder<LoginCubit, LoginState>(builder: (context, state) {
+      return CommonTextField(
+          hintText: AppText.password,
+          onChanged: (value) =>
+              context.read<LoginCubit>().passwordChanged(value),
+          obscureText: !state.isShowPassword!,
+          errorText:
+              state.password.displayError != null ? 'invalid password' : null,
+          suffixIcon: GestureDetector(
+              onTap: () => context.read<LoginCubit>().isShowPasswordChanged(),
+              child: Icon(!state.isShowPassword!
+                  ? Icons.visibility_off
+                  : Icons.remove_red_eye)));
+    });
   }
 }
 
 class _ButtonLogin extends StatelessWidget {
-  const _ButtonLogin({this.formKey});
+  const _ButtonLogin();
 
-  final GlobalKey<FormState>? formKey;
   @override
   Widget build(BuildContext context) {
-    return CommonButton(text: AppText.login, onTap: () {});
+    return BlocBuilder<LoginCubit, LoginState>(builder: (context, state) {
+      return CommonButton(
+          text: AppText.login,
+          onTap: state.isValid
+              ? () => context.read<LoginCubit>().logInWithCredentials()
+              : null);
+    });
   }
 }
 
@@ -118,7 +147,7 @@ class _ButtonSignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () => context.push(RouteName.register),
+        onTap: () => context.go(RouteName.register),
         child: CommonLineText(
             title: AppText.noAccount,
             value: AppText.signup,

@@ -1,6 +1,6 @@
 part of 'auth_bloc.dart';
 
-enum AppStatus { authenticated, unauthenticated }
+enum AuthStatus { authenticated, unauthenticated }
 
 final class AuthState extends Equatable {
   const AuthState._({
@@ -9,11 +9,12 @@ final class AuthState extends Equatable {
   });
 
   const AuthState.authenticated(User user)
-      : this._(status: AppStatus.authenticated, user: user);
+      : this._(status: AuthStatus.authenticated, user: user);
 
-  const AuthState.unauthenticated() : this._(status: AppStatus.unauthenticated);
+  const AuthState.unauthenticated()
+      : this._(status: AuthStatus.unauthenticated);
 
-  final AppStatus status;
+  final AuthStatus status;
   final User user;
 
   @override

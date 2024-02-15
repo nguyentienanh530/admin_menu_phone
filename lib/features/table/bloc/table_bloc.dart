@@ -10,9 +10,10 @@ part 'table_state.dart';
 
 class TableBloc extends Bloc<TableEvent, TableState> {
   TableBloc() : super(TableInitial()) {
-    on<TableEvent>((event, emit) {
-      on<GetAllTable>(_getAllTable);
-    });
+    // on<TableEvent>((event, emit) {
+
+    // });
+    on<GetAllTable>(_getAllTable);
   }
 
   FutureOr<void> _getAllTable(

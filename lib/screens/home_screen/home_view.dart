@@ -12,7 +12,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _widgetOptions[indexBottomBar!];
+    return PageView(children: [_widgetOptions[indexBottomBar!]]);
   }
 
   final List<Widget> _widgetOptions = [

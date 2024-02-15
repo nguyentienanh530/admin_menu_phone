@@ -1,3 +1,4 @@
+import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,43 +17,30 @@ class DashboardView extends StatefulWidget {
 class _MyWidgetState extends State<DashboardView>
     with AutomaticKeepAliveClientMixin {
   @override
-  void initState() {
-    context.read<TableBloc>().add(GetAllTable());
-    super.initState();
-  }
-
+  bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return SafeArea(
-      child: SingleChildScrollView(
-          child: Column(children: [
-        Padding(
-            padding: EdgeInsets.only(
-                left: defaultPadding,
-                right: defaultPadding,
-                top: defaultPadding),
-            child: Row(
-              children: [
-                const Expanded(child: ItemCirclePercent()),
-                SizedBox(width: defaultPadding),
-                const Expanded(child: ItemCirclePercent())
-              ],
-            )),
-        Padding(
-            padding: EdgeInsets.only(
-                left: defaultPadding,
-                right: defaultPadding,
-                top: defaultPadding),
-            child: const ChartPaymentToDay()),
-        _buildHeader(context),
-        _buildTitle(context),
-        Padding(
-          padding: EdgeInsets.all(defaultPadding),
-          child: const _ListTable(),
-        )
-      ])),
-    );
+        child: SingleChildScrollView(
+            child: Column(children: [
+      Padding(
+          padding: EdgeInsets.only(
+              left: defaultPadding, right: defaultPadding, top: defaultPadding),
+          child: Row(children: [
+            const Expanded(child: ItemCirclePercent()),
+            SizedBox(width: defaultPadding),
+            const Expanded(child: ItemCirclePercent())
+          ])),
+      Padding(
+          padding: EdgeInsets.only(
+              left: defaultPadding, right: defaultPadding, top: defaultPadding),
+          child: const ChartPaymentToDay()),
+      _buildHeader(context),
+      _buildTitle(context),
+      Padding(
+          padding: EdgeInsets.all(defaultPadding), child: const _ListTable())
+    ])));
   }
 
   Widget _buildTitle(BuildContext context) {
@@ -77,15 +65,7 @@ class _MyWidgetState extends State<DashboardView>
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                      child: _buidItemDashBoard(context,
-                          title: "Tổng đơn",
-                          title2: "Đang chờ",
-                          value: 10, onTap: () {
-                    // print(_.allOrder.length);
-                    // Navigator.of(context).push(PageRouteBuilder(
-                    //     pageBuilder: (_, __, ___) => const AllOrders()));
-                  })),
+                  Expanded(child: _buildOrderWanting()),
                   SizedBox(width: defaultPadding),
                   Expanded(
                       child: _buidItemDashBoard(context,
@@ -103,6 +83,34 @@ class _MyWidgetState extends State<DashboardView>
                     // Get.to(() => SearchFood());
                   }))
                 ])));
+  }
+
+  Widget _buildOrderWanting() {
+    return BlocProvider(
+        create: (context) => OrderBloc()..add(GetAllOrder()),
+        child: BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
+          switch (state) {
+            case OrderInProgress():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
+
+            case OrderFailure():
+              return Center(child: Text(state.error!));
+
+            case OrderSuccess():
+              return _buidItemDashBoard(context,
+                  title: "Tổng đơn",
+                  title2: "Đang chờ",
+                  value: state.orderModel!.length,
+                  onTap: () {});
+
+            case OrderInitial():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
+          }
+        }));
   }
 
   Widget _buidItemDashBoard(BuildContext context,
@@ -136,9 +144,6 @@ class _MyWidgetState extends State<DashboardView>
                   FittedBox(child: Text(title2!, style: context.textStyleSmall))
                 ])));
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
 class ChartPaymentToDay extends StatelessWidget {
@@ -172,49 +177,79 @@ class _ListTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TableBloc, TableState>(builder: (context, state) {
-      var widget = (switch (state) {
-        TableInProgress() => Center(
-            child: SpinKitCircle(color: context.colorScheme.primary, size: 30)),
-        TableFailure() => Text(state.error!),
-        TableSuccess() => GridView.count(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: 4,
-            crossAxisSpacing: defaultPadding,
-            mainAxisSpacing: defaultPadding,
-            children: state.tables!
-                .map((e) => _ItemTable(nameTable: e.name))
-                .toList()),
-        TableInitial() => const SizedBox()
-      });
-      return widget;
-    });
+    return BlocProvider(
+        create: (context) => TableBloc()..add(GetAllTable()),
+        child: BlocBuilder<TableBloc, TableState>(builder: (context, state) {
+          switch (state) {
+            case TableInProgress():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
+            case TableFailure():
+              return Text(state.error!);
+            case TableSuccess():
+              return GridView.count(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  crossAxisCount: 4,
+                  crossAxisSpacing: defaultPadding,
+                  mainAxisSpacing: defaultPadding,
+                  children: state.tables!
+                      .map((e) => _ItemTable(nameTable: e.name))
+                      .toList());
+            case TableInitial():
+              return SpinKitCircle(
+                  color: context.colorScheme.primary, size: 30);
+          }
+        }));
   }
 }
 
 class _ItemTable extends StatelessWidget {
-  const _ItemTable({super.key, this.nameTable});
+  const _ItemTable({this.nameTable});
   final String? nameTable;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-            color: context.colorScheme.primary,
-            borderRadius: BorderRadius.circular(defaultBorderRadius)),
-        child:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          FittedBox(child: Text(nameTable!, style: context.textStyleSmall)),
-          FittedBox(
-            child: Text('100',
-                style: context.textStyleLarge!.copyWith(
-                    color: context.colorScheme.secondary,
-                    fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox()
-        ]));
+    return BlocProvider(
+        create: (context) =>
+            OrderBloc()..add(GetOrderOnTable(nameTable: nameTable)),
+        child: BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
+          switch (state) {
+            case OrderInProgress():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
+
+            case OrderFailure():
+              return Center(child: Text(state.error!));
+
+            case OrderSuccess():
+              return Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                      color: context.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(defaultBorderRadius)),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        FittedBox(
+                            child: Text(nameTable!,
+                                style: context.textStyleSmall)),
+                        FittedBox(
+                            child: Text(state.orderModel!.length.toString(),
+                                style: context.textStyleLarge!.copyWith(
+                                    color: context.colorScheme.secondary,
+                                    fontWeight: FontWeight.bold))),
+                        const SizedBox()
+                      ]));
+
+            case OrderInitial():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
+          }
+        }));
   }
 }

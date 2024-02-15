@@ -13,8 +13,8 @@ dependencies:
     path: packages/form_inputs
   table_repository:
     path: packages/table_repository
-  # order_repository:
-  #   path: package/order_repository
+  order_repository:
+    path: packages/order_repository
   authentication_repository:
     path: packages/authentication_repository
   awesome_dialog: ^3.2.0

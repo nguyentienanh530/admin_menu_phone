@@ -47,7 +47,7 @@ class AppText {
   static String createAccountSuccess = 'Create account success!';
   static String goToLogin = 'Go to login';
   static String notPermission = 'Tài khoản không có quyền sử dụng!';
-  static String manage = 'Quản lý';
+  static String titleManage = 'Quản lý';
   static String needCreateAccountAdmin =
       'Bạn cần tạo 1 tài khoản quản trị để có thể sử dụng.';
 }

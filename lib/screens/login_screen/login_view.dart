@@ -4,8 +4,6 @@ import 'package:admin_menu_mobile/utils/app_alerts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
 
@@ -46,7 +44,7 @@ class LoginView extends StatelessWidget {
                         });
                         break;
                       case FormzSubmissionStatus.success:
-                        AppAlerts.successDialog(context);
+                        context.go(RouteName.home);
                         break;
                       default:
                     }

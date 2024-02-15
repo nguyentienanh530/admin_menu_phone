@@ -11,8 +11,8 @@ dependencies:
     sdk: flutter
   form_inputs:
     path: packages/form_inputs
-  # table_repository:
-  #   path: package/table_repository
+  table_repository:
+    path: packages/table_repository
   # order_repository:
   #   path: package/order_repository
   authentication_repository:

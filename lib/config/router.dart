@@ -32,7 +32,7 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: RouteName.home,
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) => HomeScreen(),
     ),
     GoRoute(
       path: RouteName.login,

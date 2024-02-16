@@ -75,14 +75,15 @@ class _MyWidgetState extends State<DashboardView>
                     // Get.to(() => UserListScreen());
                   })),
                   SizedBox(width: defaultPadding),
-                  Expanded(
-                      child: _buidItemDashBoard(context,
-                          title: "Số lượng",
-                          title2: "Món",
-                          value: 10, onTap: () {
-                    // Get.to(() => SearchFood());
-                  }))
+                  Expanded(child: _buildFoods())
                 ])));
+  }
+
+  Widget _buildFoods() {
+    return _buidItemDashBoard(context,
+        title: "Số lượng", title2: "Món", value: 10, onTap: () {
+      // Get.to(() => SearchFood());
+    });
   }
 
   Widget _buildOrderWanting() {

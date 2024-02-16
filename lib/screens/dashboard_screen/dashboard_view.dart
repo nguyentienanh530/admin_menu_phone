@@ -1,8 +1,11 @@
+import 'package:admin_menu_mobile/config/router.dart';
+import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
@@ -80,10 +83,31 @@ class _MyWidgetState extends State<DashboardView>
   }
 
   Widget _buildFoods() {
-    return _buidItemDashBoard(context,
-        title: "Số lượng", title2: "Món", value: 10, onTap: () {
-      // Get.to(() => SearchFood());
-    });
+    return BlocProvider(
+        create: (context) => FoodBloc()..add(GetFoods()),
+        child: BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
+          switch (state) {
+            case FoodInProgress():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
+
+            case FoodFailue():
+              return Center(child: Text(state.error));
+
+            case FoodSuccess():
+              return _buidItemDashBoard(context,
+                  title: "Số lượng",
+                  title2: "Món",
+                  value: state.foods.length, onTap: () {
+                context.push(RouteName.searchFood);
+              });
+            case FoodInitial():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
+          }
+        }));
   }
 
   Widget _buildOrderWanting() {

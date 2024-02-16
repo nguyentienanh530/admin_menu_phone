@@ -8,7 +8,7 @@ class FoodRepository {
 
   Future<QuerySnapshot<Map<String, dynamic>>> getFoods() async {
     try {
-      var res = await _firebaseFirestore.collection('foods').get();
+      var res = await _firebaseFirestore.collection('food').get();
       return res;
     } on FirebaseException catch (e) {
       throw '$e';

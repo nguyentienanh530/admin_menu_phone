@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FoodModel {
+class Food {
   num? ratting;
   Timestamp? date;
   String? image;
@@ -34,7 +34,7 @@ class FoodModel {
   num? totalPrice;
   String? note;
 
-  FoodModel(
+  Food(
       {this.category,
       this.date,
       this.description,
@@ -68,10 +68,10 @@ class FoodModel {
       this.locationUser,
       this.note});
 
-  factory FoodModel.fromFirestore(DocumentSnapshot snapshot) {
+  factory Food.fromFirestore(DocumentSnapshot snapshot) {
     Map data = snapshot.data() as Map<dynamic, dynamic>;
 
-    return FoodModel(
+    return Food(
         ratting: data['ratting'] ?? 1,
         category: data['category'] ?? "",
         date: data['date'],
@@ -103,10 +103,10 @@ class FoodModel {
         discount: data['discount'] ?? 0,
         note: data['note']);
   }
-  factory FoodModel.fromJson(Map<dynamic, dynamic> data, String? id) {
+  factory Food.fromJson(Map<dynamic, dynamic> data, String? id) {
     // Map data = snapshot.data() as Map<dynamic, dynamic>;
 
-    return FoodModel(
+    return Food(
         ratting: data['ratting'] ?? 1,
         category: data['category'] ?? "",
         date: data['date'],
@@ -137,7 +137,7 @@ class FoodModel {
         note: data['note']);
   }
 
-  Map<String, dynamic> toJson(FoodModel food) => {
+  Map<String, dynamic> toJson(Food food) => {
         'id': food.id.toString(),
         'timeOrder': food.timeOrder,
         'quantity': food.quantity,

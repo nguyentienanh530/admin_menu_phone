@@ -21,26 +21,28 @@ class CommonLineText extends StatelessWidget {
       this.valueStyle});
   @override
   Widget build(BuildContext context) {
-    return RichText(
-        maxLines: 1,
-        softWrap: false,
-        overflow: TextOverflow.ellipsis,
-        text: TextSpan(
-            text: title ?? "",
-            style: titleStyle ?? context.textStyleSmall!,
-            // CommonTextStyle.normal(
-            //     fontSize: kTextSizeSmall,
-            //     textColor: isDarkText! ? kBlackColor : kTextColor),
-            children: <TextSpan>[
-              TextSpan(
-                  text: value ?? '',
-                  style: valueStyle ??
-                      context.textTheme.bodySmall!
-                          .copyWith(color: color ?? kTextColor)
-                  // MyTextStyle.bold(
-                  //     fontSize: kTextSizeSmall,
-                  //     textColor: color ?? kTextColor)
-                  )
-            ]));
+    return FittedBox(
+      child: RichText(
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.ellipsis,
+          text: TextSpan(
+              text: title ?? "",
+              style: titleStyle ?? context.textStyleSmall!,
+              // CommonTextStyle.normal(
+              //     fontSize: kTextSizeSmall,
+              //     textColor: isDarkText! ? kBlackColor : kTextColor),
+              children: <TextSpan>[
+                TextSpan(
+                    text: value ?? '',
+                    style: valueStyle ??
+                        context.textTheme.bodySmall!
+                            .copyWith(color: color ?? kTextColor)
+                    // MyTextStyle.bold(
+                    //     fontSize: kTextSizeSmall,
+                    //     textColor: color ?? kTextColor)
+                    )
+              ])),
+    );
   }
 }

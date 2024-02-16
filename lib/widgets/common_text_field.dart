@@ -11,13 +11,15 @@ class CommonTextField extends StatelessWidget {
       this.obscureText,
       this.suffixIcon,
       this.validator,
-      this.controller});
+      this.controller,
+      this.prefixIcon});
   final String? errorText;
   final TextInputType? keyboardType;
   final Function(String) onChanged;
   final String? hintText;
   final bool? obscureText;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final String? Function(String?)? validator;
   final TextEditingController? controller;
 
@@ -47,6 +49,7 @@ class CommonTextField extends StatelessWidget {
                 borderRadius: BorderRadius.circular(defaultBorderRadius),
                 borderSide: BorderSide(color: context.colorScheme.primary)),
             suffixIcon: suffixIcon ?? const SizedBox(),
+            prefixIcon: prefixIcon ?? const SizedBox(),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(defaultBorderRadius),
                 borderSide: BorderSide(color: context.colorScheme.primary)),

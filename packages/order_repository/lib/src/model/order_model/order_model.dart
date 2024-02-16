@@ -9,7 +9,7 @@ class OrderModel {
   String? datePay;
   String? date;
   num? totalPrice;
-  List<FoodModel>? foods;
+  List<Food>? foods;
   OrderModel(
       {this.id,
       this.isPay,
@@ -21,14 +21,14 @@ class OrderModel {
       this.foods});
 
   factory OrderModel.fromFirestore(DocumentSnapshot snapshot) {
-    var foods = <FoodModel>[];
+    var foods = <Food>[];
 
     var data = <String, dynamic>{};
     if (snapshot.data() != null) {
       data = snapshot.data() as Map<String, dynamic>;
       if (data['order_food'] != null) {
         data['order_food'].map((e) {
-          foods.add(FoodModel.fromJson(e, e['id']));
+          foods.add(Food.fromJson(e, e['id']));
         }).toList();
       }
     }
@@ -46,10 +46,10 @@ class OrderModel {
 
   factory OrderModel.fromJson(Map<dynamic, dynamic> data, String? id) {
     // Map data = snapshot.data() as Map<dynamic, dynamic>;
-    var foods = <FoodModel>[];
+    var foods = <Food>[];
     if (data['order_food'] != null) {
       data['order_food'].map((e) {
-        foods.add(FoodModel.fromJson(e, e['id']));
+        foods.add(Food.fromJson(e, e['id']));
       }).toList();
     }
     return OrderModel(

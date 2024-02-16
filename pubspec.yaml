@@ -43,6 +43,7 @@ dependencies:
   formz: ^0.6.1
   flutter_animate: ^4.5.0
   tiengviet: ^1.0.0
+  readmore: ^2.2.0
   
   
 

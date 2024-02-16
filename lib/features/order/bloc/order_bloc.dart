@@ -5,6 +5,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_repository/order_repository.dart';
 
+import '../data/order_model.dart';
+
 part 'order_event.dart';
 part 'order_state.dart';
 

@@ -54,24 +54,10 @@ class HomeScreen extends StatelessWidget {
         ],
         style: TabStyle.reactCircle,
         elevation: 1,
-        activeColor: context.colorScheme.background,
-        shadowColor: context.colorScheme.tertiary,
-        // shadowColor: heighlightColor,
-        backgroundColor: context.colorScheme.primary,
+        activeColor: context.colorScheme.primary,
+        shadowColor: context.colorScheme.shadow,
+        backgroundColor: context.colorScheme.background,
         onTap: (index) =>
             context.read<IndexBottomBarCubit>().indexChanged(index));
-  }
-
-  Widget _buildIconLogout() {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        return IconButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(const AuthLogoutRequested());
-              context.go(RouteName.login);
-            },
-            icon: const Icon(Icons.logout_outlined));
-      },
-    );
   }
 }

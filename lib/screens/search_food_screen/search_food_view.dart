@@ -1,18 +1,20 @@
+import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
+import 'package:admin_menu_mobile/features/search_food/cubit/text_search_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:food_repository/food_repository.dart';
-import 'package:order_repository/order_repository.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tiengviet/tiengviet.dart';
 
+import '../../features/food/data/food_model.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
 
 class SearchFoodView extends StatelessWidget {
-  const SearchFoodView({super.key});
-
+  SearchFoodView({super.key});
+  final TextEditingController _searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,31 +22,33 @@ class SearchFoodView extends StatelessWidget {
       Padding(
           padding: EdgeInsets.all(defaultPadding),
           child: _buildSearch(context)),
-      const Expanded(child: AfterSearchUI(text: ''))
+      Expanded(child:
+          BlocBuilder<TextSearchCubit, String>(builder: (context, state) {
+        return AfterSearchUI(text: state);
+      }))
     ]
             .animate(interval: 50.ms)
             .slideX(
                 begin: -0.1,
                 end: 0,
                 curve: Curves.easeInOutCubic,
-                duration: 400.ms)
-            .fadeIn(curve: Curves.easeInOutCubic, duration: 400.ms));
+                duration: 500.ms)
+            .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms));
   }
 
   Widget _buildSearch(BuildContext context) {
     return CommonTextField(
-      onChanged: (value) {},
-      hintText: "Tìm kiếm",
-      suffixIcon: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            // _.textValue.value = '';
-            // controller.clear();
-
-            // searchCtrl.saerchInitialize();
-          }),
-      prefixIcon: const Icon(Icons.search),
-    );
+        controller: _searchController,
+        onChanged: (value) =>
+            context.read<TextSearchCubit>().textChanged(value),
+        hintText: "Tìm kiếm",
+        suffixIcon: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              context.read<TextSearchCubit>().clear();
+              _searchController.clear();
+            }),
+        prefixIcon: const Icon(Icons.search));
 
     // TextFormField(
     //     // controller: controller,
@@ -128,49 +132,36 @@ class AfterSearchUI extends StatelessWidget {
   Widget _buildItemSearch(BuildContext context, FoodModel food) {
     return InkWell(
         onTap: () {
-          // Get.to(() => Featuredfood2Detail(food: food, id: food.id));
+          context.push(RouteName.foodDetail, extra: food);
         },
         child: Padding(
             padding: EdgeInsets.symmetric(
                 horizontal: defaultPadding, vertical: defaultPadding / 2),
-            child: SizedBox(
+            child: Container(
                 height: 80,
-                child: Stack(children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                decoration: BoxDecoration(
+                    color: context.colorScheme.background,
+                    borderRadius: BorderRadius.circular(defaultBorderRadius)),
+                child: Row(
+                    children: [
+                  _buildImage(food),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        const Spacer(),
-                        Expanded(
-                          flex: 7,
-                          child: Container(
-                            padding: EdgeInsets.all(defaultPadding),
-                            decoration: BoxDecoration(
-                                color: context.colorScheme.primary,
-                                borderRadius:
-                                    BorderRadius.circular(defaultBorderRadius)),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  _buildTitle(context, food),
-                                  _buildCategory(context, food),
-                                  _buildPrice(context, food)
-                                ]),
-                          ),
-                        ),
-                        const Spacer(),
-                      ]),
-
-                  // color: Colors.red,
-                  Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: _buildImage(food)),
-                        const Expanded(flex: 2, child: SizedBox()),
-                        Expanded(child: _buildImage(food)),
+                        _buildTitle(context, food),
+                        // _buildCategory(context, food),
+                        _buildPrice(context, food)
                       ])
-                ]))));
+                ]
+                        .animate(interval: 50.ms)
+                        .slideX(
+                            begin: -0.1,
+                            end: 0,
+                            curve: Curves.easeInOutCubic,
+                            duration: 500.ms)
+                        .fadeIn(
+                            curve: Curves.easeInOutCubic, duration: 500.ms)))));
   }
 
   Widget _buildImage(FoodModel food) {
@@ -179,15 +170,12 @@ class AfterSearchUI extends StatelessWidget {
         child: Material(
             color: Colors.transparent,
             child: Container(
-                margin: EdgeInsets.all(defaultPadding),
+                margin: EdgeInsets.all(defaultPadding / 2),
                 height: 80,
                 width: 80,
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.black.withOpacity(0.3),
-                    // borderRadius: BorderRadius.only(
-                    //     topLeft: Radius.circular(15),
-                    //     bottomLeft: Radius.circular(15)),
                     image: DecorationImage(
                         image: NetworkImage(
                             food.image == null || food.image == ""
@@ -199,35 +187,29 @@ class AfterSearchUI extends StatelessWidget {
   }
 
   Widget _buildCategory(BuildContext context, FoodModel food) {
-    return Text(food.category!, style: context.textStyleSmall!);
+    return FittedBox(
+        child: Text(food.category!, style: context.textStyleSmall!));
   }
 
   Widget _buildTitle(BuildContext context, FoodModel food) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      CommonLineText(
-          value: food.title,
-          valueStyle:
-              context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold))
-    ]);
+    return FittedBox(
+        child: Text(food.title!,
+            style:
+                context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold)));
   }
 
   Widget _buildPrice(BuildContext context, FoodModel food) {
     double discountAmount = (food.price! * food.discount!.toDouble()) / 100;
     double discountedPrice = food.price! - discountAmount;
     return food.isDiscount == false
-        ? CommonLineText(
-            valueStyle: context.textStyleSmall!.copyWith(
-                color: context.colorScheme.secondaryContainer,
-                fontWeight: FontWeight.bold),
-            value: Ultils.currencyFormat(
-              double.parse(food.price.toString()),
-            ))
+        ? Text(Ultils.currencyFormat(double.parse(food.price.toString())),
+            style: context.textStyleSmall!.copyWith(
+                color: context.colorScheme.secondary,
+                fontWeight: FontWeight.bold))
         : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(children: [
-              CommonLineText(
-                  value: Ultils.currencyFormat(
-                      double.parse(food.price.toString())),
-                  valueStyle: const TextStyle(
+              Text(Ultils.currencyFormat(double.parse(food.price.toString())),
+                  style: const TextStyle(
                       decoration: TextDecoration.lineThrough,
                       decorationThickness: 3.0,
                       decorationColor: Colors.red,
@@ -236,17 +218,16 @@ class AfterSearchUI extends StatelessWidget {
                       color: Color.fromARGB(255, 131, 128, 126),
                       fontWeight: FontWeight.w700)),
               const SizedBox(width: 10.0),
-              CommonLineText(
-                value: Ultils.currencyFormat(
-                    double.parse(discountedPrice.toString())),
-                valueStyle: context.textStyleSmall!
-                    .copyWith(color: context.colorScheme.secondaryContainer),
-              )
+              Text(
+                  Ultils.currencyFormat(
+                      double.parse(discountedPrice.toString())),
+                  style: context.textStyleSmall!
+                      .copyWith(color: context.colorScheme.tertiaryContainer))
             ])
           ]);
   }
 
-  Widget _buildPercentDiscount(Food food) {
+  Widget _buildPercentDiscount(FoodModel food) {
     return Container(
         height: 80,
         width: 80,

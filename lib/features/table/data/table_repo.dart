@@ -1,5 +1,7 @@
 import 'package:table_repository/table_repository.dart';
 
+import 'table_model.dart';
+
 class TableRepo {
   final TableRepository _tableRepository;
 

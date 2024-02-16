@@ -50,4 +50,6 @@ class AppText {
   static String titleManage = 'Quản lý';
   static String needCreateAccountAdmin =
       'Bạn cần tạo 1 tài khoản quản trị để có thể sử dụng.';
+
+  static String titleFoodDetail = 'Chi tiết món ăn';
 }

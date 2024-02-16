@@ -1,5 +1,7 @@
 import 'package:order_repository/order_repository.dart';
 
+import 'order_model.dart';
+
 class OrderRepo {
   final OrderRepository _orderRepository;
 

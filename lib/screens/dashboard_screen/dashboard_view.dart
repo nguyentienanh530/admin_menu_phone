@@ -3,6 +3,7 @@ import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
@@ -146,7 +147,7 @@ class _MyWidgetState extends State<DashboardView>
             padding: EdgeInsets.all(defaultPadding / 2),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(defaultBorderRadius),
-                color: context.colorScheme.primary,
+                color: context.colorScheme.background,
                 boxShadow: [
                   BoxShadow(
                       color: Colors.black12.withOpacity(0.05),
@@ -167,7 +168,14 @@ class _MyWidgetState extends State<DashboardView>
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center)),
                   FittedBox(child: Text(title2!, style: context.textStyleSmall))
-                ])));
+                ]
+                    .animate(interval: 50.ms)
+                    .slideX(
+                        begin: -0.1,
+                        end: 0,
+                        curve: Curves.easeInOutCubic,
+                        duration: 500.ms)
+                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
   }
 }
 
@@ -179,7 +187,7 @@ class ChartPaymentToDay extends StatelessWidget {
     return Container(
         height: context.sizeDevice.height * 0.2,
         decoration: BoxDecoration(
-            color: context.colorScheme.primary,
+            color: context.colorScheme.background,
             borderRadius: BorderRadius.circular(defaultBorderRadius)));
   }
 }
@@ -192,7 +200,7 @@ class ItemCirclePercent extends StatelessWidget {
     return Container(
         height: context.sizeDevice.height * 0.2,
         decoration: BoxDecoration(
-            color: context.colorScheme.primary,
+            color: context.colorScheme.background,
             borderRadius: BorderRadius.circular(defaultBorderRadius)));
   }
 }
@@ -254,7 +262,7 @@ class _ItemTable extends StatelessWidget {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                      color: context.colorScheme.primary,
+                      color: context.colorScheme.background,
                       borderRadius: BorderRadius.circular(defaultBorderRadius)),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,

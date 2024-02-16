@@ -1,3 +1,5 @@
+import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/search_food_screen/search_food_screen.dart';
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +16,7 @@ class RouteName {
   static const String profile = '/profile';
   static const String register = '/register';
   static const String searchFood = '/searchFood';
+  static const String foodDetail = '/foodDetail';
 
   static const publicRoutes = [login, register];
 }
@@ -40,5 +43,12 @@ final router = GoRouter(
           builder: (context, state) => const SignUpScreen()),
       GoRoute(
           path: RouteName.searchFood,
-          builder: (context, state) => const SearchFoodScreen())
+          builder: (context, state) => const SearchFoodScreen()),
+      GoRoute(
+          path: RouteName.foodDetail,
+          builder: (context, state) {
+            final FoodModel foodModel =
+                GoRouterState.of(context).extra as FoodModel;
+            return FoodDetailScreen(food: foodModel);
+          })
     ]);

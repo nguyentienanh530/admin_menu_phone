@@ -70,9 +70,9 @@ class SignUpView extends StatelessWidget {
         children: [
           const Center(child: _Wellcome()),
           SizedBox(height: defaultPadding),
-          const _Email(),
+          _Email(),
           SizedBox(height: defaultPadding / 2),
-          const _Password(),
+          _Password(),
           SizedBox(height: defaultPadding),
           const _ButtonSignUp(),
           SizedBox(height: defaultPadding / 2),
@@ -101,15 +101,18 @@ class _Wellcome extends StatelessWidget {
 }
 
 class _Email extends StatelessWidget {
-  const _Email();
+  _Email();
+  final TextEditingController _emailcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RegisterCubit, RegisterState>(
         buildWhen: (previous, current) => previous.email != current.email,
         builder: (context, state) {
           return CommonTextField(
+              controller: _emailcontroller,
               keyboardType: TextInputType.emailAddress,
               hintText: AppText.email,
+              prefixIcon: const Icon(Icons.email_rounded),
               errorText:
                   state.email.displayError != null ? 'invalid email' : null,
               onChanged: (value) =>
@@ -119,8 +122,8 @@ class _Email extends StatelessWidget {
 }
 
 class _Password extends StatelessWidget {
-  const _Password();
-
+  _Password();
+  final TextEditingController _passwordcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RegisterCubit, RegisterState>(
@@ -129,6 +132,7 @@ class _Password extends StatelessWidget {
             previous.isShowPassword != current.isShowPassword,
         builder: (context, state) {
           return CommonTextField(
+              controller: _passwordcontroller,
               hintText: AppText.password,
               errorText: state.password.displayError != null
                   ? 'invalid password'
@@ -136,6 +140,7 @@ class _Password extends StatelessWidget {
               onChanged: (value) =>
                   context.read<RegisterCubit>().passwordChanged(value),
               obscureText: !state.isShowPassword,
+              prefixIcon: const Icon(Icons.password_rounded),
               suffixIcon: GestureDetector(
                   onTap: () =>
                       context.read<RegisterCubit>().ishowPasswordChanged(),

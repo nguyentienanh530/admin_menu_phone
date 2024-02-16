@@ -44,7 +44,9 @@ class CommonBottomSheet extends StatelessWidget {
           Expanded(
               child: Padding(
                   padding: EdgeInsets.all(defaultPadding / 2),
-                  child: Text(title ?? "", style: CommonTextStyle.normal()))),
+                  child: Center(
+                      child:
+                          Text(title ?? "", style: CommonTextStyle.normal())))),
           Container(height: 1, color: kTextColor.withOpacity(0.3)),
           Expanded(
             child: GestureDetector(

@@ -5,6 +5,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_repository/table_repository.dart';
 
+import '../data/table_model.dart';
+
 part 'table_event.dart';
 part 'table_state.dart';
 

@@ -1,5 +1,7 @@
 import 'package:food_repository/food_repository.dart';
 
+import 'food_model.dart';
+
 class FoodRepo {
   final FoodRepository _foodRepository;
 

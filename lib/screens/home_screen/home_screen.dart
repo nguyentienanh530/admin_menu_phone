@@ -1,12 +1,9 @@
-import 'package:admin_menu_mobile/config/config.dart';
-import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
 import 'package:admin_menu_mobile/features/home/cubit/home_cubit.dart';
 import 'package:admin_menu_mobile/screens/home_screen/home_view.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatelessWidget {

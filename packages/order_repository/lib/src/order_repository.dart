@@ -21,9 +21,21 @@ class OrderRepository {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllOrder({String? nameTable}) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllOrder() {
     try {
       return _firebaseFirestore.collection("AllOrder").snapshots();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getOrderByID(
+      {required String id}) {
+    try {
+      var data = _firebaseFirestore.collection("AllOrder").doc(id).snapshots();
+      return data;
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {

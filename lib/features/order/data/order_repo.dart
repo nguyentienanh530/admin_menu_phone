@@ -23,6 +23,16 @@ class OrderRepo {
     }
   }
 
+  Stream<OrderModel> getOrderByID({required String idOrder}) {
+    try {
+      return _orderRepository.getOrderByID(id: idOrder).map((e) {
+        return OrderModel.fromFirestore(e);
+      });
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
   Stream<List<OrderModel>> getAllOrder() {
     try {
       return _orderRepository.getAllOrder().map((event) {

@@ -14,3 +14,9 @@ final class GetOrderOnTable extends OrderEvent {
 }
 
 final class GetAllOrder extends OrderEvent {}
+
+final class GetOrderByID extends OrderEvent {
+  final String? idOrder;
+
+  const GetOrderByID({required this.idOrder});
+}

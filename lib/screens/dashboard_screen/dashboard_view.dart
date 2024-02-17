@@ -1,6 +1,7 @@
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
+import 'package:admin_menu_mobile/features/order/data/order_model.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -125,10 +126,11 @@ class _MyWidgetState extends State<DashboardView>
               return Center(child: Text(state.error!));
 
             case OrderSuccess():
+              var orders = state.orderModel as List<OrderModel>;
               return _buidItemDashBoard(context,
                   title: "Tổng đơn",
                   title2: "Đang chờ",
-                  value: state.orderModel!.length,
+                  value: orders.length,
                   onTap: () {});
 
             case OrderInitial():
@@ -251,6 +253,7 @@ class _ItemTable extends StatelessWidget {
               return Center(child: Text(state.error!));
 
             case OrderSuccess():
+              var orders = state.orderModel as List<OrderModel>;
               return GestureDetector(
                   onTap: () => context.push(RouteName.order, extra: nameTable),
                   child: Card(
@@ -264,8 +267,7 @@ class _ItemTable extends StatelessWidget {
                                   child: Text(nameTable!,
                                       style: context.textStyleSmall)),
                               FittedBox(
-                                  child: Text(
-                                      state.orderModel!.length.toString(),
+                                  child: Text(orders.length.toString(),
                                       style: context.textStyleLarge!.copyWith(
                                           color: context.colorScheme.secondary,
                                           fontWeight: FontWeight.bold))),

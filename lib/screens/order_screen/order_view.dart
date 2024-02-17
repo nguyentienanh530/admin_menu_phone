@@ -33,13 +33,14 @@ class OrderView extends StatelessWidget {
           return Center(child: Text(state.error!));
 
         case OrderSuccess():
-          if (state.orderModel!.isEmpty) {
+          var orders = state.orderModel as List<OrderModel>;
+          if (orders.isEmpty) {
             return const EmptyScreen();
           }
           return ListView.builder(
-              itemCount: state.orderModel!.length,
+              itemCount: orders.length,
               itemBuilder: (context, index) =>
-                  ExpandableListView(orderModel: state.orderModel![index]));
+                  ExpandableListView(orderModel: orders[index]));
 
         case OrderInitial():
           return Center(
@@ -57,56 +58,59 @@ class ExpandableListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-      child: GestureDetector(
-          onTap: () =>
-              context.push(RouteName.orderDetail, extra: orderModel!.id),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Card(
-                  child: Container(
-                      padding: EdgeInsets.all(defaultPadding),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CommonLineText(
-                                      title: "ID: ", value: orderModel!.id!),
-                                  SizedBox(height: defaultPadding / 2),
-                                  CommonLineText(
-                                      title: "Thời gian đặt: ",
-                                      value: Ultils.formatDateTime(
-                                          orderModel!.dateOrder!))
-                                ]),
-                            Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CommonLineText(
-                                      valueStyle: context.textStyleMedium!
-                                          .copyWith(
-                                              color:
-                                                  context.colorScheme.secondary,
-                                              fontWeight: FontWeight.bold),
-                                      value: Ultils.currencyFormat(double.parse(
-                                          orderModel!.totalPrice.toString())))
-                                ])
-                          ])),
-                )
-              ]
-                  .animate(interval: 50.ms)
-                  .slideX(
-                      begin: -0.1,
-                      end: 0,
-                      curve: Curves.easeInOutCubic,
-                      duration: 500.ms)
-                  .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))),
-    );
+        padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+        child: GestureDetector(
+            onTap: () =>
+                context.push(RouteName.orderDetail, extra: orderModel!.id),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Card(
+                      child: Container(
+                          padding: EdgeInsets.all(defaultPadding),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CommonLineText(
+                                          title: "ID: ",
+                                          value: orderModel!.id!),
+                                      SizedBox(height: defaultPadding / 2),
+                                      CommonLineText(
+                                          title: "Đặt lúc: ",
+                                          value: Ultils.formatDateTime(
+                                              orderModel!.dateOrder!))
+                                    ]),
+                                Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CommonLineText(
+                                          valueStyle: context.textStyleMedium!
+                                              .copyWith(
+                                                  color: context
+                                                      .colorScheme.secondary,
+                                                  fontWeight: FontWeight.bold),
+                                          value: Ultils.currencyFormat(
+                                              double.parse(orderModel!
+                                                  .totalPrice
+                                                  .toString())))
+                                    ])
+                              ])))
+                ]
+                    .animate(interval: 50.ms)
+                    .slideX(
+                        begin: -0.1,
+                        end: 0,
+                        curve: Curves.easeInOutCubic,
+                        duration: 500.ms)
+                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
   }
 }

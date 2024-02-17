@@ -14,6 +14,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   OrderBloc() : super(OrderInitial()) {
     on<GetOrderOnTable>(_getOrderOnTable);
     on<GetAllOrder>(_getAllOrder);
+    on<GetOrderByID>(_getOrderByID);
   }
 
   FutureOr<void> _getOrderOnTable(
@@ -40,6 +41,21 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
               orderRepository: OrderRepository(
                   firebaseFirestore: FirebaseFirestore.instance))
           .getAllOrder()
+          .first;
+      emit(OrderSuccess(orderModel: orders));
+    } catch (e) {
+      emit(OrderFailure(error: e.toString()));
+    }
+  }
+
+  FutureOr<void> _getOrderByID(
+      GetOrderByID event, Emitter<OrderState> emit) async {
+    emit(OrderInProgress());
+    try {
+      var orders = await OrderRepo(
+              orderRepository: OrderRepository(
+                  firebaseFirestore: FirebaseFirestore.instance))
+          .getOrderByID(idOrder: event.idOrder!)
           .first;
       emit(OrderSuccess(orderModel: orders));
     } catch (e) {

@@ -143,39 +143,35 @@ class _MyWidgetState extends State<DashboardView>
       {String? title, String? title2, Function()? onTap, int? value}) {
     return GestureDetector(
         onTap: onTap,
-        child: Container(
-            padding: EdgeInsets.all(defaultPadding / 2),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(defaultBorderRadius),
-                color: context.colorScheme.background,
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black12.withOpacity(0.05),
-                      blurRadius: 20.0,
-                      spreadRadius: 10.0,
-                      offset: const Offset(0.0, 10.0))
-                ]),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  FittedBox(child: Text(title!, style: context.textStyleSmall)),
-                  FittedBox(
-                      child: Text(
-                          value == null || value == 0 ? "0" : value.toString(),
-                          style: context.textTheme.titleLarge!.copyWith(
-                              color: context.colorScheme.secondary,
-                              fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center)),
-                  FittedBox(child: Text(title2!, style: context.textStyleSmall))
-                ]
-                    .animate(interval: 50.ms)
-                    .slideX(
-                        begin: -0.1,
-                        end: 0,
-                        curve: Curves.easeInOutCubic,
-                        duration: 500.ms)
-                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
+        child: Card(
+            child: Container(
+                padding: EdgeInsets.all(defaultPadding / 2),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FittedBox(
+                          child: Text(title!, style: context.textStyleSmall)),
+                      FittedBox(
+                          child: Text(
+                              value == null || value == 0
+                                  ? "0"
+                                  : value.toString(),
+                              style: context.textTheme.titleLarge!.copyWith(
+                                  color: context.colorScheme.secondary,
+                                  fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center)),
+                      FittedBox(
+                          child: Text(title2!, style: context.textStyleSmall))
+                    ]
+                        .animate(interval: 50.ms)
+                        .slideX(
+                            begin: -0.1,
+                            end: 0,
+                            curve: Curves.easeInOutCubic,
+                            duration: 500.ms)
+                        .fadeIn(
+                            curve: Curves.easeInOutCubic, duration: 500.ms)))));
   }
 }
 
@@ -184,11 +180,12 @@ class ChartPaymentToDay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        height: context.sizeDevice.height * 0.2,
-        decoration: BoxDecoration(
-            color: context.colorScheme.background,
-            borderRadius: BorderRadius.circular(defaultBorderRadius)));
+    return Card(
+      child: Container(
+          height: context.sizeDevice.height * 0.2,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(defaultBorderRadius))),
+    );
   }
 }
 
@@ -197,11 +194,7 @@ class ItemCirclePercent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        height: context.sizeDevice.height * 0.2,
-        decoration: BoxDecoration(
-            color: context.colorScheme.background,
-            borderRadius: BorderRadius.circular(defaultBorderRadius)));
+    return Card(child: SizedBox(height: context.sizeDevice.height * 0.2));
   }
 }
 
@@ -258,25 +251,27 @@ class _ItemTable extends StatelessWidget {
               return Center(child: Text(state.error!));
 
             case OrderSuccess():
-              return Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                      color: context.colorScheme.background,
-                      borderRadius: BorderRadius.circular(defaultBorderRadius)),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        FittedBox(
-                            child: Text(nameTable!,
-                                style: context.textStyleSmall)),
-                        FittedBox(
-                            child: Text(state.orderModel!.length.toString(),
-                                style: context.textStyleLarge!.copyWith(
-                                    color: context.colorScheme.secondary,
-                                    fontWeight: FontWeight.bold))),
-                        const SizedBox()
-                      ]));
+              return GestureDetector(
+                  onTap: () => context.push(RouteName.order, extra: nameTable),
+                  child: Card(
+                    child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(3),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              FittedBox(
+                                  child: Text(nameTable!,
+                                      style: context.textStyleSmall)),
+                              FittedBox(
+                                  child: Text(
+                                      state.orderModel!.length.toString(),
+                                      style: context.textStyleLarge!.copyWith(
+                                          color: context.colorScheme.secondary,
+                                          fontWeight: FontWeight.bold))),
+                              const SizedBox()
+                            ])),
+                  ));
 
             case OrderInitial():
               return Center(

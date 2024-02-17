@@ -136,32 +136,33 @@ class AfterSearchUI extends StatelessWidget {
         },
         child: Padding(
             padding: EdgeInsets.symmetric(
-                horizontal: defaultPadding, vertical: defaultPadding / 2),
-            child: Container(
-                height: 80,
-                decoration: BoxDecoration(
-                    color: context.colorScheme.background,
-                    borderRadius: BorderRadius.circular(defaultBorderRadius)),
-                child: Row(
-                    children: [
-                  _buildImage(food),
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildTitle(context, food),
-                        // _buildCategory(context, food),
-                        _buildPrice(context, food)
-                      ])
-                ]
-                        .animate(interval: 50.ms)
-                        .slideX(
-                            begin: -0.1,
-                            end: 0,
-                            curve: Curves.easeInOutCubic,
-                            duration: 500.ms)
-                        .fadeIn(
-                            curve: Curves.easeInOutCubic, duration: 500.ms)))));
+                horizontal: defaultPadding, vertical: defaultPadding / 5),
+            child: Card(
+                borderOnForeground: false,
+                child: SizedBox(
+                    height: 80,
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildImage(food),
+                          Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildTitle(context, food),
+                                // _buildCategory(context, food),
+                                _buildPrice(context, food)
+                              ])
+                        ]
+                            .animate(interval: 50.ms)
+                            .slideX(
+                                begin: -0.1,
+                                end: 0,
+                                curve: Curves.easeInOutCubic,
+                                duration: 500.ms)
+                            .fadeIn(
+                                curve: Curves.easeInOutCubic,
+                                duration: 500.ms))))));
   }
 
   Widget _buildImage(FoodModel food) {

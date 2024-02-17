@@ -178,11 +178,14 @@ class _Gallery extends StatelessWidget {
       Padding(
           padding: EdgeInsets.symmetric(
               horizontal: defaultPadding, vertical: defaultPadding / 2),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: food.photoGallery!
-                  .map((item) => _buildImage(context, item))
-                  .toList()))
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Expanded(child: _buildImage(context, food.photoGallery![0])),
+            SizedBox(width: defaultPadding / 2),
+            Expanded(child: _buildImage(context, food.photoGallery![1])),
+            SizedBox(width: defaultPadding / 2),
+            Expanded(child: _buildImage(context, food.photoGallery![2]))
+          ]))
     ]);
   }
 
@@ -214,22 +217,28 @@ class _Gallery extends StatelessWidget {
           return Material(
               clipBehavior: Clip.antiAlias,
               elevation: 18.0,
-              color: Colors.transparent,
-              child: GestureDetector(
-                  onTap: () {
-                    context.pop();
-                  },
-                  child: Center(
-                      child: Container(
-                          height: context.sizeDevice.width * 0.9,
-                          width: context.sizeDevice.width * 0.9,
-                          decoration: BoxDecoration(
-                              color: kRedColor,
-                              borderRadius:
-                                  BorderRadius.circular(defaultBorderRadius),
-                              image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(item)))))));
+              color: context.colorScheme.background,
+              child: Center(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                    Container(
+                        height: context.sizeDevice.width * 0.9,
+                        width: context.sizeDevice.width * 0.9,
+                        decoration: BoxDecoration(
+                            color: kRedColor,
+                            borderRadius:
+                                BorderRadius.circular(defaultBorderRadius),
+                            image: DecorationImage(
+                                fit: BoxFit.cover, image: NetworkImage(item)))),
+                    IconButton(
+                        iconSize: 30,
+                        onPressed: () {
+                          context.pop();
+                        },
+                        icon: const Icon(Icons.highlight_remove_sharp),
+                        color: context.colorScheme.secondaryContainer)
+                  ])));
         },
         transitionDuration: const Duration(milliseconds: 500)));
   }

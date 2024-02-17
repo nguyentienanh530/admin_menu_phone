@@ -1,5 +1,7 @@
 import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:admin_menu_mobile/screens/food_detail_screen/food_detail_screen.dart';
+import 'package:admin_menu_mobile/screens/order_detail_screen/order_detail_screen.dart';
+import 'package:admin_menu_mobile/screens/order_screen/order_screen.dart';
 import 'package:admin_menu_mobile/screens/search_food_screen/search_food_screen.dart';
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +19,8 @@ class RouteName {
   static const String register = '/register';
   static const String searchFood = '/searchFood';
   static const String foodDetail = '/foodDetail';
+  static const String order = '/order';
+  static const String orderDetail = '/orderDetail';
 
   static const publicRoutes = [login, register];
 }
@@ -50,5 +54,17 @@ final router = GoRouter(
             final FoodModel foodModel =
                 GoRouterState.of(context).extra as FoodModel;
             return FoodDetailScreen(food: foodModel);
+          }),
+      GoRoute(
+          path: RouteName.order,
+          builder: (context, state) {
+            final String nametable = GoRouterState.of(context).extra as String;
+            return OrderScreen(nameTable: nametable);
+          }),
+      GoRoute(
+          path: RouteName.orderDetail,
+          builder: (context, state) {
+            final String idOrder = GoRouterState.of(context).extra as String;
+            return OrderDetailScreen(idOrder: idOrder);
           })
     ]);

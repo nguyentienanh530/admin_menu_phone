@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/order/data/order_model.dart';
+import '../../features/order/dtos/order_model.dart';
 import '../../widgets/widgets.dart';
 
 class OrderView extends StatelessWidget {
@@ -22,32 +22,34 @@ class OrderView extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    return BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
-      switch (state) {
-        case OrderInProgress():
-          return Center(
-              child:
-                  SpinKitCircle(color: context.colorScheme.primary, size: 30));
+    return BlocBuilder<OrderBloc, OrderState>(
+        buildWhen: (previous, current) => previous != current,
+        builder: (context, state) {
+          switch (state) {
+            case OrderInProgress():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
 
-        case OrderFailure():
-          return Center(child: Text(state.error!));
+            case OrderFailure():
+              return Center(child: Text(state.error!));
 
-        case OrderSuccess():
-          var orders = state.orderModel as List<OrderModel>;
-          if (orders.isEmpty) {
-            return const EmptyScreen();
+            case OrderSuccess():
+              var orders = state.orderModel as List<OrderModel>;
+              if (orders.isEmpty) {
+                return const EmptyScreen();
+              }
+              return ListView.builder(
+                  itemCount: orders.length,
+                  itemBuilder: (context, index) =>
+                      ExpandableListView(orderModel: orders[index]));
+
+            case OrderInitial():
+              return Center(
+                  child: SpinKitCircle(
+                      color: context.colorScheme.primary, size: 30));
           }
-          return ListView.builder(
-              itemCount: orders.length,
-              itemBuilder: (context, index) =>
-                  ExpandableListView(orderModel: orders[index]));
-
-        case OrderInitial():
-          return Center(
-              child:
-                  SpinKitCircle(color: context.colorScheme.primary, size: 30));
-      }
-    });
+        });
   }
 }
 
@@ -71,38 +73,8 @@ class ExpandableListView extends StatelessWidget {
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
-                                Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CommonLineText(
-                                          title: "ID: ",
-                                          value: orderModel!.id!),
-                                      SizedBox(height: defaultPadding / 2),
-                                      CommonLineText(
-                                          title: "Đặt lúc: ",
-                                          value: Ultils.formatDateTime(
-                                              orderModel!.dateOrder!))
-                                    ]),
-                                Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CommonLineText(
-                                          valueStyle: context.textStyleMedium!
-                                              .copyWith(
-                                                  color: context
-                                                      .colorScheme.secondary,
-                                                  fontWeight: FontWeight.bold),
-                                          value: Ultils.currencyFormat(
-                                              double.parse(orderModel!
-                                                  .totalPrice
-                                                  .toString())))
-                                    ])
+                                _buildIDAndTimeOrder(),
+                                _buildPrice(context)
                               ])))
                 ]
                     .animate(interval: 50.ms)
@@ -112,5 +84,32 @@ class ExpandableListView extends StatelessWidget {
                         curve: Curves.easeInOutCubic,
                         duration: 500.ms)
                     .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
+  }
+
+  Widget _buildPrice(BuildContext context) {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CommonLineText(
+              valueStyle: context.textStyleMedium!.copyWith(
+                  color: context.colorScheme.secondary,
+                  fontWeight: FontWeight.bold),
+              value: Ultils.currencyFormat(
+                  double.parse(orderModel!.totalPrice.toString())))
+        ]);
+  }
+
+  Widget _buildIDAndTimeOrder() {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CommonLineText(title: "ID: ", value: orderModel!.id!),
+          SizedBox(height: defaultPadding / 2),
+          CommonLineText(
+              title: "Đặt lúc: ",
+              value: Ultils.formatDateTime(orderModel!.dateOrder!))
+        ]);
   }
 }

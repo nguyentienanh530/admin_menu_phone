@@ -22,7 +22,7 @@ class FoodDetailView extends StatelessWidget {
                     _buildTitle(context, food),
                     _buildPrice(context, food),
                     _buildDescription(context, food),
-                    food.photoGallery != null
+                    food.photoGallery != null && food.photoGallery!.isNotEmpty
                         ? _Gallery(food: food)
                         : const SizedBox()
                   ]

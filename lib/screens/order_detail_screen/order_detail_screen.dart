@@ -20,6 +20,10 @@ class OrderDetailScreen extends StatelessWidget {
         title: Text('$idOrder',
             style: context.titleStyleMedium!
                 .copyWith(fontWeight: FontWeight.bold)),
-        centerTitle: true);
+        centerTitle: true,
+        actions: [
+          IconButton.filled(
+              iconSize: 20, onPressed: () {}, icon: const Icon(Icons.add))
+        ]);
   }
 }

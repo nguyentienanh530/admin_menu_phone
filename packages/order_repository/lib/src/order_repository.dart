@@ -42,4 +42,30 @@ class OrderRepository {
       throw '$e';
     }
   }
+
+  Future<void> deleteOrderItem(
+      {required String idOrder,
+      required List<Map<String, dynamic>> json,
+      required num totalPrice}) async {
+    try {
+      await _firebaseFirestore
+          .collection('AllOrder')
+          .doc(idOrder)
+          .update({'order_food': json, 'totalPrice': totalPrice});
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Future<void> deleteOrder({required String idOrder}) async {
+    try {
+      await _firebaseFirestore.collection('AllOrder').doc(idOrder).delete();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
 }

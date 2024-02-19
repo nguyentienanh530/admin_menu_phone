@@ -1,6 +1,6 @@
 import 'package:order_repository/order_repository.dart';
 
-import 'order_model.dart';
+import '../dtos/order_model.dart';
 
 class OrderRepo {
   final OrderRepository _orderRepository;
@@ -41,6 +41,26 @@ class OrderRepo {
             event.docs.map((e) => OrderModel.fromFirestore(e)).toList());
         return orders;
       });
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Future<void> deleteFoodInOrder(
+      {required String idOrder,
+      required List<Map<String, dynamic>> jsonData,
+      required num totalPrice}) async {
+    try {
+      await _orderRepository.deleteOrderItem(
+          idOrder: idOrder, json: jsonData, totalPrice: totalPrice);
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Future<void> deleteOrder({required String idOrder}) async {
+    try {
+      await _orderRepository.deleteOrder(idOrder: idOrder);
     } catch (e) {
       throw '$e';
     }

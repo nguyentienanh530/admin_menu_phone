@@ -12,7 +12,7 @@ final class OrderInitial extends OrderState {}
 final class OrderInProgress extends OrderState {}
 
 final class OrderSuccess extends OrderState {
-  final Object? orderModel;
+  final dynamic orderModel;
   // final OrderModel? order;
   const OrderSuccess({this.orderModel});
   @override

@@ -1,7 +1,7 @@
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
-import 'package:admin_menu_mobile/features/order/data/order_model.dart';
+import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';

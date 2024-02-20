@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -7,12 +5,10 @@ class FoodDto {
   final String? image;
   final bool? isDiscount;
   final String? id;
-
   final int? discount;
   final bool? isImageCrop;
   final num? price;
   final String? title;
-
   final int? timeOrder;
   final int? quantity;
   final num? totalPrice;
@@ -75,6 +71,6 @@ class FoodDto {
         'isImageCrop': food.isImageCrop,
         'price': food.price,
         'title': food.title,
-        'note': food.note
+        'note': food.note ?? ''
       };
 }

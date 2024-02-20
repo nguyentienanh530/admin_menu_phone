@@ -2,15 +2,15 @@ import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrderModel {
-  String? id;
-  bool? isPay;
-  String? table;
-  String? dateOrder;
-  String? datePay;
-  String? date;
-  num? totalPrice;
-  List<FoodModel>? foods;
-  OrderModel(
+  final String? id;
+  final bool? isPay;
+  final String? table;
+  final String? dateOrder;
+  final String? datePay;
+  final String? date;
+  final num? totalPrice;
+  final List<FoodModel>? foods;
+  const OrderModel(
       {this.id,
       this.isPay,
       this.table,
@@ -62,4 +62,18 @@ class OrderModel {
         totalPrice: data['totalPrice'] ?? 0,
         foods: foods);
   }
+
+  Map<String, dynamic> toJson(FoodModel food) => {
+        'id': food.id.toString(),
+        'timeOrder': food.timeOrder,
+        'quantity': food.quantity,
+        'totalPrice': food.totalPrice ?? food.price,
+        'discount': food.discount,
+        "image": food.image,
+        'isDiscount': food.isDiscount,
+        'isImageCrop': food.isImageCrop,
+        'price': food.price,
+        'title': food.title,
+        'note': food.note ?? ''
+      };
 }

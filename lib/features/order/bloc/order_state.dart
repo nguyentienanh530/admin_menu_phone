@@ -1,28 +1,30 @@
 part of 'order_bloc.dart';
 
-sealed class OrderState extends Equatable {
-  const OrderState();
+enum OrderStatus { initial, loading, success, failure }
+
+class OrderState extends Equatable {
+  const OrderState(
+      {this.status = OrderStatus.initial,
+      this.orders = const <OrderModel>[],
+      this.order = const OrderModel(),
+      this.message = ''});
+  final OrderStatus status;
+  final List<OrderModel> orders;
+  final OrderModel order;
+  final String message;
+
+  OrderState copyWith(
+      {OrderStatus? status,
+      List<OrderModel>? orders,
+      OrderModel? order,
+      String? message}) {
+    return OrderState(
+        status: status ?? this.status,
+        orders: orders ?? this.orders,
+        order: order ?? this.order,
+        message: message ?? this.message);
+  }
 
   @override
-  List<Object> get props => [];
-}
-
-final class OrderInitial extends OrderState {}
-
-final class OrderInProgress extends OrderState {}
-
-final class OrderSuccess extends OrderState {
-  final dynamic orderModel;
-  // final OrderModel? order;
-  const OrderSuccess({this.orderModel});
-  @override
-  List<Object> get props => [orderModel!];
-}
-
-final class OrderFailure extends OrderState {
-  final String? error;
-
-  const OrderFailure({required this.error});
-  @override
-  List<Object> get props => [error!];
+  List<Object> get props => [status, orders, order, message];
 }

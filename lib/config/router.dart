@@ -1,6 +1,8 @@
 import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/screens/add_food_screen/add_food_screen.dart';
 import 'package:admin_menu_mobile/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/order_detail_screen/order_detail_screen.dart';
+import 'package:admin_menu_mobile/screens/order_history_detail_screen/order_history_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/order_screen/order_screen.dart';
 import 'package:admin_menu_mobile/screens/search_food_screen/search_food_screen.dart';
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
@@ -21,6 +23,8 @@ class RouteName {
   static const String foodDetail = '/foodDetail';
   static const String order = '/order';
   static const String orderDetail = '/orderDetail';
+  static const String addFood = '/addFood';
+  static const String orderHistoryDetail = '/orderHistoryDetail';
 
   static const publicRoutes = [login, register];
 }
@@ -49,6 +53,9 @@ final router = GoRouter(
           path: RouteName.searchFood,
           builder: (context, state) => const SearchFoodScreen()),
       GoRoute(
+          path: RouteName.addFood,
+          builder: (context, state) => const AddFoodScreen()),
+      GoRoute(
           path: RouteName.foodDetail,
           builder: (context, state) {
             final FoodModel foodModel =
@@ -66,5 +73,11 @@ final router = GoRouter(
           builder: (context, state) {
             final String idOrder = GoRouterState.of(context).extra as String;
             return OrderDetailScreen(idOrder: idOrder);
+          }),
+      GoRoute(
+          path: RouteName.orderHistoryDetail,
+          builder: (context, state) {
+            // final String idOrder = GoRouterState.of(context).extra as String;
+            return const OrderHistoryDetailScreen();
           })
     ]);

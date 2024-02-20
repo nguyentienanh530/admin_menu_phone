@@ -1,14 +1,12 @@
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
-import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
 
@@ -116,28 +114,38 @@ class _MyWidgetState extends State<DashboardView>
     return BlocProvider(
         create: (context) => OrderBloc()..add(GetAllOrder()),
         child: BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
-          switch (state) {
-            case OrderInProgress():
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-
-            case OrderFailure():
-              return Center(child: Text(state.error!));
-
-            case OrderSuccess():
-              var orders = state.orderModel as List<OrderModel>;
-              return _buidItemDashBoard(context,
-                  title: "Tổng đơn",
-                  title2: "Đang chờ",
-                  value: orders.length,
-                  onTap: () {});
-
-            case OrderInitial():
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-          }
+          return (switch (state.status) {
+            OrderStatus.loading => Center(
+                child: SpinKitCircle(
+                    color: context.colorScheme.primary, size: 30)),
+            OrderStatus.failure => Center(child: Text(state.message)),
+            OrderStatus.success => _buidItemDashBoard(context,
+                title: "Tổng đơn",
+                title2: "Đang chờ",
+                value: state.orders.length,
+                onTap: () {}),
+            OrderStatus.initial => Center(
+                child:
+                    SpinKitCircle(color: context.colorScheme.primary, size: 30))
+          });
+          // switch (state.status) {
+          //   case OrderStatus.loading:
+          //     return Center(
+          //         child: SpinKitCircle(
+          //             color: context.colorScheme.primary, size: 30));
+          //   case OrderStatus.failure:
+          //     return Center(child: Text(state.message));
+          //   case OrderStatus.success:
+          //     return _buidItemDashBoard(context,
+          //         title: "Tổng đơn",
+          //         title2: "Đang chờ",
+          //         value: state.orders.length,
+          //         onTap: () {});
+          //   case OrderStatus.initial:
+          //     return Center(
+          //         child: SpinKitCircle(
+          //             color: context.colorScheme.primary, size: 30));
+          // }
         }));
   }
 
@@ -243,17 +251,14 @@ class _ItemTable extends StatelessWidget {
         create: (context) =>
             OrderBloc()..add(GetOrderOnTable(nameTable: nameTable)),
         child: BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
-          switch (state) {
-            case OrderInProgress():
+          switch (state.status) {
+            case OrderStatus.loading:
               return Center(
                   child: SpinKitCircle(
                       color: context.colorScheme.primary, size: 30));
-
-            case OrderFailure():
-              return Center(child: Text(state.error!));
-
-            case OrderSuccess():
-              var orders = state.orderModel as List<OrderModel>;
+            case OrderStatus.failure:
+              return Center(child: Text(state.message));
+            case OrderStatus.success:
               return GestureDetector(
                   onTap: () => context.push(RouteName.order, extra: nameTable),
                   child: Card(
@@ -267,15 +272,14 @@ class _ItemTable extends StatelessWidget {
                                   child: Text(nameTable!,
                                       style: context.textStyleSmall)),
                               FittedBox(
-                                  child: Text(orders.length.toString(),
+                                  child: Text(state.orders.length.toString(),
                                       style: context.textStyleLarge!.copyWith(
                                           color: context.colorScheme.secondary,
                                           fontWeight: FontWeight.bold))),
                               const SizedBox()
                             ])),
                   ));
-
-            case OrderInitial():
+            case OrderStatus.initial:
               return Center(
                   child: SpinKitCircle(
                       color: context.colorScheme.primary, size: 30));

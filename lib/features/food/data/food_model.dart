@@ -148,6 +148,6 @@ class FoodModel {
         'isImageCrop': food.isImageCrop,
         'price': food.price,
         'title': food.title,
-        'note': food.note
+        'note': food.note ?? ''
       };
 }

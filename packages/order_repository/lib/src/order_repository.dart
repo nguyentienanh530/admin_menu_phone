@@ -21,9 +21,35 @@ class OrderRepository {
     }
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> getHistoryOrder() {
+    try {
+      return _firebaseFirestore
+          .collection("AllOrder")
+          .where("isPay", isEqualTo: true)
+          .get();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getAllOrder() {
     try {
       return _firebaseFirestore.collection("AllOrder").snapshots();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllOrderWanting() {
+    try {
+      return _firebaseFirestore
+          .collection("AllOrder")
+          .where('isPay', isEqualTo: false)
+          .snapshots();
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {
@@ -43,7 +69,7 @@ class OrderRepository {
     }
   }
 
-  Future<void> deleteOrderItem(
+  Future<void> updateOrderItem(
       {required String idOrder,
       required List<Map<String, dynamic>> json,
       required num totalPrice}) async {
@@ -62,6 +88,19 @@ class OrderRepository {
   Future<void> deleteOrder({required String idOrder}) async {
     try {
       await _firebaseFirestore.collection('AllOrder').doc(idOrder).delete();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Future<void> paymentOrder({required String idOrder}) async {
+    try {
+      await _firebaseFirestore
+          .collection('AllOrder')
+          .doc(idOrder)
+          .update({'isPay': true, "datePay": DateTime.now().toString()});
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {

@@ -25,26 +25,25 @@ class OrderView extends StatelessWidget {
     return BlocBuilder<OrderBloc, OrderState>(
         buildWhen: (previous, current) => previous != current,
         builder: (context, state) {
-          switch (state) {
-            case OrderInProgress():
+          switch (state.status) {
+            case OrderStatus.loading:
               return Center(
                   child: SpinKitCircle(
                       color: context.colorScheme.primary, size: 30));
 
-            case OrderFailure():
-              return Center(child: Text(state.error!));
+            case OrderStatus.failure:
+              return Center(child: Text(state.message));
 
-            case OrderSuccess():
-              var orders = state.orderModel as List<OrderModel>;
-              if (orders.isEmpty) {
+            case OrderStatus.success:
+              if (state.orders.isEmpty) {
                 return const EmptyScreen();
               }
               return ListView.builder(
-                  itemCount: orders.length,
+                  itemCount: state.orders.length,
                   itemBuilder: (context, index) =>
-                      ExpandableListView(orderModel: orders[index]));
+                      ExpandableListView(orderModel: state.orders[index]));
 
-            case OrderInitial():
+            case OrderStatus.initial:
               return Center(
                   child: SpinKitCircle(
                       color: context.colorScheme.primary, size: 30));

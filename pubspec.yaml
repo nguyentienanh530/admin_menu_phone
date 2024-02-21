@@ -19,6 +19,8 @@ dependencies:
     path: packages/food_repository
   authentication_repository:
     path: packages/authentication_repository
+  category_repository:
+    path: packages/category_repository
   awesome_dialog: ^3.2.0
   equatable: ^2.0.5
   firebase_auth: ^4.16.0
@@ -41,6 +43,8 @@ dependencies:
   readmore: ^2.2.0
   flutter_slidable: ^3.0.1
   grouped_list: ^5.1.2
+  dotted_border: ^2.1.0
+  image_picker: ^1.0.7
   
   
 

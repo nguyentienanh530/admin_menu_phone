@@ -1,23 +1,17 @@
-import 'package:admin_menu_mobile/features/home/cubit/home_cubit.dart';
 import 'package:admin_menu_mobile/screens/home_screen/home_view.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
+  HomeScreen({super.key});
+  final PageController controller = PageController();
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (context) => IndexBottomBarCubit(),
-        child: BlocBuilder<IndexBottomBarCubit, int>(builder: (context, state) {
-          return Scaffold(
-              bottomNavigationBar: _buildBottomBar(context),
-              body: HomeView(indexBottomBar: state));
-        }));
+    return Scaffold(
+        bottomNavigationBar: _buildBottomBar(context),
+        body: HomeView(controller: controller));
   }
 
   Widget _buildBottomBar(BuildContext context) {
@@ -50,11 +44,13 @@ class HomeScreen extends StatelessWidget {
               title: "Hồ sơ")
         ],
         style: TabStyle.reactCircle,
-        elevation: 1,
         activeColor: context.colorScheme.primary,
-        shadowColor: context.colorScheme.shadow,
+        shadowColor: context.colorScheme.inversePrimary,
         backgroundColor: context.colorScheme.background,
-        onTap: (index) =>
-            context.read<IndexBottomBarCubit>().indexChanged(index));
+        top: -15,
+        curveSize: 60,
+        onTap: (index) {
+          controller.jumpToPage(index);
+        });
   }
 }

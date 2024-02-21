@@ -54,7 +54,9 @@ class OrderHistoryView extends StatelessWidget {
               child: Text(
                   '${Ultils.reverseDate(value)} - ${Ultils.currencyFormat(totalPrice)}',
                   textAlign: TextAlign.center,
-                  style: context.textStyleMedium));
+                  style: context.textStyleMedium!.copyWith(
+                      color: context.colorScheme.tertiary,
+                      fontWeight: FontWeight.bold)));
         },
         itemBuilder: (context, element) {
           return _buildItemListView(context, element);
@@ -63,55 +65,60 @@ class OrderHistoryView extends StatelessWidget {
 
   Widget _buildItemListView(BuildContext context, OrderModel? orderModel) {
     return Card(
-      child: Container(
-          padding: EdgeInsets.all(defaultPadding / 2),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CommonLineText(title: 'ID: ', value: orderModel!.id!),
-                      CommonLineText(title: 'Bàn: ', value: orderModel.table!),
-                      CommonLineText(
-                          title: 'Thời gian đặt: ',
-                          value: Ultils.formatDateTime(orderModel.dateOrder!)),
-                      CommonLineText(
-                          title: 'Thời thanh toán: ',
-                          value: Ultils.formatDateTime(orderModel.datePay!))
-                    ]),
-                Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CommonLineText(
-                          color: context.colorScheme.secondaryContainer,
-                          title: 'Tổng tiền: ',
-                          value: Ultils.currencyFormat(
-                              double.parse(orderModel.totalPrice!.toString()))),
-                      SizedBox(height: defaultPadding / 2),
-                      InkWell(
-                          onTap: () {
-                            context.push(RouteName.orderHistoryDetail);
-                            // Get.to<HistoryOrderDetail>(() => HistoryOrderDetail(
-                            //     idTable: orderModel.id.toString(),
-                            //     nameTable: orderModel.id));
-                          },
-                          child: Container(
-                              width: 80,
-                              height: 30,
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(3),
-                              decoration: BoxDecoration(
-                                  color: context.colorScheme.errorContainer,
-                                  borderRadius: BorderRadius.circular(
-                                      defaultBorderRadius)),
-                              child: FittedBox(
-                                  child: Text("Xem chi tiết",
-                                      style: context.textStyleSmall))))
-                    ])
-              ])),
-    );
+        child: Container(
+            padding: EdgeInsets.all(defaultPadding / 2),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CommonLineText(title: 'ID: ', value: orderModel!.id!),
+                        CommonLineText(
+                            title: 'Bàn: ', value: orderModel.table!),
+                        CommonLineText(
+                            title: 'Thời gian đặt: ',
+                            value:
+                                Ultils.formatDateTime(orderModel.dateOrder!)),
+                        CommonLineText(
+                            title: 'Thời thanh toán: ',
+                            value: Ultils.formatDateTime(orderModel.datePay!))
+                      ]),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CommonLineText(
+                            color: context.colorScheme.secondaryContainer,
+                            title: 'Tổng tiền: ',
+                            valueStyle: context.textStyleMedium!.copyWith(
+                                color: context.colorScheme.secondary,
+                                fontWeight: FontWeight.bold),
+                            value: Ultils.currencyFormat(double.parse(
+                                orderModel.totalPrice!.toString()))),
+                        SizedBox(height: defaultPadding / 2),
+                        InkWell(
+                            onTap: () {
+                              context.push(RouteName.orderHistoryDetail,
+                                  extra: orderModel.id);
+                              // Get.to<HistoryOrderDetail>(() => HistoryOrderDetail(
+                              //     idTable: orderModel.id.toString(),
+                              //     nameTable: orderModel.id));
+                            },
+                            child: Container(
+                                width: 80,
+                                height: 30,
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                    color: context.colorScheme.errorContainer,
+                                    borderRadius: BorderRadius.circular(
+                                        defaultBorderRadius)),
+                                child: FittedBox(
+                                    child: Text("Xem chi tiết",
+                                        style: context.textStyleSmall))))
+                      ])
+                ])));
   }
 }

@@ -40,9 +40,7 @@ final router = GoRouter(
       return RouteName.login;
     },
     routes: [
-      GoRoute(
-          path: RouteName.home,
-          builder: (context, state) => const HomeScreen()),
+      GoRoute(path: RouteName.home, builder: (context, state) => HomeScreen()),
       GoRoute(
           path: RouteName.login,
           builder: (context, state) => const LoginScreen()),
@@ -77,7 +75,7 @@ final router = GoRouter(
       GoRoute(
           path: RouteName.orderHistoryDetail,
           builder: (context, state) {
-            // final String idOrder = GoRouterState.of(context).extra as String;
-            return const OrderHistoryDetailScreen();
+            final String idOrder = GoRouterState.of(context).extra as String;
+            return OrderHistoryDetailScreen(idOrder: idOrder);
           })
     ]);

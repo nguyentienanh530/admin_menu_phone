@@ -1,6 +1,4 @@
-import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
-import 'package:admin_menu_mobile/features/order/dtos/food_dto.dart';
 import 'package:admin_menu_mobile/features/search_food/cubit/text_search_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -94,39 +92,31 @@ class AfterSearchUI extends StatelessWidget {
   const AfterSearchUI({super.key, this.text});
   @override
   Widget build(BuildContext context) {
+    var loadingOrInitState = Center(
+        child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
     return BlocProvider(
         create: (context) => FoodBloc()..add(GetFoods()),
         child: BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
-          switch (state) {
-            case FoodInProgress():
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-
-            case FoodFailue():
-              return Center(child: Text(state.error));
-
-            case FoodSuccess():
-              return ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: state.foods.length,
-                  itemBuilder: (context, i) {
-                    if (state.foods[i].title
-                            .toString()
-                            .toLowerCase()
-                            .contains(text!.toLowerCase()) ||
-                        TiengViet.parse(
-                                state.foods[i].title.toString().toLowerCase())
-                            .contains(text!.toLowerCase())) {
-                      return _buildItemSearch(context, state.foods[i]);
-                    }
-                    return const SizedBox();
-                  });
-            case FoodInitial():
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-          }
+          return (switch (state.status) {
+            FoodStatus.loading => loadingOrInitState,
+            FoodStatus.initial => loadingOrInitState,
+            FoodStatus.failure => Center(child: Text(state.error)),
+            FoodStatus.success => ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: state.foods.length,
+                itemBuilder: (context, i) {
+                  if (state.foods[i].title
+                          .toString()
+                          .toLowerCase()
+                          .contains(text!.toLowerCase()) ||
+                      TiengViet.parse(
+                              state.foods[i].title.toString().toLowerCase())
+                          .contains(text!.toLowerCase())) {
+                    return _buildItemSearch(context, state.foods[i]);
+                  }
+                  return const SizedBox();
+                })
+          });
         }));
   }
 

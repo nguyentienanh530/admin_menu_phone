@@ -20,13 +20,10 @@ class DashboardView extends StatefulWidget {
 class _MyWidgetState extends State<DashboardView>
     with AutomaticKeepAliveClientMixin {
   @override
-  bool get wantKeepAlive => true;
-  @override
   Widget build(BuildContext context) {
     super.build(context);
-    return SafeArea(
-        child: SingleChildScrollView(
-            child: Column(children: [
+    return SingleChildScrollView(
+        child: Column(children: [
       Padding(
           padding: EdgeInsets.only(
               left: defaultPadding, right: defaultPadding, top: defaultPadding),
@@ -43,7 +40,7 @@ class _MyWidgetState extends State<DashboardView>
       _buildTitle(context),
       Padding(
           padding: EdgeInsets.all(defaultPadding), child: const _ListTable())
-    ])));
+    ]));
   }
 
   Widget _buildTitle(BuildContext context) {
@@ -83,30 +80,22 @@ class _MyWidgetState extends State<DashboardView>
   }
 
   Widget _buildFoods() {
+    var loadingOrInitState = Center(
+        child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
     return BlocProvider(
         create: (context) => FoodBloc()..add(GetFoods()),
         child: BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
-          switch (state) {
-            case FoodInProgress():
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-
-            case FoodFailue():
-              return Center(child: Text(state.error));
-
-            case FoodSuccess():
-              return _buidItemDashBoard(context,
+          return (switch (state.status) {
+            FoodStatus.loading => loadingOrInitState,
+            FoodStatus.initial => loadingOrInitState,
+            FoodStatus.failure => Center(child: Text(state.error)),
+            FoodStatus.success => _buidItemDashBoard(context,
                   title: "Số lượng",
                   title2: "Món",
                   value: state.foods.length, onTap: () {
                 context.push(RouteName.searchFood);
-              });
-            case FoodInitial():
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-          }
+              })
+          });
         }));
   }
 
@@ -183,6 +172,9 @@ class _MyWidgetState extends State<DashboardView>
                         .fadeIn(
                             curve: Curves.easeInOutCubic, duration: 500.ms)))));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class ChartPaymentToDay extends StatelessWidget {

@@ -7,12 +7,15 @@ import 'package:flutter/material.dart';
 import '../order_history_screen/order_history_screen.dart';
 
 class HomeView extends StatelessWidget {
-  HomeView({super.key, this.indexBottomBar});
-  final int? indexBottomBar;
+  HomeView({super.key, required this.controller});
 
+  final PageController controller;
   @override
   Widget build(BuildContext context) {
-    return PageView(children: [_widgetOptions[indexBottomBar!]]);
+    return PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: controller,
+        children: _widgetOptions);
   }
 
   final List<Widget> _widgetOptions = [

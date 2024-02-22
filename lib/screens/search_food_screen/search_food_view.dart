@@ -49,50 +49,21 @@ class SearchFoodView extends StatelessWidget {
               _searchController.clear();
             }),
         prefixIcon: const Icon(Icons.search));
-
-    // TextFormField(
-    //     // controller: controller,
-    //     onChanged: (value) {
-    //       // _.textValue.value = value;
-
-    //       // context.read<SearchBloc>().setSearchText(value);
-    //       // context.read<SearchBloc>().getData();
-    //     },
-    //     style: context.textStyleSmall,
-    //     decoration: InputDecoration(
-    //         border: InputBorder.none,
-    //         prefixIcon: const Icon(Icons.search),
-    //         hintText: "Tìm kiếm",
-    //         hintStyle: context.textStyleSmall,
-    //         suffixIcon: IconButton(
-    //             icon: const Icon(Icons.close),
-    //             onPressed: () {
-    //               // _.textValue.value = '';
-    //               // controller.clear();
-
-    //               // searchCtrl.saerchInitialize();
-    //             })),
-    //     textInputAction: TextInputAction.search,
-    //     onFieldSubmitted: (value) {
-    //       if (value == '') {
-    //         // Get.snackbar('Thông báo', 'trống').show();
-    //       } else {
-    //         // searchCtrl.setSearchText(value);
-    //         // context
-    //         //     .read<SearchBloc>()
-    //         //     .addToSearchList(value);
-    //         // context.read<SearchBloc>().getData();
-    //       }
-    //     });
   }
 }
 
-class AfterSearchUI extends StatelessWidget {
+class AfterSearchUI extends StatefulWidget {
+  const AfterSearchUI({super.key, this.text});
   final String? text;
 
-  const AfterSearchUI({super.key, this.text});
+  @override
+  State<AfterSearchUI> createState() => _AfterSearchUIState();
+}
+
+class _AfterSearchUIState extends State<AfterSearchUI> {
   @override
   Widget build(BuildContext context) {
+    var text = widget.text;
     var loadingOrInitState = Center(
         child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
     return BlocProvider(
@@ -112,7 +83,7 @@ class AfterSearchUI extends StatelessWidget {
                           .contains(text!.toLowerCase()) ||
                       TiengViet.parse(
                               state.foods[i].title.toString().toLowerCase())
-                          .contains(text!.toLowerCase())) {
+                          .contains(text.toLowerCase())) {
                     return _buildItemSearch(context, state.foods[i]);
                   }
                   return const SizedBox();
@@ -124,7 +95,9 @@ class AfterSearchUI extends StatelessWidget {
   Widget _buildItemSearch(BuildContext context, FoodModel food) {
     return InkWell(
         onTap: () {
-          context.push(RouteName.foodDetail, extra: food);
+          context.push(RouteName.foodDetail, extra: food).then((value) {
+            context.read<FoodBloc>().add(GetFoods());
+          });
         },
         child: Padding(
             padding: EdgeInsets.symmetric(

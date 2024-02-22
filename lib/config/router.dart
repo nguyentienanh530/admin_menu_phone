@@ -6,6 +6,7 @@ import 'package:admin_menu_mobile/screens/order_history_detail_screen/order_hist
 import 'package:admin_menu_mobile/screens/order_screen/order_screen.dart';
 import 'package:admin_menu_mobile/screens/search_food_screen/search_food_screen.dart';
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
+import 'package:admin_menu_mobile/screens/update_food_screen/update_food_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,6 +26,7 @@ class RouteName {
   static const String orderDetail = '/orderDetail';
   static const String addFood = '/addFood';
   static const String orderHistoryDetail = '/orderHistoryDetail';
+  static const String updateFood = '/updateFood';
 
   static const publicRoutes = [login, register];
 }
@@ -77,5 +79,12 @@ final router = GoRouter(
           builder: (context, state) {
             final String idOrder = GoRouterState.of(context).extra as String;
             return OrderHistoryDetailScreen(idOrder: idOrder);
+          }),
+      GoRoute(
+          path: RouteName.updateFood,
+          builder: (context, state) {
+            final FoodModel foodModel =
+                GoRouterState.of(context).extra as FoodModel;
+            return UpdateFoodScreen(foodModel: foodModel);
           })
     ]);

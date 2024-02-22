@@ -316,7 +316,7 @@ class _AddFoodButton extends StatelessWidget {
           orderModel.foods!.add(newFood);
           lstFood.addAll(orderModel.foods!.map((e) {
             totalBill = totalBill + e.totalPrice!;
-            return FoodModel().toJson(e);
+            return FoodDto().toJson(e);
           }).toList());
 
           context.read<OrderBloc>().add(UpdateFoodInOrder(

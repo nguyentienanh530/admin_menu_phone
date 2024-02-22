@@ -30,6 +30,7 @@ class CommonTextField extends StatelessWidget {
         validator: validator,
         textAlignVertical: TextAlignVertical.center,
         key: key,
+        maxLines: null,
         style: context.textStyleSmall,
         textAlign: TextAlign.start,
         keyboardType: keyboardType ?? TextInputType.text,

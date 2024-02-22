@@ -39,7 +39,6 @@ class LoginView extends StatelessWidget {
                             title: AppText.errorTitle,
                             desc: state.errorMessage, btnCancelOnPress: () {
                           context.read<LoginCubit>().resetStatus();
-
                           context.pop();
                         });
                         break;

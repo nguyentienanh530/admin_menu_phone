@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'dart:io';
-
+import 'dart:math';
 import 'package:admin_menu_mobile/features/food/data/food_repo.dart';
 import 'package:admin_menu_mobile/utils/contants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_repository/food_repository.dart';
 import 'package:formz/formz.dart';
@@ -27,6 +27,15 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     on<DescriptionFoodChanged>(_desctriptionChanged);
     on<IsDiscountFoodChanged>(_isDisountChanged);
     on<DiscountFoodChanged>(_discountFoodChanged);
+    on<PriceFoodChanged>(_priceFoodChanged);
+    on<SubmitCreateFood>(_handleCreateFood);
+    on<ResetData>(_resetData);
+    on<DeleteFood>(_deleteFood);
+    on<ImageChanged>(_imageChanged);
+    on<Image1Changed>(_image1Changed);
+    on<Image2Changed>(_image2Changed);
+    on<Image3Changed>(_image3Changed);
+    on<UpdateFood>(_updateFood);
   }
 
   FutureOr<void> _fetchFoods(GetFoods event, Emitter<FoodState> emit) async {
@@ -39,6 +48,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
       emit(state.copyWith(status: FoodStatus.success, foods: foods));
     } catch (e) {
       emit(state.copyWith(status: FoodStatus.failure, error: e.toString()));
+      logger.e(e);
     }
   }
 
@@ -51,10 +61,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     var imagepicked = await imagePicker.pickImage(
         source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
     if (imagepicked != null) {
-      emit(state.copyWith(
-          status: FoodStatus.success,
-          imageFile: File(imagepicked.path),
-          imageName: File(imagepicked.path).path));
+      emit(state.copyWith(imageFile: File(imagepicked.path)));
     } else {
       logger.d('No image selected!');
     }
@@ -65,24 +72,36 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     final nameFood = NameFood.dirty(event.nameFood);
     emit(state.copyWith(
         nameFood: nameFood,
-        isValid:
-            Formz.validate([nameFood, state.discount, state.description]) &&
-                state.imageFile != null &&
-                state.imageGallery1 != null &&
-                state.imageGallery2 != null &&
-                state.imageGallery3 != null));
+        isValid: state.isDiscount
+            ? Formz.validate(
+                [nameFood, state.discount, state.description, state.priceFood])
+            : Formz.validate([nameFood, state.description, state.priceFood])));
+  }
+
+  FutureOr<void> _priceFoodChanged(
+      PriceFoodChanged event, Emitter<FoodState> emit) {
+    final price = PriceFood.dirty(event.priceFood);
+    emit(state.copyWith(
+        priceFood: price,
+        isValid: state.isDiscount
+            ? Formz.validate(
+                [state.nameFood, state.discount, state.description, price])
+            : Formz.validate([state.nameFood, state.description, price])));
   }
 
   FutureOr<void> _categoryChanged(
       CategoryFoodChanged event, Emitter<FoodState> emit) {
     emit(state.copyWith(
         category: event.category,
-        isValid: Formz.validate(
-                [state.discount, state.description, state.nameFood]) &&
-            state.imageFile != null &&
-            state.imageGallery1 != null &&
-            state.imageGallery2 != null &&
-            state.imageGallery3 != null));
+        isValid: state.isDiscount
+            ? Formz.validate([
+                state.discount,
+                state.description,
+                state.nameFood,
+                state.priceFood
+              ])
+            : Formz.validate(
+                [state.description, state.nameFood, state.priceFood])));
   }
 
   FutureOr<void> _desctriptionChanged(
@@ -90,12 +109,15 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     final descriptionFood = DescriptionFood.dirty(event.description);
     emit(state.copyWith(
         description: descriptionFood,
-        isValid:
-            Formz.validate([state.discount, descriptionFood, state.nameFood]) &&
-                state.imageFile != null &&
-                state.imageGallery1 != null &&
-                state.imageGallery2 != null &&
-                state.imageGallery3 != null));
+        isValid: state.isDiscount
+            ? Formz.validate([
+                state.discount,
+                descriptionFood,
+                state.nameFood,
+                state.priceFood
+              ])
+            : Formz.validate(
+                [descriptionFood, state.nameFood, state.priceFood])));
   }
 
   FutureOr<void> _pickImageFoodGallery1(
@@ -104,16 +126,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     var imagepicked = await imagePicker.pickImage(
         source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
     if (imagepicked != null) {
-      emit(state.copyWith(
-          isValid: Formz.validate(
-                  [state.discount, state.description, state.nameFood]) &&
-              state.imageFile != null &&
-              state.imageGallery1 != null &&
-              state.imageGallery2 != null &&
-              state.imageGallery3 != null,
-          status: FoodStatus.success,
-          imageGallery1: File(imagepicked.path),
-          imageNameGallery1: File(imagepicked.path).path));
+      emit(state.copyWith(imageGallery1: File(imagepicked.path)));
     } else {
       logger.d('No image selected!');
     }
@@ -125,16 +138,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     var imagepicked = await imagePicker.pickImage(
         source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
     if (imagepicked != null) {
-      emit(state.copyWith(
-          isValid: Formz.validate(
-                  [state.discount, state.description, state.nameFood]) &&
-              state.imageFile != null &&
-              state.imageGallery1 != null &&
-              state.imageGallery2 != null &&
-              state.imageGallery3 != null,
-          status: FoodStatus.success,
-          imageGallery2: File(imagepicked.path),
-          imageNameGallery2: File(imagepicked.path).path));
+      emit(state.copyWith(imageGallery2: File(imagepicked.path)));
     } else {
       logger.d('No image selected!');
     }
@@ -146,16 +150,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     var imagepicked = await imagePicker.pickImage(
         source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
     if (imagepicked != null) {
-      emit(state.copyWith(
-          isValid: Formz.validate(
-                  [state.discount, state.description, state.nameFood]) &&
-              state.imageFile != null &&
-              state.imageGallery1 != null &&
-              state.imageGallery2 != null &&
-              state.imageGallery3 != null,
-          status: FoodStatus.success,
-          imageGallery3: File(imagepicked.path),
-          imageNameGallery3: File(imagepicked.path).path));
+      emit(state.copyWith(imageGallery3: File(imagepicked.path)));
     } else {
       logger.d('No image selected!');
     }
@@ -164,14 +159,16 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
   FutureOr<void> _isDisountChanged(
       IsDiscountFoodChanged event, Emitter<FoodState> emit) {
     emit(state.copyWith(
-      isDiscount: event.isDiscount,
-      isValid:
-          Formz.validate([state.discount, state.description, state.nameFood]) &&
-              state.imageFile != null &&
-              state.imageGallery1 != null &&
-              state.imageGallery2 != null &&
-              state.imageGallery3 != null,
-    ));
+        isDiscount: event.isDiscount,
+        isValid: event.isDiscount
+            ? Formz.validate([
+                state.discount,
+                state.description,
+                state.nameFood,
+                state.priceFood
+              ])
+            : Formz.validate(
+                [state.description, state.nameFood, state.priceFood])));
   }
 
   FutureOr<void> _discountFoodChanged(
@@ -179,12 +176,201 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     final discountFood = DiscountFood.dirty(event.discount);
     emit(state.copyWith(
         discount: discountFood,
-        isValid:
-            Formz.validate([discountFood, state.description, state.nameFood]) &&
-                state.imageFile != null &&
-                state.imageGallery1 != null &&
-                state.imageGallery2 != null &&
-                state.imageGallery3 != null));
+        isValid: state.isDiscount
+            ? Formz.validate([
+                discountFood,
+                state.description,
+                state.nameFood,
+                state.priceFood
+              ])
+            : Formz.validate(
+                [state.description, state.nameFood, state.priceFood])));
     logger.d(state.isValid);
+  }
+
+  FutureOr<String> _uploadImageFood() async {
+    var image = '';
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"0"');
+    UploadTask uploadTask = storageReference.putFile(state.imageFile!);
+    await uploadTask.whenComplete(() async {
+      var url = await storageReference.getDownloadURL();
+      image = url.toString();
+    });
+    return image;
+  }
+
+  FutureOr<String> _uploadImageFoodGallery1() async {
+    var image = '';
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"1"');
+    UploadTask uploadTask = storageReference.putFile(state.imageGallery1!);
+    await uploadTask.whenComplete(() async {
+      var url = await storageReference.getDownloadURL();
+      image = url.toString();
+    });
+    return image;
+  }
+
+  FutureOr<String> _uploadImageFoodGallery2() async {
+    var image = '';
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"2"');
+    UploadTask uploadTask = storageReference.putFile(state.imageGallery2!);
+    await uploadTask.whenComplete(() async {
+      var url = await storageReference.getDownloadURL();
+      image = url.toString();
+    });
+    return image;
+  }
+
+  FutureOr<String> _uploadImageFoodGallery3() async {
+    var image = '';
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"3"');
+    UploadTask uploadTask = storageReference.putFile(state.imageGallery3!);
+    await uploadTask.whenComplete(() async {
+      var url = await storageReference.getDownloadURL();
+      image = url.toString();
+    });
+    return image;
+  }
+
+  FutureOr<void> _handleCreateFood(
+      SubmitCreateFood event, Emitter<FoodState> emit) async {
+    emit(state.copyWith(status: FoodStatus.loading));
+    try {
+      var imageFood = await _uploadImageFood();
+      var imageGallery1 = await _uploadImageFoodGallery1();
+      var imageGallery2 = await _uploadImageFoodGallery2();
+      var imageGallery3 = await _uploadImageFoodGallery3();
+      emit(state.copyWith(
+          imageFood: imageFood,
+          imageFood1: imageGallery1,
+          imageFood2: imageGallery2,
+          imageFood3: imageGallery3));
+      var dataFood = {
+        "category": state.category,
+        "date": Timestamp.fromDate(DateTime.now()),
+        "description": state.description.value,
+        "id": DateTime.now().toString(),
+        "image": imageFood,
+        "isImageCrop": true,
+        "isDiscount": state.isDiscount,
+        "discount": state.isDiscount ? int.parse(state.discount.value) : 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'count': 0,
+        "price": int.parse(state.priceFood.value),
+        "title": state.nameFood.value,
+        'photoGallery': [imageGallery1, imageGallery2, imageGallery3],
+        "ratting": 4.5
+      };
+      await FoodRepo(
+              foodRepository:
+                  FoodRepository(firebaseFirestore: FirebaseFirestore.instance))
+          .createFood(dataFood)
+          .then((value) async {
+        await FoodRepo(
+                foodRepository: FoodRepository(
+                    firebaseFirestore: FirebaseFirestore.instance))
+            .updateFood(idFood: value.id, data: {'id': value.id});
+      }).whenComplete(() {
+        emit(state.copyWith(status: FoodStatus.success));
+      });
+    } catch (e) {
+      emit(state.copyWith(status: FoodStatus.failure, error: e.toString()));
+    }
+  }
+
+  FutureOr<void> _resetData(ResetData event, Emitter<FoodState> emit) {
+    emit(const FoodState());
+  }
+
+  FutureOr<void> _deleteFood(DeleteFood event, Emitter<FoodState> emit) async {
+    emit(state.copyWith(status: FoodStatus.loading));
+    try {
+      await FoodRepo(
+              foodRepository:
+                  FoodRepository(firebaseFirestore: FirebaseFirestore.instance))
+          .deleteFood(idFood: event.idFood);
+      emit(state.copyWith(status: FoodStatus.success));
+    } catch (e) {
+      emit(state.copyWith(status: FoodStatus.failure, error: e.toString()));
+    }
+  }
+
+  FutureOr<void> _imageChanged(ImageChanged event, Emitter<FoodState> emit) {
+    emit(state.copyWith(imageFood: event.image));
+  }
+
+  FutureOr<void> _image1Changed(Image1Changed event, Emitter<FoodState> emit) {
+    emit(state.copyWith(imageFood1: event.image));
+  }
+
+  FutureOr<void> _image2Changed(Image2Changed event, Emitter<FoodState> emit) {
+    emit(state.copyWith(imageFood2: event.image));
+  }
+
+  FutureOr<void> _image3Changed(Image3Changed event, Emitter<FoodState> emit) {
+    emit(state.copyWith(imageFood3: event.image));
+  }
+
+  FutureOr<void> _updateFood(UpdateFood event, Emitter<FoodState> emit) async {
+    emit(state.copyWith(status: FoodStatus.loading));
+    var imageFood = '';
+    var imageGallery1 = '';
+    var imageGallery2 = '';
+    var imageGallery3 = '';
+    try {
+      if (state.imageFile == null) {
+        imageFood = state.imageFood;
+      } else {
+        imageFood = await _uploadImageFood();
+      }
+      if (state.imageGallery1 == null) {
+        imageGallery1 = state.imageFood1;
+      } else {
+        imageGallery1 = await _uploadImageFoodGallery1();
+      }
+      if (state.imageGallery2 == null) {
+        imageGallery2 = state.imageFood2;
+      } else {
+        imageGallery2 = await _uploadImageFoodGallery2();
+      }
+      if (state.imageGallery3 == null) {
+        imageGallery3 = state.imageFood3;
+      } else {
+        imageGallery3 = await _uploadImageFoodGallery3();
+      }
+
+      emit(state.copyWith(
+          imageFood: imageFood,
+          imageFood1: imageGallery1,
+          imageFood2: imageGallery2,
+          imageFood3: imageGallery3));
+      var dataFood = {
+        "category": state.category,
+        "date": Timestamp.fromDate(DateTime.now()),
+        "description": state.description.value,
+        "id": DateTime.now().toString(),
+        "image": imageFood,
+        "isImageCrop": true,
+        "isDiscount": state.isDiscount,
+        "discount": state.isDiscount ? int.parse(state.discount.value) : 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'count': 0,
+        "price": int.parse(state.priceFood.value),
+        "title": state.nameFood.value,
+        'photoGallery': [imageGallery1, imageGallery2, imageGallery3],
+        "ratting": 4.5
+      };
+      await FoodRepo(
+              foodRepository:
+                  FoodRepository(firebaseFirestore: FirebaseFirestore.instance))
+          .updateFood(idFood: event.idFood, data: dataFood);
+      emit(state.copyWith(status: FoodStatus.success));
+    } catch (e) {
+      emit(state.copyWith(status: FoodStatus.failure, error: e.toString()));
+    }
   }
 }

@@ -8,25 +8,66 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
-import 'package:admin_menu_mobile/features/category/dtos/category_model.dart';
-import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
+import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:admin_menu_mobile/utils/app_alerts.dart';
-import 'package:admin_menu_mobile/widgets/common_text_field.dart';
+import 'package:admin_menu_mobile/utils/utils.dart';
 
-import '../../utils/utils.dart';
+import '../../features/category/bloc/category_bloc.dart';
+import '../../features/category/dtos/category_model.dart';
+import '../../features/food/bloc/food_bloc.dart';
+import '../../widgets/widgets.dart';
 
-class CreateFoodView extends StatelessWidget {
-  CreateFoodView({super.key});
+class UpdateFoodView extends StatefulWidget {
+  const UpdateFoodView({super.key, required this.foodModel});
+  final FoodModel foodModel;
+
+  @override
+  State<UpdateFoodView> createState() => _UpdateFoodViewState();
+}
+
+class _UpdateFoodViewState extends State<UpdateFoodView> {
   final TextEditingController _disController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceCtrl = TextEditingController();
   final TextEditingController _discountController = TextEditingController();
-  void reset() {
-    _disController.clear();
-    _nameController.clear();
-    _priceCtrl.clear();
-    _discountController.clear();
+
+  @override
+  void initState() {
+    _disController.text = widget.foodModel.description!;
+    _nameController.text = widget.foodModel.title!;
+    _priceCtrl.text = widget.foodModel.price.toString();
+    _discountController.text = widget.foodModel.discount.toString();
+    context
+        .read<FoodBloc>()
+        .add(NameFoodChanged(nameFood: widget.foodModel.title ?? ''));
+    context
+        .read<FoodBloc>()
+        .add(PriceFoodChanged(priceFood: widget.foodModel.price.toString()));
+    context.read<FoodBloc>().add(DescriptionFoodChanged(
+        description: widget.foodModel.description ?? ''));
+    context.read<FoodBloc>().add(
+        DiscountFoodChanged(discount: widget.foodModel.discount.toString()));
+    context
+        .read<FoodBloc>()
+        .add(Image3Changed(image: widget.foodModel.photoGallery![2]));
+    if (widget.foodModel.photoGallery == null ||
+        widget.foodModel.photoGallery!.isEmpty) {
+      logger.d('null');
+    } else {
+      logger.d(' k null');
+      logger.d(widget.foodModel.photoGallery);
+      context
+          .read<FoodBloc>()
+          .add(Image1Changed(image: widget.foodModel.photoGallery![0]));
+      context
+          .read<FoodBloc>()
+          .add(Image2Changed(image: widget.foodModel.photoGallery![1]));
+      context
+          .read<FoodBloc>()
+          .add(Image3Changed(image: widget.foodModel.photoGallery![2]));
+    }
+
+    super.initState();
   }
 
   @override
@@ -53,7 +94,7 @@ class CreateFoodView extends StatelessWidget {
                     title: AppText.success,
                     desc: 'Tạo món thành công', btnOkOnPress: () {
                   context.read<FoodBloc>().add(ResetData());
-                  reset();
+                  // reset();
                   context.pop();
                 });
                 break;
@@ -145,11 +186,7 @@ class _ButtonCreateFood extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
-      return state.isValid &&
-              state.imageFile != null &&
-              state.imageGallery1 != null &&
-              state.imageGallery2 != null &&
-              state.imageGallery3 != null
+      return state.isValid
           ? Center(
               child: FilledButton.icon(
                   icon: const Icon(Icons.library_add_rounded),
@@ -229,6 +266,7 @@ class _PhotoGallery extends StatelessWidget {
             child: _buildImageGallery(
                 context: context,
                 imageFile: state.imageGallery1,
+                image: state.imageFood1,
                 onTap: () =>
                     context.read<FoodBloc>().add(PickImageFoodGallery1()))),
         SizedBox(width: defaultPadding / 2),
@@ -236,6 +274,7 @@ class _PhotoGallery extends StatelessWidget {
             child: _buildImageGallery(
                 context: context,
                 imageFile: state.imageGallery2,
+                image: state.imageFood2,
                 onTap: () =>
                     context.read<FoodBloc>().add(PickImageFoodGallery2()))),
         SizedBox(width: defaultPadding / 2),
@@ -243,6 +282,7 @@ class _PhotoGallery extends StatelessWidget {
             child: _buildImageGallery(
                 context: context,
                 imageFile: state.imageGallery3,
+                image: state.imageFood3,
                 onTap: () =>
                     context.read<FoodBloc>().add(PickImageFoodGallery3())))
       ]);
@@ -250,24 +290,14 @@ class _PhotoGallery extends StatelessWidget {
   }
 
   Widget _buildImageGallery(
-      {required BuildContext context, File? imageFile, Function()? onTap}) {
+      {required BuildContext context,
+      File? imageFile,
+      Function()? onTap,
+      String? image}) {
     return GestureDetector(
         onTap: onTap,
         child: imageFile == null
-            ? Container(
-                height: context.sizeDevice.height * 0.15,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(defaultBorderRadius)),
-                child: DottedBorder(
-                    dashPattern: const [6, 6],
-                    color: context.colorScheme.secondary,
-                    strokeWidth: 1,
-                    padding: EdgeInsets.all(defaultPadding),
-                    radius: Radius.circular(defaultBorderRadius),
-                    borderType: BorderType.RRect,
-                    child: Center(
-                        child: Icon(Icons.add,
-                            size: 40, color: context.colorScheme.secondary))))
+            ? _buildImage(context, image!)
             : Container(
                 height: context.sizeDevice.height * 0.15,
                 decoration: BoxDecoration(
@@ -275,70 +305,97 @@ class _PhotoGallery extends StatelessWidget {
                     image: DecorationImage(
                         image: FileImage(imageFile), fit: BoxFit.fill))));
   }
+
+  Widget _buildImage(BuildContext context, String image) {
+    return image == ''
+        ? Container(
+            height: context.sizeDevice.height * 0.15,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(defaultBorderRadius)),
+            child: DottedBorder(
+                dashPattern: const [6, 6],
+                color: context.colorScheme.secondary,
+                strokeWidth: 1,
+                padding: EdgeInsets.all(defaultPadding),
+                radius: Radius.circular(defaultBorderRadius),
+                borderType: BorderType.RRect,
+                child: Center(
+                    child: Icon(Icons.add,
+                        size: 40, color: context.colorScheme.secondary))))
+        : Container(
+            height: context.sizeDevice.height * 0.15,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(defaultBorderRadius),
+                image: DecorationImage(
+                    image: NetworkImage(image), fit: BoxFit.cover)),
+          );
+  }
 }
 
 class _ImageFood extends StatelessWidget {
-  const _ImageFood({Key? key}) : super(key: key);
-
+  const _ImageFood();
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FoodBloc, FoodState>(
-        buildWhen: (previous, current) =>
-            previous.imageFile != current.imageFile,
-        builder: (context, state) {
-          logger.d(state.imageFile);
+    return BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
+      return GestureDetector(
+          onTap: () {
+            context.read<FoodBloc>().add(PickImageFood());
+          },
+          child: state.imageFile == null
+              ? _buildImage(context, state.imageFood)
+              : Container(
+                  height: 155,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(defaultBorderRadius),
+                      image: DecorationImage(
+                          image: FileImage(state.imageFile!),
+                          fit: BoxFit.cover)),
+                ));
+    });
+  }
 
-          return GestureDetector(
-              onTap: () {
-                context.read<FoodBloc>().add(PickImageFood());
-              },
-              child: state.imageFile == null
-                  ? Container(
-                      height: 155,
-                      decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(defaultBorderRadius)),
-                      child: DottedBorder(
-                          dashPattern: const [6, 6],
-                          color: context.colorScheme.secondary,
-                          strokeWidth: 1,
-                          radius: Radius.circular(defaultBorderRadius),
-                          borderType: BorderType.RRect,
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Align(
-                                    alignment: Alignment.topCenter,
-                                    child: Container(
-                                        height: 48,
-                                        width: 48,
-                                        decoration: BoxDecoration(
-                                            color: context.colorScheme.primary,
-                                            border: Border.all(
-                                                color:
-                                                    context.colorScheme.primary,
-                                                width: 1),
-                                            borderRadius: BorderRadius.circular(
-                                                defaultBorderRadius)),
-                                        child: Icon(Icons.add,
-                                            color: context
-                                                .colorScheme.secondary))),
-                                SizedBox(height: defaultPadding / 2),
-                                Text("Hình ảnh món ăn",
-                                    style: context.textStyleSmall)
-                              ])))
-                  : Container(
-                      height: 155,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(defaultBorderRadius),
-                          image: DecorationImage(
-                              image: FileImage(state.imageFile!),
-                              fit: BoxFit.cover)),
-                    ));
-        });
+  Widget _buildImage(BuildContext context, String image) {
+    return image == ''
+        ? Container(
+            height: 155,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(defaultBorderRadius)),
+            child: DottedBorder(
+                dashPattern: const [6, 6],
+                color: context.colorScheme.secondary,
+                strokeWidth: 1,
+                radius: Radius.circular(defaultBorderRadius),
+                borderType: BorderType.RRect,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                              height: 48,
+                              width: 48,
+                              decoration: BoxDecoration(
+                                  color: context.colorScheme.primary,
+                                  border: Border.all(
+                                      color: context.colorScheme.primary,
+                                      width: 1),
+                                  borderRadius: BorderRadius.circular(
+                                      defaultBorderRadius)),
+                              child: Icon(Icons.add,
+                                  color: context.colorScheme.secondary))),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Hình ảnh món ăn", style: context.textStyleSmall)
+                    ])))
+        : Container(
+            height: 155,
+            width: double.infinity,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(defaultBorderRadius),
+                image: DecorationImage(
+                    image: NetworkImage(image), fit: BoxFit.cover)),
+          );
   }
 }
 

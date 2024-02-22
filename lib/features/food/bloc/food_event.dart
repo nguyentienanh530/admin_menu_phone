@@ -46,3 +46,49 @@ final class DiscountFoodChanged extends FoodEvent {
 
   const DiscountFoodChanged({required this.discount});
 }
+
+final class SubmitCreateFood extends FoodEvent {}
+
+final class PriceFoodChanged extends FoodEvent {
+  final String priceFood;
+
+  const PriceFoodChanged({required this.priceFood});
+}
+
+final class ResetData extends FoodEvent {}
+
+final class DeleteFood extends FoodEvent {
+  final String idFood;
+
+  const DeleteFood({required this.idFood});
+}
+
+final class ImageChanged extends FoodEvent {
+  final String image;
+
+  const ImageChanged({required this.image});
+}
+
+final class Image1Changed extends FoodEvent {
+  final String image;
+
+  const Image1Changed({required this.image});
+}
+
+final class Image2Changed extends FoodEvent {
+  final String image;
+
+  const Image2Changed({required this.image});
+}
+
+final class Image3Changed extends FoodEvent {
+  final String image;
+
+  const Image3Changed({required this.image});
+}
+
+final class UpdateFood extends FoodEvent {
+  final String idFood;
+
+  const UpdateFood({required this.idFood});
+}

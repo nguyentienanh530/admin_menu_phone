@@ -118,21 +118,22 @@ class AppAlerts {
         context: context,
         barrierDismissible: false,
         builder: (_) => Center(
-            child: Container(
-                height: context.sizeDevice.height * 0.2,
-                width: context.sizeDevice.height * 0.2,
-                decoration: BoxDecoration(
-                    color: context.colorScheme.secondary,
-                    borderRadius: BorderRadius.circular(defaultBorderRadius)),
-                padding: EdgeInsets.all(defaultPadding),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SpinKitCircle(
-                          color: context.colorScheme.primary, size: 30),
-                      SizedBox(height: defaultPadding / 2),
-                      Text(desc ?? 'Please wait...',
-                          style: context.textStyleSmall)
-                    ]))));
+            child: Card(
+                child: Container(
+                    height: context.sizeDevice.height * 0.2,
+                    width: context.sizeDevice.height * 0.2,
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(defaultBorderRadius)),
+                    padding: EdgeInsets.all(defaultPadding),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SpinKitCircle(
+                              color: context.colorScheme.secondary, size: 30),
+                          SizedBox(height: defaultPadding / 2),
+                          Text(desc ?? 'Please wait...',
+                              style: context.textStyleSmall)
+                        ])))));
   }
 }

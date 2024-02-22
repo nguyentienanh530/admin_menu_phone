@@ -1,10 +1,14 @@
+import 'package:admin_menu_mobile/config/config.dart';
+import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:readmore/readmore.dart';
 
+import '../../utils/app_alerts.dart';
 import '../../widgets/widgets.dart';
 
 class FoodDetailView extends StatelessWidget {
@@ -12,69 +16,106 @@ class FoodDetailView extends StatelessWidget {
   final FoodModel food;
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Expanded(
-          child: SingleChildScrollView(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _ImageFood(food: food),
-                    _buildTitle(context, food),
-                    _buildPrice(context, food),
-                    _buildDescription(context, food),
-                    food.photoGallery != null && food.photoGallery!.isNotEmpty
-                        ? _Gallery(food: food)
-                        : const SizedBox()
-                  ]
-                      .animate(interval: 50.ms)
-                      .slideX(
-                          begin: -0.1,
-                          end: 0,
-                          curve: Curves.easeInOutCubic,
-                          duration: 500.ms)
-                      .fadeIn(
-                          curve: Curves.easeInOutCubic, duration: 500.ms)))),
-      Container(
-          padding: EdgeInsets.all(defaultPadding),
-          height: 150,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildUpdateFood(context, food),
-                _buildDeleteFood(context, food)
-              ]))
-    ]);
+    return BlocListener<FoodBloc, FoodState>(
+      listenWhen: (previous, current) =>
+          previous.status != FoodStatus.initial ||
+          current.status != FoodStatus.initial,
+      listener: (context, state) {
+        switch (state.status) {
+          case FoodStatus.loading:
+            AppAlerts.loadingDialog(context);
+            break;
+          case FoodStatus.failure:
+            AppAlerts.failureDialog(context,
+                title: AppText.errorTitle,
+                desc: state.error, btnCancelOnPress: () {
+              context.pop();
+              context.pop();
+            });
+            break;
+          case FoodStatus.success:
+            AppAlerts.successDialog(context,
+                title: AppText.success,
+                desc: 'Xóa thành công', btnOkOnPress: () {
+              context.pop();
+              context.pop();
+            });
+            break;
+          default:
+        }
+      },
+      child: Column(children: [
+        Expanded(
+            child: SingleChildScrollView(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ImageFood(food: food),
+                      _buildTitle(context, food),
+                      _buildPrice(context, food),
+                      _buildDescription(context, food),
+                      food.photoGallery != null && food.photoGallery!.isNotEmpty
+                          ? _Gallery(food: food)
+                          : const SizedBox()
+                    ]
+                        .animate(interval: 50.ms)
+                        .slideX(
+                            begin: -0.1,
+                            end: 0,
+                            curve: Curves.easeInOutCubic,
+                            duration: 500.ms)
+                        .fadeIn(
+                            curve: Curves.easeInOutCubic, duration: 500.ms)))),
+        Container(
+            padding: EdgeInsets.all(defaultPadding),
+            height: 150,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildUpdateFood(context, food),
+                  _buildDeleteFood(context, food)
+                ]))
+      ]),
+    );
   }
 
   Widget _buildDeleteFood(BuildContext context, FoodModel food) {
     return InkWell(
         onTap: () {
           showModalBottomSheet<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return SizedBox(
-                  height: 200,
-                  child: CommonBottomSheet(
-                      title: "Bạn có muốn xóa món ăn này không?",
-                      textConfirm: 'Xóa',
-                      textCancel: "Hủy",
-                      onCancel: () {
-                        context.pop();
-                      },
-                      onConfirm: () {
-                        // deleteDoc();
-                      }));
-            },
-          );
+              context: context,
+              builder: (BuildContext context) {
+                return SizedBox(
+                    // height: 200,
+                    child: CommonBottomSheet(
+                        title: "Bạn có muốn xóa món ăn này không?",
+                        textConfirm: 'Xóa',
+                        textCancel: "Hủy",
+                        textConfirmColor: context.colorScheme.errorContainer,
+                        onCancel: () {
+                          context.pop();
+                        },
+                        onConfirm: () async {
+                          context
+                              .read<FoodBloc>()
+                              .add(DeleteFood(idFood: food.id!));
+                          context.pop();
+                          // context.pop();
+                          // AppAlerts.successDialog(context,
+                          //     title: AppText.success,
+                          //     desc: 'Xóa thành công', btnOkOnPress: () {
+                          //   context.pop();
+                          // });
+                        }));
+              });
         },
         child: Container(
             height: 50.0,
             width: double.infinity,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(defaultBorderRadius),
-                color: context.colorScheme.error),
-            child: Center(
-                child: Text("Xoá món ăn", style: context.textStyleMedium))));
+                color: context.colorScheme.errorContainer),
+            child: Center(child: Text("Xoá", style: context.textStyleMedium))));
   }
 
   Widget _buildUpdateFood(BuildContext context, FoodModel food) {
@@ -83,6 +124,7 @@ class FoodDetailView extends StatelessWidget {
           // Navigator.of(context).push(PageRouteBuilder(
           //     pageBuilder: (_, __, ___) =>
           //         UpdateFoodDetailScreen(food: widget.food, id: widget.id)));
+          context.push(RouteName.updateFood, extra: food);
         },
         child: Container(
             height: 50.0,
@@ -91,8 +133,7 @@ class FoodDetailView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(defaultBorderRadius),
                 color: context.colorScheme.primary),
             child: Center(
-                child:
-                    Text("Cập nhật món ăn", style: context.textStyleMedium))));
+                child: Text("Cập nhật", style: context.textStyleMedium))));
   }
 
   Widget _buildDescription(BuildContext context, FoodModel food) {

@@ -1,3 +1,4 @@
+import 'package:admin_menu_mobile/utils/contants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FoodModel {
@@ -71,6 +72,7 @@ class FoodModel {
   factory FoodModel.fromFirestore(DocumentSnapshot snapshot) {
     Map data = snapshot.data() as Map<dynamic, dynamic>;
 
+    logger.d(data['photoGallery']);
     return FoodModel(
         ratting: data['ratting'] ?? 1,
         category: data['category'] ?? "",
@@ -93,7 +95,9 @@ class FoodModel {
         price: data['price'] ?? 1,
         title: data['title'] ?? "",
         locationUser: data['locationUser'] ?? "",
-        photoGallery: data['photoGallery'] ?? [],
+        photoGallery: data['photoGallery'] == null || data['photoGallery'] == []
+            ? []
+            : data['photoGallery'],
         valueAffordable: data['valueAffordable'] ?? 0,
         valueTaste: data['valueTaste'] ?? 0,
         valuePackaging: data['valuePackaging'] ?? 0,
@@ -138,16 +142,38 @@ class FoodModel {
   }
 
   Map<String, dynamic> toJson(FoodModel food) => {
-        'id': food.id.toString(),
-        'timeOrder': food.timeOrder,
-        'quantity': food.quantity,
-        'totalPrice': food.totalPrice ?? food.price,
-        'discount': food.discount,
+        "category": food.category,
+        "date": food.date,
+        "description": food.description,
+        "id": food.id,
         "image": food.image,
-        'isDiscount': food.isDiscount,
-        'isImageCrop': food.isImageCrop,
-        'price': food.price,
-        'title': food.title,
-        'note': food.note ?? ''
+        "isImageCrop": food,
+        "isDiscount": food.isDiscount,
+        "discount": food.discount,
+        'createdAt': FieldValue.serverTimestamp(),
+        'count': 0,
+        "price": food.price,
+        "title": food.title,
+        'photoGallery': food.photoGallery,
+        "ratting": 4.5
       };
+
+  String toStringg(FoodModel food) {
+    return {
+      "category": food.category,
+      "date": food.date,
+      "description": food.description,
+      "id": food.id,
+      "image": food.image,
+      "isImageCrop": food,
+      "isDiscount": food.isDiscount,
+      "discount": food.discount,
+      'createdAt': FieldValue.serverTimestamp(),
+      'count': 0,
+      "price": food.price,
+      "title": food.title,
+      'photoGallery': food.photoGallery,
+      "ratting": 4.5
+    }.toString();
+  }
 }

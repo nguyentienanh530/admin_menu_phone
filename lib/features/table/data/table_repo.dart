@@ -16,7 +16,7 @@ class TableRepo extends FirebaseBase<TableModel> {
     return result;
   }
 
-  Future<FirebaseResult<bool>> deleteTable({required String idTable}) async {
+  Future<FirebaseResult> deleteTable({required String idTable}) async {
     return await deleteItem(_tableRepository.deleteTable(idTable: idTable));
   }
 

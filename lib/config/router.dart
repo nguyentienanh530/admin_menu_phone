@@ -1,4 +1,5 @@
 import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/features/table/model/table_model.dart';
 import 'package:admin_menu_mobile/screens/add_food_screen/add_food_screen.dart';
 import 'package:admin_menu_mobile/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/order_detail_screen/order_detail_screen.dart';
@@ -46,7 +47,13 @@ final router = GoRouter(
       GoRoute(path: RouteName.home, builder: (context, state) => HomeScreen()),
       GoRoute(
           path: RouteName.createTable,
-          builder: (context, state) => const CreateTable()),
+          builder: (context, state) {
+            final arg = GoRouterState.of(context).extra as Map<String, dynamic>;
+            final mode = arg['mode'] as Mode;
+            final table = arg['table'] ?? TableModel();
+
+            return CreateTable(mode: mode, tableModel: table);
+          }),
       GoRoute(
           path: RouteName.login,
           builder: (context, state) => const LoginScreen()),

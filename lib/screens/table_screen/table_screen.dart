@@ -1,5 +1,6 @@
 import 'package:admin_menu_mobile/config/config.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
+import 'package:admin_menu_mobile/screens/table_screen/create_or_update_table.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -27,24 +28,43 @@ class TableScreen extends StatefulWidget {
 class _TableScreenState extends State<TableScreen>
     with AutomaticKeepAliveClientMixin {
   @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    return BlocProvider(
-        create: (BuildContext context) => TableBloc()..add(TablesFetched()),
-        child: Scaffold(
-            appBar: _buildAppbar(context),
-            body: const SafeArea(child: TableView())));
+    return Scaffold(
+        appBar: _buildAppbar(context),
+        body: const SafeArea(child: TableView()));
+  }
+
+  getData() async {
+    if (!mounted) return;
+    context.read<TableBloc>().add(TablesFetched());
   }
 
   _buildAppbar(BuildContext context) => AppBar(
       centerTitle: true,
-      title: Text("Bàn ăn", style: context.textStyleMedium),
+      title: Text("Bàn ăn",
+          style:
+              context.textStyleMedium!.copyWith(fontWeight: FontWeight.bold)),
       actions: [_buildIconCreateTable()]);
 
   Widget _buildIconCreateTable() {
     return SizedBox(
         child: IconButton(
-            onPressed: () => context.push(RouteName.createTable),
+            onPressed: () async {
+              var result = await context.push<bool>(RouteName.createTable,
+                  extra: {'mode': Mode.create});
+              if (result != null && result) {
+                getData();
+              } else {
+                print('k co gi');
+              }
+            },
             icon: const Icon(Icons.add)));
   }
 
@@ -81,121 +101,75 @@ class TableView extends StatelessWidget {
               child: Column(children: [
         Column(
             children: tables
-                .map((e) => Slidable(
+                .map((table) => Slidable(
                     endActionPane: ActionPane(
                         extentRatio: 0.6,
                         motion: const ScrollMotion(),
                         children: [
-                          Container(
-                              width: context.sizeDevice.width * 0.3,
-                              height: context.sizeDevice.width * 0.2,
-                              decoration: BoxDecoration(
-                                color: context.colorScheme.primaryContainer,
-                                // borderRadius: BorderRadius.circular(
-                                //     defaultBorderRadius)
-                              ),
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.update, size: 18),
-                                    Text('Cập nhật',
-                                        style: context.textStyleSmall)
-                                  ])),
-                          GestureDetector(
-                            onTap: () => onDeleteTable(context, tables, e),
-                            child: Container(
-                                width: context.sizeDevice.width * 0.3,
-                                height: context.sizeDevice.width * 0.2,
-                                decoration: BoxDecoration(
-                                  color: context.colorScheme.errorContainer,
-                                  // borderRadius: BorderRadius.circular(
-                                  //     defaultBorderRadius)
-                                ),
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(Icons.delete, size: 18),
-                                      Text('Xóa', style: context.textStyleSmall)
-                                    ])),
-                          ),
-                          // SlidableAction(
-                          //     borderRadius:
-                          //         BorderRadius.circular(defaultBorderRadius),
-                          //     autoClose: true,
-                          //     flex: 1,
-                          //     padding: EdgeInsets.all(defaultPadding),
-                          //     onPressed: (ct) {
-                          //       // Get.bottomSheet(SizedBox(
-                          //       //     height: 200,
-                          //       //     child: BottomSheetDelete(
-                          //       //         title: "Xóa bàn '${e.name}' ?",
-                          //       //         textConfirm: 'Xóa',
-                          //       //         textCancel: "Hủy",
-                          //       //         onCancel: () {
-                          //       //           Get.back();
-                          //       //         },
-                          //       //         onConfirm: () {
-                          //       //           FirebaseFirestore.instance
-                          //       //               .collection('table')
-                          //       //               .doc(e.id)
-                          //       //               .delete()
-                          //       //               .then((value) {
-                          //       //             Get.back();
-                          //       //             return Get.snackbar("Thông báo",
-                          //       //                 "Đã xóa bàn: ${e.name}",
-                          //       //                 colorText: textColor,
-                          //       //                 duration: Duration(seconds: 2),
-                          //       //                 snackPosition:
-                          //       //                     SnackPosition.TOP);
-                          //       //           }).onError((error, stackTrace) =>
-                          //       //                   Get.snackbar("Thông báo",
-                          //       //                       "Lỗi xóa bàn: $error",
-                          //       //                       colorText: textColor,
-                          //       //                       duration:
-                          //       //                           Duration(seconds: 2),
-                          //       //                       snackPosition:
-                          //       //                           SnackPosition.TOP));
-                          //       //         })));
-                          //     },
-                          //     backgroundColor:
-                          //         context.colorScheme.errorContainer,
-                          //     foregroundColor: Colors.white,
-                          //     icon: Icons.delete),
+                          _buildActionSlidable(context,
+                              color: context.colorScheme.primaryContainer,
+                              icon: Icons.update, onTap: () {
+                            context.push(RouteName.createTable,
+                                extra: {'mode': Mode.update, 'table': table});
+                          }, title: 'Cập nhật'),
+                          _buildActionSlidable(context,
+                              color: context.colorScheme.errorContainer,
+                              icon: Icons.delete,
+                              onTap: () => onDeleteTable(context, table),
+                              title: 'Xóa'),
                         ]),
-                    child: _buildItem(context, e)))
+                    child: _buildItem(context, table)))
                 .toList())
       ])))
     ]);
   }
 
-  void onDeleteTable(
-      BuildContext context, List<TableModel> tables, TableModel table) {
-    tables.remove(table);
-    context.read<TableBloc>().add(TableDeleted(idTable: table.id!));
+  Widget _buildActionSlidable(BuildContext context,
+      {Function()? onTap, String? title, IconData? icon, Color? color}) {
+    return GestureDetector(
+        onTap: onTap,
+        child: Container(
+            width: context.sizeDevice.width * 0.3,
+            height: context.sizeDevice.width * 0.2,
+            decoration: BoxDecoration(color: color),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon!, size: 18),
+                  Text(title!, style: context.textStyleSmall)
+                ])));
+  }
 
+  void onDeleteTable(BuildContext context, TableModel table) {
+    context.read<TableBloc>().add(TableDeleted(idTable: table.id!));
+    logger.d(context.read<TableBloc>().operation);
     showDialog(
         context: context,
-        builder: (_) {
-          return BlocBuilder<TableBloc, GenericBlocState<TableModel>>(
-              buildWhen: (previous, current) =>
-                  context.read<TableBloc>().operation == ApiOperation.delete,
-              builder: (context, state) {
-                return switch (state.status) {
-                  Status.empty => const SizedBox(),
-                  Status.loading => const ProgressDialog(
-                      descriptrion: "Deleting post...", isProgressed: true),
-                  Status.failure => RetryDialog(
-                      title: state.error ?? "Error",
-                      onRetryPressed: () => context
-                          .read<TableBloc>()
-                          .add(TableDeleted(idTable: table.id!))),
-                  Status.success => ProgressDialog(
-                      descriptrion: "Successfully deleted",
-                      onPressed: () => pop(context, 1),
-                      isProgressed: false)
-                };
-              });
-        });
+        builder: (_) => BlocBuilder<TableBloc, GenericBlocState<TableModel>>(
+            buildWhen: (previous, current) =>
+                context.read<TableBloc>().operation == ApiOperation.delete &&
+                previous.status != current.status,
+            builder: (context, state) {
+              logger.d(state.status);
+
+              return switch (state.status) {
+                Status.empty => const SizedBox(),
+                Status.loading => const ProgressDialog(
+                    descriptrion: "Deleting post...", isProgressed: true),
+                Status.failure => RetryDialog(
+                    title: state.error ?? "Error",
+                    onRetryPressed: () => context
+                        .read<TableBloc>()
+                        .add(TableDeleted(idTable: table.id!))),
+                Status.success => ProgressDialog(
+                    descriptrion: "Đã xoá bàn: ${table.name}",
+                    onPressed: () {
+                      context.read<TableBloc>().add(TablesFetched());
+                      pop(context, 1);
+                    },
+                    isProgressed: false)
+              };
+            }));
   }
 
   Widget _buildItem(BuildContext context, TableModel table) {

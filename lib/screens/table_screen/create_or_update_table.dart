@@ -11,16 +11,18 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../common/bloc/generic_bloc_state.dart';
 import '../../common/dialog/retry_dialog.dart';
 import '../../widgets/widgets.dart';
 
-class CreateTable extends StatefulWidget {
-  const CreateTable({super.key});
+enum Mode { create, update }
 
+class CreateTable extends StatefulWidget {
+  const CreateTable({super.key, required this.mode, this.tableModel});
+  final Mode mode;
+  final TableModel? tableModel;
   @override
   State<CreateTable> createState() => _CreateTableState();
 }
@@ -34,6 +36,20 @@ class _CreateTableState extends State<CreateTable> {
   File? _imageFile;
   var _image = '';
   var _loading = false;
+
+  @override
+  void initState() {
+    initValue();
+    super.initState();
+  }
+
+  void initValue() {
+    if (widget.tableModel != null && widget.mode == Mode.update) {
+      _seat = widget.tableModel!.seats.toString();
+      _image = widget.tableModel!.image;
+      _nameController.text = widget.tableModel!.name;
+    }
+  }
 
   Future _uploadPicture() async {
     Reference storageReference =
@@ -85,47 +101,45 @@ class _CreateTableState extends State<CreateTable> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppbar(context),
-      body: SafeArea(
-        child: SizedBox(
-            height: context.sizeDevice.height * 0.8,
-            width: context.sizeDevice.width,
-            child: Form(
-                key: _formKey,
-                child: Padding(
-                    padding: EdgeInsets.all(defaultPadding),
-                    child: SingleChildScrollView(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // _buildAppbar(context),
-                              SizedBox(height: defaultPadding / 2),
-                              _ImageFood(
-                                  onTap: () => pickImage(),
-                                  imageFile: _imageFile),
-                              SizedBox(height: defaultPadding / 2),
-                              _buildTitle('Tên bàn:'),
-                              SizedBox(height: defaultPadding / 2),
-                              _NameTable(nameController: _nameController),
-                              SizedBox(height: defaultPadding / 2),
-                              _buildTitle('Số ghế:'),
-                              SizedBox(height: defaultPadding / 2),
-                              _buildSeats(),
-                              SizedBox(height: defaultPadding / 2),
-                              _buildButtonCreateTable(),
-                              SizedBox(height: defaultPadding / 2)
-                            ]
-                                .animate(interval: 50.ms)
-                                .slideX(
-                                    begin: -0.1,
-                                    end: 0,
-                                    curve: Curves.easeInOutCubic,
-                                    duration: 500.ms)
-                                .fadeIn(
-                                    curve: Curves.easeInOutCubic,
-                                    duration: 500.ms)))))),
-      ),
-    );
+        appBar: _buildAppbar(context),
+        body: SafeArea(
+            child: SizedBox(
+                height: context.sizeDevice.height * 0.8,
+                width: context.sizeDevice.width,
+                child: Form(
+                    key: _formKey,
+                    child: Padding(
+                        padding: EdgeInsets.all(defaultPadding),
+                        child: SingleChildScrollView(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // _buildAppbar(context),
+                                  SizedBox(height: defaultPadding / 2),
+                                  _ImageFood(
+                                      onTap: () => pickImage(),
+                                      imageFile: _imageFile),
+                                  SizedBox(height: defaultPadding / 2),
+                                  _buildTitle('Tên bàn:'),
+                                  SizedBox(height: defaultPadding / 2),
+                                  _NameTable(nameController: _nameController),
+                                  SizedBox(height: defaultPadding / 2),
+                                  _buildTitle('Số ghế:'),
+                                  SizedBox(height: defaultPadding / 2),
+                                  _buildSeats(),
+                                  SizedBox(height: defaultPadding / 2),
+                                  _buildButtonCreateTable(),
+                                  SizedBox(height: defaultPadding / 2)
+                                ]
+                                    .animate(interval: 50.ms)
+                                    .slideX(
+                                        begin: -0.1,
+                                        end: 0,
+                                        curve: Curves.easeInOutCubic,
+                                        duration: 500.ms)
+                                    .fadeIn(
+                                        curve: Curves.easeInOutCubic,
+                                        duration: 500.ms))))))));
   }
 
   Widget _buildButtonCreateTable() {
@@ -133,9 +147,7 @@ class _CreateTableState extends State<CreateTable> {
       _loading
           ? SpinKitCircle(color: context.colorScheme.secondary, size: 30)
           : FilledButton.icon(
-              onPressed: () => handleCreateTable().then((value) {
-                    // context.read<TableBloc>().add(TablesFetched());
-                  }),
+              onPressed: () => handleCreateTable(),
               icon: const Icon(Icons.add_box),
               label: _buildTitle('Thêm bàn'))
     ]);
@@ -205,7 +217,7 @@ class _CreateTableState extends State<CreateTable> {
   _buildAppbar(BuildContext context) {
     return AppBar(
         centerTitle: true,
-        title: Text('Tạo bàn ăn',
+        title: Text(widget.mode == Mode.create ? 'Tạo bàn ăn' : 'Cập nhật',
             style:
                 context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold)));
   }

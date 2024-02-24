@@ -96,7 +96,9 @@ class _AfterSearchUIState extends State<AfterSearchUI> {
     return InkWell(
         onTap: () {
           context.push(RouteName.foodDetail, extra: food).then((value) {
-            context.read<FoodBloc>().add(GetFoods());
+            if (value is bool || value == true) {
+              context.read<FoodBloc>().add(GetFoods());
+            }
           });
         },
         child: Padding(

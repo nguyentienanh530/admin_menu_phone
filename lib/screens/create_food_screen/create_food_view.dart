@@ -5,11 +5,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
-import 'package:admin_menu_mobile/features/category/dtos/category_model.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/utils/app_alerts.dart';
 import 'package:admin_menu_mobile/widgets/common_text_field.dart';
@@ -54,6 +51,7 @@ class CreateFoodView extends StatelessWidget {
                     desc: 'Tạo món thành công', btnOkOnPress: () {
                   context.read<FoodBloc>().add(ResetData());
                   reset();
+                  context.pop();
                   context.pop();
                 });
                 break;
@@ -370,50 +368,30 @@ class _Categories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    success(List<CategoryModel> categories, String category) {
-      return Container(
-          height: 60,
-          decoration: BoxDecoration(
-              // color: secondaryColor,
-              borderRadius: BorderRadius.circular(defaultBorderRadius),
-              border: Border.all(color: context.colorScheme.primary, width: 1)),
-          padding: EdgeInsets.symmetric(horizontal: defaultPadding),
-          alignment: Alignment.center,
-          child: DropdownButton(
-              borderRadius: BorderRadius.circular(defaultBorderRadius),
-              // dropdownColor: context.colorScheme.primary,
-              value: category,
-              underline: Container(),
-              isDense: true,
-              style: context.textStyleSmall,
-              icon: const Icon(Icons.arrow_drop_down),
-              isExpanded: true,
-              items: categories.map((e) {
-                return DropdownMenuItem(
-                    value: e.name,
-                    child:
-                        Text(e.name.toString(), style: context.textStyleSmall));
-              }).toList(),
-              onChanged: (String? newValue) {
-                context
-                    .read<FoodBloc>()
-                    .add(CategoryFoodChanged(category: newValue!));
-                context
-                    .read<CategoryBloc>()
-                    .add(CategoryChanged(category: newValue));
-              }));
-    }
-
-    var loadingOrInitState = Center(
-        child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
-    return BlocBuilder<CategoryBloc, CategoryState>(builder: (context, state) {
-      return (switch (state.status) {
-        CategoryStatus.loading => loadingOrInitState,
-        CategoryStatus.initial => loadingOrInitState,
-        CategoryStatus.failure => Center(child: Text(state.errorMessage)),
-        CategoryStatus.success => success(state.categories, state.category)
-      });
-    });
+    var categoryState = context.watch<CategoryBloc>().state;
+    var category = context.watch<FoodBloc>().state;
+    return Wrap(
+        spacing: 4.0,
+        runSpacing: 2.0,
+        children: categoryState.categories
+            .map((e) => SizedBox(
+                height: 25,
+                child: FilledButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(
+                            category.category == e.name
+                                ? context.colorScheme.errorContainer
+                                : context.colorScheme.primaryContainer)),
+                    onPressed: () {
+                      context
+                          .read<FoodBloc>()
+                          .add(CategoryFoodChanged(category: e.name!));
+                      context
+                          .read<CategoryBloc>()
+                          .add(CategoryChanged(category: e.name!));
+                    },
+                    child: Text(e.name!, style: context.textStyleSmall))))
+            .toList());
   }
 }
 

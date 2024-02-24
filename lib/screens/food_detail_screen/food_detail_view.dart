@@ -2,81 +2,71 @@ import 'package:admin_menu_mobile/config/config.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
+import 'package:admin_menu_mobile/widgets/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../utils/app_alerts.dart';
 import '../../widgets/widgets.dart';
 
-class FoodDetailView extends StatelessWidget {
+class FoodDetailView extends StatefulWidget {
   const FoodDetailView({super.key, required this.food});
   final FoodModel food;
+
+  @override
+  State<FoodDetailView> createState() => _FoodDetailViewState();
+}
+
+class _FoodDetailViewState extends State<FoodDetailView> {
   @override
   Widget build(BuildContext context) {
-    return BlocListener<FoodBloc, FoodState>(
-      listenWhen: (previous, current) =>
-          previous.status != FoodStatus.initial ||
-          current.status != FoodStatus.initial,
-      listener: (context, state) {
-        switch (state.status) {
-          case FoodStatus.loading:
-            AppAlerts.loadingDialog(context);
-            break;
-          case FoodStatus.failure:
-            AppAlerts.failureDialog(context,
-                title: AppText.errorTitle,
-                desc: state.error, btnCancelOnPress: () {
-              context.pop();
-              context.pop();
-            });
-            break;
-          case FoodStatus.success:
-            AppAlerts.successDialog(context,
-                title: AppText.success,
-                desc: 'Xóa thành công', btnOkOnPress: () {
-              context.pop();
-              context.pop();
-            });
-            break;
-          default:
-        }
-      },
-      child: Column(children: [
-        Expanded(
-            child: SingleChildScrollView(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ImageFood(food: food),
-                      _buildTitle(context, food),
-                      _buildPrice(context, food),
-                      _buildDescription(context, food),
-                      food.photoGallery != null && food.photoGallery!.isNotEmpty
-                          ? _Gallery(food: food)
-                          : const SizedBox()
-                    ]
-                        .animate(interval: 50.ms)
-                        .slideX(
-                            begin: -0.1,
-                            end: 0,
-                            curve: Curves.easeInOutCubic,
-                            duration: 500.ms)
-                        .fadeIn(
-                            curve: Curves.easeInOutCubic, duration: 500.ms)))),
-        Container(
-            padding: EdgeInsets.all(defaultPadding),
-            height: 150,
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildUpdateFood(context, food),
-                  _buildDeleteFood(context, food)
-                ]))
-      ]),
-    );
+    return BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
+      return (switch (state.status) {
+        FoodStatus.loading => const LoadingScreen(),
+        FoodStatus.initial => const LoadingScreen(),
+        FoodStatus.failure => Center(child: Text(state.error)),
+        FoodStatus.success => _buildBody(context, state.food!)
+      });
+    });
+  }
+
+  Widget _buildBody(BuildContext context, FoodModel food) {
+    return Column(children: [
+      Expanded(
+          child: SingleChildScrollView(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _ImageFood(food: food),
+                    _buildTitle(context, food),
+                    _buildPrice(context, food),
+                    _buildDescription(context, food),
+                    food.photoGallery != null && food.photoGallery!.isNotEmpty
+                        ? _Gallery(food: food)
+                        : const SizedBox()
+                  ]
+                      .animate(interval: 50.ms)
+                      .slideX(
+                          begin: -0.1,
+                          end: 0,
+                          curve: Curves.easeInOutCubic,
+                          duration: 500.ms)
+                      .fadeIn(
+                          curve: Curves.easeInOutCubic, duration: 500.ms)))),
+      Container(
+          padding: EdgeInsets.all(defaultPadding),
+          height: 150,
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildUpdateFood(context, food),
+                _buildDeleteFood(context, food)
+              ]))
+    ]);
   }
 
   Widget _buildDeleteFood(BuildContext context, FoodModel food) {
@@ -95,17 +85,17 @@ class FoodDetailView extends StatelessWidget {
                         onCancel: () {
                           context.pop();
                         },
-                        onConfirm: () async {
+                        onConfirm: () {
                           context
                               .read<FoodBloc>()
                               .add(DeleteFood(idFood: food.id!));
-                          context.pop();
-                          // context.pop();
-                          // AppAlerts.successDialog(context,
-                          //     title: AppText.success,
-                          //     desc: 'Xóa thành công', btnOkOnPress: () {
-                          //   context.pop();
-                          // });
+                          FToast()
+                            ..init(context)
+                            ..showToast(
+                                child: AppAlerts.successToast(
+                                    msg: 'Xóa thành công!'));
+                          context.pop<bool>(true);
+                          context.pop<bool>(true);
                         }));
               });
         },

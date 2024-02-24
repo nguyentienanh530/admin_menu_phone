@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'package:admin_menu_mobile/features/food/data/food_repo.dart';
 import 'package:admin_menu_mobile/utils/contants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,6 +35,8 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
     on<Image2Changed>(_image2Changed);
     on<Image3Changed>(_image3Changed);
     on<UpdateFood>(_updateFood);
+    on<ResetStatusFood>(_resetStatusFood);
+    on<GetFoodByID>(_getFoodByID);
   }
 
   FutureOr<void> _fetchFoods(GetFoods event, Emitter<FoodState> emit) async {
@@ -287,14 +288,21 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
   }
 
   FutureOr<void> _deleteFood(DeleteFood event, Emitter<FoodState> emit) async {
-    emit(state.copyWith(status: FoodStatus.loading));
     try {
-      await FoodRepo(
+      emit(state.copyWith(isDeleteFood: true, status: FoodStatus.loading));
+      var deleted = await FoodRepo(
               foodRepository:
                   FoodRepository(firebaseFirestore: FirebaseFirestore.instance))
           .deleteFood(idFood: event.idFood);
-      emit(state.copyWith(status: FoodStatus.success));
+      if (deleted) {
+        emit(state.copyWith(status: FoodStatus.success));
+        logger.d(state);
+      } else {
+        emit(state.copyWith(
+            status: FoodStatus.failure, error: 'delete failure'));
+      }
     } catch (e) {
+      logger.e(e.toString());
       emit(state.copyWith(status: FoodStatus.failure, error: e.toString()));
     }
   }
@@ -316,7 +324,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
   }
 
   FutureOr<void> _updateFood(UpdateFood event, Emitter<FoodState> emit) async {
-    emit(state.copyWith(status: FoodStatus.loading));
+    emit(state.copyWith(status: FoodStatus.loading, isUpdateFood: true));
     var imageFood = '';
     var imageGallery1 = '';
     var imageGallery2 = '';
@@ -352,7 +360,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
         "category": state.category,
         "date": Timestamp.fromDate(DateTime.now()),
         "description": state.description.value,
-        "id": DateTime.now().toString(),
+        "id": event.idFood,
         "image": imageFood,
         "isImageCrop": true,
         "isDiscount": state.isDiscount,
@@ -368,7 +376,67 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
               foodRepository:
                   FoodRepository(firebaseFirestore: FirebaseFirestore.instance))
           .updateFood(idFood: event.idFood, data: dataFood);
-      emit(state.copyWith(status: FoodStatus.success));
+      emit(state.copyWith(status: FoodStatus.success, isUpdateFood: false));
+    } catch (e) {
+      emit(state.copyWith(
+          status: FoodStatus.failure,
+          error: e.toString(),
+          isUpdateFood: false));
+    }
+  }
+
+  FutureOr<void> _resetStatusFood(
+      ResetStatusFood event, Emitter<FoodState> emit) {
+    emit(state.copyWith(status: FoodStatus.initial));
+  }
+
+  FutureOr<void> _getFoodByID(
+      GetFoodByID event, Emitter<FoodState> emit) async {
+    emit(state.copyWith(status: FoodStatus.loading));
+    try {
+      await emit.forEach(
+          FoodRepo(
+                  foodRepository: FoodRepository(
+                      firebaseFirestore: FirebaseFirestore.instance))
+              .getFoodByID(idFood: event.idFood),
+          onData: (data) => state.copyWith(
+              status: FoodStatus.success,
+              food: data,
+              category: data.category,
+              nameFood: NameFood.dirty(data.title!),
+              description: DescriptionFood.dirty(data.description!),
+              imageFood: data.image,
+              priceFood: PriceFood.dirty(data.price.toString()),
+              isDiscount: data.isDiscount,
+              imageFood1:
+                  data.photoGallery != null && data.photoGallery!.isNotEmpty
+                      ? data.photoGallery![0]
+                      : '',
+              imageFood2:
+                  data.photoGallery != null && data.photoGallery!.isNotEmpty
+                      ? data.photoGallery![1]
+                      : '',
+              imageFood3:
+                  data.photoGallery != null && data.photoGallery!.isNotEmpty
+                      ? data.photoGallery![2]
+                      : '',
+              discount: data.isDiscount!
+                  ? DiscountFood.dirty(data.discount.toString())
+                  : const DiscountFood.pure(),
+              isValid: state.isDiscount
+                  ? Formz.validate([
+                      DiscountFood.dirty(data.discount.toString()),
+                      DescriptionFood.dirty(data.description!),
+                      NameFood.dirty(data.title!),
+                      PriceFood.dirty(data.price.toString())
+                    ])
+                  : Formz.validate([
+                      DescriptionFood.dirty(data.description!),
+                      NameFood.dirty(data.title!),
+                      PriceFood.dirty(data.price.toString())
+                    ])),
+          onError: (error, stackTrace) => state.copyWith(
+              status: FoodStatus.failure, error: error.toString()));
     } catch (e) {
       emit(state.copyWith(status: FoodStatus.failure, error: e.toString()));
     }

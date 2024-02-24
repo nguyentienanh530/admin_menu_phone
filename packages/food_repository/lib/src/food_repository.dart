@@ -16,6 +16,17 @@ class FoodRepository {
     }
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getFoodByID(
+      {required String idFood}) {
+    try {
+      return _firebaseFirestore.collection('food').doc(idFood).snapshots();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
   Future<DocumentReference<Map<String, dynamic>>> createFood(
       Map<String, dynamic> data) async {
     try {
@@ -25,11 +36,11 @@ class FoodRepository {
     }
   }
 
-  Future<void> deleteFood({required String idFood}) async {
+  Future deleteFood({required String idFood}) async {
     try {
-      return await _firebaseFirestore.collection('food').doc(idFood).delete();
+      await _firebaseFirestore.collection('food').doc(idFood).delete();
     } catch (e) {
-      throw '$e';
+      return false;
     }
   }
 

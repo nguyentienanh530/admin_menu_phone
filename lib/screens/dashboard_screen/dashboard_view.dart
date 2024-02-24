@@ -1,7 +1,12 @@
+import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
+import 'package:admin_menu_mobile/features/table/model/table_model.dart';
+import 'package:admin_menu_mobile/widgets/empty_screen.dart';
+import 'package:admin_menu_mobile/widgets/error_screen.dart';
+import 'package:admin_menu_mobile/widgets/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -206,29 +211,23 @@ class _ListTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (context) => TableBloc()..add(GetAllTable()),
-        child: BlocBuilder<TableBloc, TableState>(builder: (context, state) {
-          switch (state) {
-            case TableInProgress():
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-            case TableFailure():
-              return Text(state.error!);
-            case TableSuccess():
-              return GridView.count(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  crossAxisCount: 4,
-                  crossAxisSpacing: defaultPadding,
-                  mainAxisSpacing: defaultPadding,
-                  children: state.tables!
-                      .map((e) => _ItemTable(nameTable: e.name))
-                      .toList());
-            case TableInitial():
-              return SpinKitCircle(
-                  color: context.colorScheme.primary, size: 30);
-          }
+        create: (context) => TableBloc()..add(TablesFetched()),
+        child: BlocBuilder<TableBloc, GenericBlocState<TableModel>>(
+            builder: (context, state) {
+          return switch (state.status) {
+            Status.empty => const EmptyScreen(),
+            Status.loading => const LoadingScreen(),
+            Status.failure => ErrorScreen(errorMsg: state.error),
+            Status.success => GridView.count(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                crossAxisCount: 4,
+                crossAxisSpacing: defaultPadding,
+                mainAxisSpacing: defaultPadding,
+                children: state.data!
+                    .map((e) => _ItemTable(nameTable: e.name))
+                    .toList()),
+          };
         }));
   }
 }

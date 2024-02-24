@@ -5,6 +5,7 @@ enum FoodStatus { initial, loading, success, failure }
 class FoodState extends Equatable {
   const FoodState(
       {this.foods = const <FoodModel>[],
+      this.food,
       this.error = '',
       this.status = FoodStatus.initial,
       this.imageFile,
@@ -21,8 +22,11 @@ class FoodState extends Equatable {
       this.imageFood = '',
       this.imageFood1 = '',
       this.imageFood2 = '',
-      this.imageFood3 = ''});
+      this.imageFood3 = '',
+      this.isUpdateFood = false,
+      this.isDeleteFood = false});
   final List<FoodModel> foods;
+  final FoodModel? food;
   final String error;
   final FoodStatus status;
   final File? imageFile, imageGallery1, imageGallery2, imageGallery3;
@@ -30,6 +34,8 @@ class FoodState extends Equatable {
   final String category;
   final DescriptionFood description;
   final bool isValid;
+  final bool isUpdateFood;
+  final bool isDeleteFood;
   final bool isDiscount;
   final DiscountFood discount;
   final PriceFood priceFood;
@@ -37,6 +43,7 @@ class FoodState extends Equatable {
 
   FoodState copyWith(
       {List<FoodModel>? foods,
+      FoodModel? food,
       String? error,
       FoodStatus? status,
       File? imageFile,
@@ -46,6 +53,8 @@ class FoodState extends Equatable {
       NameFood? nameFood,
       bool? isValid,
       bool? isDiscount,
+      bool? isUpdateFood,
+      bool? isDeleteFood,
       String? category,
       DescriptionFood? description,
       DiscountFood? discount,
@@ -57,6 +66,7 @@ class FoodState extends Equatable {
     return FoodState(
         status: status ?? this.status,
         foods: foods ?? this.foods,
+        food: food ?? this.food,
         error: error ?? this.error,
         imageFile: imageFile ?? this.imageFile,
         imageGallery1: imageGallery1 ?? this.imageGallery1,
@@ -72,13 +82,16 @@ class FoodState extends Equatable {
         imageFood: imageFood ?? this.imageFood,
         imageFood1: imageFood1 ?? this.imageFood1,
         imageFood2: imageFood2 ?? this.imageFood2,
-        imageFood3: imageFood3 ?? this.imageFood3);
+        imageFood3: imageFood3 ?? this.imageFood3,
+        isUpdateFood: isUpdateFood ?? this.isUpdateFood,
+        isDeleteFood: isDeleteFood ?? this.isDeleteFood);
   }
 
   @override
   List<Object> get props => [
         status,
         foods,
+        food ?? FoodModel(),
         error,
         imageFile ?? File(''),
         imageGallery1 ?? File(''),
@@ -94,6 +107,8 @@ class FoodState extends Equatable {
         imageFood,
         imageFood1,
         imageFood2,
-        imageFood3
+        imageFood3,
+        isUpdateFood,
+        isDeleteFood
       ];
 }

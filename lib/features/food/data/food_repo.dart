@@ -20,6 +20,16 @@ class FoodRepo {
     }
   }
 
+  Stream<FoodModel> getFoodByID({required String idFood}) {
+    try {
+      return _foodRepository
+          .getFoodByID(idFood: idFood)
+          .map((event) => FoodModel.fromFirestore(event));
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
   Future<DocumentReference<Map<String, dynamic>>> createFood(
       Map<String, dynamic> data) async {
     try {
@@ -29,11 +39,13 @@ class FoodRepo {
     }
   }
 
-  Future deleteFood({required String idFood}) async {
+  Future<bool> deleteFood({required String idFood}) async {
     try {
-      await _foodRepository.deleteFood(idFood: idFood);
+      return await _foodRepository
+          .deleteFood(idFood: idFood)
+          .then((value) => true);
     } catch (e) {
-      throw '$e';
+      return false;
     }
   }
 

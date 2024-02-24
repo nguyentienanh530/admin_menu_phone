@@ -60,7 +60,7 @@ class AppAlerts {
       context: context,
       dialogType: DialogType.success,
       animType: AnimType.rightSlide,
-      title: title ?? '',
+      title: title ?? 'Thành công!',
       desc: desc ?? '',
       btnOkText: btnOkText ?? AppText.ok,
       btnCancelOnPress: btnCancelOnPress,

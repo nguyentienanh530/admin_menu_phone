@@ -1,4 +1,5 @@
 import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
+import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:admin_menu_mobile/screens/update_food_screen/update_food_view.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,14 @@ class UpdateFoodScreen extends StatelessWidget {
   final FoodModel foodModel;
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (context) => CategoryBloc()..add(FetchCategories()),
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+              create: (context) => CategoryBloc()..add(FetchCategories())),
+          BlocProvider(
+              create: (context) =>
+                  FoodBloc()..add(GetFoodByID(idFood: foodModel.id!))),
+        ],
         child: Scaffold(
             appBar: _buildAppbar(context),
             body: UpdateFoodView(foodModel: foodModel)));

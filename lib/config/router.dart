@@ -6,6 +6,7 @@ import 'package:admin_menu_mobile/screens/order_history_detail_screen/order_hist
 import 'package:admin_menu_mobile/screens/order_screen/order_screen.dart';
 import 'package:admin_menu_mobile/screens/search_food_screen/search_food_screen.dart';
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
+import 'package:admin_menu_mobile/screens/table_screen/create_or_update_table.dart';
 import 'package:admin_menu_mobile/screens/update_food_screen/update_food_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +28,7 @@ class RouteName {
   static const String addFood = '/addFood';
   static const String orderHistoryDetail = '/orderHistoryDetail';
   static const String updateFood = '/updateFood';
-
+  static const String createTable = '/createTable';
   static const publicRoutes = [login, register];
 }
 
@@ -43,6 +44,9 @@ final router = GoRouter(
     },
     routes: [
       GoRoute(path: RouteName.home, builder: (context, state) => HomeScreen()),
+      GoRoute(
+          path: RouteName.createTable,
+          builder: (context, state) => const CreateTable()),
       GoRoute(
           path: RouteName.login,
           builder: (context, state) => const LoginScreen()),

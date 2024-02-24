@@ -25,9 +25,9 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
                   firebaseFirestore: FirebaseFirestore.instance))
           .getAllCategory();
       emit(state.copyWith(
-          status: CategoryStatus.success,
-          categories: categories,
-          category: categories.first.name));
+          status: CategoryStatus.success, categories: categories));
+      // ,
+      // category: categories.first.name
     } catch (e) {
       emit(state.copyWith(
           status: CategoryStatus.failure, errorMessage: e.toString()));

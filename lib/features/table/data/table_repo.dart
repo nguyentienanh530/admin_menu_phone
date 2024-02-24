@@ -1,21 +1,27 @@
+import 'package:admin_menu_mobile/common/firebase/firebase_base.dart';
+import 'package:admin_menu_mobile/common/firebase/firebase_result.dart';
 import 'package:table_repository/table_repository.dart';
 
-import 'table_model.dart';
+import '../model/table_model.dart';
 
-class TableRepo {
+class TableRepo extends FirebaseBase<TableModel> {
   final TableRepository _tableRepository;
 
   TableRepo({required TableRepository tableRepository})
       : _tableRepository = tableRepository;
 
-  Future<List<TableModel>> getTable() async {
-    var tables = <TableModel>[];
-    try {
-      var res = await _tableRepository.getAllTable();
-      res.docs.map((e) => tables.add(TableModel.fromFirestore(e))).toList();
-      return tables;
-    } catch (e) {
-      throw '$e';
-    }
+  Future<FirebaseResult<List<TableModel>>> getTable() async {
+    Future<FirebaseResult<List<TableModel>>> result =
+        getItems(await _tableRepository.getAllTable(), TableModel.fromJson);
+    return result;
+  }
+
+  Future<FirebaseResult<bool>> deleteTable({required String idTable}) async {
+    return await deleteItem(_tableRepository.deleteTable(idTable: idTable));
+  }
+
+  Future<FirebaseResult<bool>> createTable({required TableModel table}) async {
+    return await createItem(
+        _tableRepository.createTable(dataJson: table.toJson()));
   }
 }

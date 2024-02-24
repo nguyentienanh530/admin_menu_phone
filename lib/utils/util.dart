@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class Ultils {
@@ -26,5 +28,11 @@ class Ultils {
     final outputFormat = DateFormat('dd/MM/yyyy');
     final dateTime = inputFormat.parse(dateTimeString);
     return outputFormat.format(dateTime);
+  }
+}
+
+Future pop(BuildContext context, int returnedLevel) async {
+  for (var i = 0; i < returnedLevel; ++i) {
+    context.pop<bool>(true);
   }
 }

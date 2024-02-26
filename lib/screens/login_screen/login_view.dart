@@ -110,6 +110,7 @@ class _Password extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginCubit, LoginState>(builder: (context, state) {
       return CommonTextField(
+          maxLines: 1,
           controller: _passwordcontroller,
           hintText: AppText.password,
           onChanged: (value) =>

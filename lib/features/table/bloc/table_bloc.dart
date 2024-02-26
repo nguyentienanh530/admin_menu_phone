@@ -3,20 +3,21 @@ import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/features/table/data/table_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_repository/table_repository.dart';
 import '../model/table_model.dart';
 part 'table_event.dart';
 
-typedef Emit = Emitter<GenericBlocState<TableModel>>;
+typedef Emit = Emitter<GenericBlocState<Table>>;
+typedef Table = TableModel;
 
-class TableBloc extends Bloc<TableEvent, GenericBlocState<TableModel>>
-    with BlocHelper<TableModel> {
+class TableBloc extends Bloc<TableEvent, GenericBlocState<Table>>
+    with BlocHelper<Table> {
   TableBloc() : super(GenericBlocState.loading()) {
     on<TablesFetched>(_getAllTable);
     on<TableDeleted>(_deleteTable);
     on<TableCreated>(_createTable);
+    on<TableUpdated>(_updateTable);
   }
   final _tableRepository = TableRepo(
       tableRepository:
@@ -34,5 +35,10 @@ class TableBloc extends Bloc<TableEvent, GenericBlocState<TableModel>>
   FutureOr<void> _createTable(TableCreated event, Emit emit) async {
     await createItem(
         _tableRepository.createTable(table: event.tableModel), emit);
+  }
+
+  FutureOr<void> _updateTable(
+      TableUpdated event, Emitter<GenericBlocState<Table>> emit) async {
+    await updateItem(_tableRepository.updateTable(table: event.table), emit);
   }
 }

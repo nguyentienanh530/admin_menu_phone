@@ -12,7 +12,8 @@ class CommonTextField extends StatelessWidget {
       this.suffixIcon,
       this.validator,
       this.controller,
-      this.prefixIcon});
+      this.prefixIcon,
+      this.maxLines});
   final String? errorText;
   final TextInputType? keyboardType;
   final Function(String) onChanged;
@@ -22,6 +23,7 @@ class CommonTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final String? Function(String?)? validator;
   final TextEditingController? controller;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class CommonTextField extends StatelessWidget {
         validator: validator,
         textAlignVertical: TextAlignVertical.center,
         key: key,
-        maxLines: null,
+        maxLines: maxLines,
         style: context.textStyleSmall,
         textAlign: TextAlign.start,
         keyboardType: keyboardType ?? TextInputType.text,

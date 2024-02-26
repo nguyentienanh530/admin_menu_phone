@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:cache/cache.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -147,22 +148,27 @@ class LogInWithGoogleFailure implements Exception {
 /// Thrown during the logout process if a failure occurs.
 class LogOutFailure implements Exception {}
 
+class CreateUserToCloudFirebaseFailure implements Exception {}
+
 /// {@template authentication_repository}
 /// Repository which manages user authentication.
 /// {@endtemplate}
 class AuthenticationRepository {
   /// {@macro authentication_repository}
-  AuthenticationRepository({
-    CacheClient? cache,
-    firebase_auth.FirebaseAuth? firebaseAuth,
-    GoogleSignIn? googleSignIn,
-  })  : _cache = cache ?? CacheClient(),
+  AuthenticationRepository(
+      {CacheClient? cache,
+      firebase_auth.FirebaseAuth? firebaseAuth,
+      GoogleSignIn? googleSignIn,
+      FirebaseFirestore? firebaseFirestore})
+      : _cache = cache ?? CacheClient(),
         _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.standard();
+        _googleSignIn = googleSignIn ?? GoogleSignIn.standard(),
+        _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
 
   final CacheClient _cache;
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+  final FirebaseFirestore _firebaseFirestore;
 
   /// Whether or not the current environment is web
   /// Should only be overridden for testing purposes. Otherwise,
@@ -269,6 +275,15 @@ class AuthenticationRepository {
       ]);
     } catch (_) {
       throw LogOutFailure();
+    }
+  }
+
+  createUserToCloudFirebase({required Map<String, dynamic> userJson}) async {
+    try {
+      var addUser = await _firebaseFirestore.collection('users').add(userJson);
+      addUser.update({'id': addUser.id});
+    } catch (e) {
+      throw CreateUserToCloudFirebaseFailure();
     }
   }
 }

@@ -9,6 +9,7 @@ environment:
 dependencies:
   cache:
     path: ../cache
+  cloud_firestore: ^4.15.5
   equatable: ^2.0.5
   firebase_auth: ^4.14.1
   firebase_core: ^2.23.0

@@ -1,6 +1,8 @@
 import 'package:admin_menu_mobile/config/config.dart';
 import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
 import 'package:admin_menu_mobile/features/register/cubit/register_cubit.dart';
+import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
+import 'package:admin_menu_mobile/features/user/model/user_model.dart';
 import 'package:admin_menu_mobile/utils/app_alerts.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +49,7 @@ class SignUpView extends StatelessWidget {
                         });
                         break;
                       case FormzSubmissionStatus.success:
+                        _handleCreateUser(context, state.email.value);
                         AppAlerts.successDialog(context,
                             title: AppText.success,
                             desc: AppText.registerSuccessTitle,
@@ -62,6 +65,17 @@ class SignUpView extends StatelessWidget {
                   },
                   child: _buildBody())))
     ]);
+  }
+
+  void _handleCreateUser(BuildContext context, String email) {
+    var userID = context.read<AuthBloc>().state.user.id;
+    var user = UserModel().copyWith(
+        id: userID,
+        name: email,
+        email: email,
+        role: 'admin',
+        createAt: DateTime.now().toString());
+    context.read<UserBloc>().add(UserCreated(user: user));
   }
 
   Widget _buildBody() {
@@ -132,6 +146,7 @@ class _Password extends StatelessWidget {
             previous.isShowPassword != current.isShowPassword,
         builder: (context, state) {
           return CommonTextField(
+              maxLines: 1,
               controller: _passwordcontroller,
               hintText: AppText.password,
               errorText: state.password.displayError != null
@@ -164,14 +179,6 @@ class _ButtonSignUp extends StatelessWidget {
               : null);
     });
   }
-
-  // void _handleSignUp({GlobalKey<FormState>? key, WidgetRef? ref}) {
-  //   if (!key!.currentState!.validate()) return;
-  //   ref!.read(signUpProvider.notifier).signUpWithEmailAndPassword(ref);
-  //   // FocusScope.of(context!)
-  //   //   ..nextFocus()
-  //   //   ..unfocus();
-  // }
 }
 
 class _ButtonSignIn extends StatelessWidget {

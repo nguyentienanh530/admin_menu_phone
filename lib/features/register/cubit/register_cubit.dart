@@ -3,14 +3,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_inputs/form_inputs.dart';
 import 'package:formz/formz.dart';
-
 import '../data/register_repo.dart';
-
 part 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
-  RegisterCubit(this._authenticationRepository) : super(const RegisterState());
+  RegisterCubit(AuthenticationRepository authenticationRepository)
+      : _authenticationRepository = authenticationRepository,
+        super(const RegisterState());
+
   final AuthenticationRepository _authenticationRepository;
+
   void emailChanged(String value) {
     final email = Email.dirty(value);
     emit(state.copyWith(

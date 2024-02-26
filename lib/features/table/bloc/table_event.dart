@@ -1,10 +1,7 @@
 part of 'table_bloc.dart';
 
-sealed class TableEvent extends Equatable {
+sealed class TableEvent {
   const TableEvent();
-
-  @override
-  List<Object> get props => [];
 }
 
 final class TablesFetched extends TableEvent {}
@@ -16,9 +13,13 @@ final class TableDeleted extends TableEvent {
 }
 
 final class TableCreated extends TableEvent {
-  final TableModel tableModel;
+  final Table tableModel;
 
   const TableCreated({required this.tableModel});
 }
 
-final class TableUpdated extends TableEvent {}
+final class TableUpdated extends TableEvent {
+  final Table table;
+
+  const TableUpdated({required this.table});
+}

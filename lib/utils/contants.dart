@@ -3,6 +3,8 @@ import 'package:logger/logger.dart';
 
 // var lstFoodInCart = <FoodModel>[];
 
+enum Mode { create, update }
+
 // Size Text
 double kTextSizeSmall = 12.0;
 double kTextSizeMedium = 16.0;

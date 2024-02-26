@@ -1,13 +1,11 @@
 import 'package:admin_menu_mobile/config/config.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
-import 'package:admin_menu_mobile/screens/table_screen/create_or_update_table.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../common/bloc/bloc_helper.dart';
 import '../../common/bloc/generic_bloc_state.dart';
 import '../../common/dialog/progress_dialog.dart';
@@ -61,9 +59,7 @@ class _TableScreenState extends State<TableScreen>
                   extra: {'mode': Mode.create});
               if (result != null && result) {
                 getData();
-              } else {
-                print('k co gi');
-              }
+              } else {}
             },
             icon: const Icon(Icons.add)));
   }
@@ -109,19 +105,38 @@ class TableView extends StatelessWidget {
                           _buildActionSlidable(context,
                               color: context.colorScheme.primaryContainer,
                               icon: Icons.update, onTap: () {
-                            context.push(RouteName.createTable,
-                                extra: {'mode': Mode.update, 'table': table});
+                            context.push(RouteName.createTable, extra: {
+                              'mode': Mode.update,
+                              'table': table
+                            }).then((result) {
+                              if (result is bool && result) {
+                                context.read<TableBloc>().add(TablesFetched());
+                              }
+                            });
                           }, title: 'Cập nhật'),
                           _buildActionSlidable(context,
                               color: context.colorScheme.errorContainer,
                               icon: Icons.delete,
-                              onTap: () => onDeleteTable(context, table),
+                              onTap: () => _dialogDeleted(context, table),
                               title: 'Xóa'),
                         ]),
                     child: _buildItem(context, table)))
                 .toList())
       ])))
     ]);
+  }
+
+  void _dialogDeleted(BuildContext context, TableModel table) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => CommonBottomSheet(
+              title: 'Chắc chắn muốn xóa bàn: ${table.name}?',
+              textCancel: 'Hủy',
+              textConfirm: 'Xóa',
+              textConfirmColor: context.colorScheme.errorContainer,
+              onCancel: () => context.pop(),
+              onConfirm: () => onDeleteTable(context, table),
+            ));
   }
 
   Widget _buildActionSlidable(BuildContext context,
@@ -141,6 +156,7 @@ class TableView extends StatelessWidget {
   }
 
   void onDeleteTable(BuildContext context, TableModel table) {
+    // context.pop();
     context.read<TableBloc>().add(TableDeleted(idTable: table.id!));
     logger.d(context.read<TableBloc>().operation);
     showDialog(
@@ -165,7 +181,7 @@ class TableView extends StatelessWidget {
                     descriptrion: "Đã xoá bàn: ${table.name}",
                     onPressed: () {
                       context.read<TableBloc>().add(TablesFetched());
-                      pop(context, 1);
+                      pop(context, 2);
                     },
                     isProgressed: false)
               };
@@ -174,35 +190,29 @@ class TableView extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, TableModel table) {
     return Card(
-      shape: const OutlineInputBorder(borderRadius: BorderRadius.zero),
-      margin: const EdgeInsets.all(0),
-      child: InkWell(
-          onTap: () {
-            // Get.to(() => UpdateTableScreen(id: table.id!, tableModel: table));
-          },
-          child: SizedBox(
-              height: context.sizeDevice.width * 0.15,
-              child: Row(
+        shape: const OutlineInputBorder(borderRadius: BorderRadius.zero),
+        margin: const EdgeInsets.all(0),
+        child: SizedBox(
+            height: context.sizeDevice.width * 0.15,
+            child: Row(
+                children: [
+              _buildImage(context, table),
+              Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                _buildImage(context, table),
-                Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      CommonLineText(title: 'Tên bàn: ', value: table.name),
-                      CommonLineText(
-                          title: 'Số ghế: ', value: table.seats.toString())
-                    ])
-              ]
-                      .animate(interval: 50.ms)
-                      .slideX(
-                          begin: -0.1,
-                          end: 0,
-                          curve: Curves.easeInOutCubic,
-                          duration: 500.ms)
-                      .fadeIn(
-                          curve: Curves.easeInOutCubic, duration: 500.ms)))),
-    );
+                    CommonLineText(title: 'Tên bàn: ', value: table.name),
+                    CommonLineText(
+                        title: 'Số ghế: ', value: table.seats.toString())
+                  ])
+            ]
+                    .animate(interval: 50.ms)
+                    .slideX(
+                        begin: -0.1,
+                        end: 0,
+                        curve: Curves.easeInOutCubic,
+                        duration: 500.ms)
+                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
   }
 
   Widget _buildImage(BuildContext context, TableModel table) {

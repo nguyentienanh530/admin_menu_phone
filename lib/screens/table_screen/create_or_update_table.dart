@@ -17,8 +17,6 @@ import '../../common/bloc/generic_bloc_state.dart';
 import '../../common/dialog/retry_dialog.dart';
 import '../../widgets/widgets.dart';
 
-enum Mode { create, update }
-
 class CreateTable extends StatefulWidget {
   const CreateTable({super.key, required this.mode, this.tableModel});
   final Mode mode;
@@ -36,6 +34,7 @@ class _CreateTableState extends State<CreateTable> {
   File? _imageFile;
   var _image = '';
   var _loading = false;
+  //  = BlocProvider.of<IsLoadingCubit>(context);
 
   @override
   void initState() {
@@ -58,9 +57,7 @@ class _CreateTableState extends State<CreateTable> {
     await uploadTask.whenComplete(() async {
       var url = await storageReference.getDownloadURL();
       var imageUrl = url.toString();
-      setState(() {
-        _image = imageUrl;
-      });
+      _image = imageUrl;
     });
   }
 
@@ -100,61 +97,114 @@ class _CreateTableState extends State<CreateTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: _buildAppbar(context),
-        body: SafeArea(
-            child: SizedBox(
-                height: context.sizeDevice.height * 0.8,
-                width: context.sizeDevice.width,
-                child: Form(
-                    key: _formKey,
-                    child: Padding(
-                        padding: EdgeInsets.all(defaultPadding),
-                        child: SingleChildScrollView(
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // _buildAppbar(context),
-                                  SizedBox(height: defaultPadding / 2),
-                                  _ImageFood(
-                                      onTap: () => pickImage(),
-                                      imageFile: _imageFile),
-                                  SizedBox(height: defaultPadding / 2),
-                                  _buildTitle('Tên bàn:'),
-                                  SizedBox(height: defaultPadding / 2),
-                                  _NameTable(nameController: _nameController),
-                                  SizedBox(height: defaultPadding / 2),
-                                  _buildTitle('Số ghế:'),
-                                  SizedBox(height: defaultPadding / 2),
-                                  _buildSeats(),
-                                  SizedBox(height: defaultPadding / 2),
-                                  _buildButtonCreateTable(),
-                                  SizedBox(height: defaultPadding / 2)
-                                ]
-                                    .animate(interval: 50.ms)
-                                    .slideX(
-                                        begin: -0.1,
-                                        end: 0,
-                                        curve: Curves.easeInOutCubic,
-                                        duration: 500.ms)
-                                    .fadeIn(
-                                        curve: Curves.easeInOutCubic,
-                                        duration: 500.ms))))))));
+    return Scaffold(appBar: _buildAppbar(context), body: _buildBody());
   }
 
-  Widget _buildButtonCreateTable() {
+  Widget _buildBody() {
+    var bodyWidget = Expanded(
+        child: SingleChildScrollView(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      SizedBox(height: defaultPadding / 2),
+      _buildImage(),
+      SizedBox(height: defaultPadding / 2),
+      _buildTitle('Tên bàn:'),
+      SizedBox(height: defaultPadding / 2),
+      _NameTable(nameController: _nameController),
+      SizedBox(height: defaultPadding / 2),
+      _buildTitle('Số ghế:'),
+      SizedBox(height: defaultPadding / 2),
+      _buildSeats()
+    ])));
+    return SafeArea(
+        child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.all(defaultPadding),
+              child: SizedBox(
+                  height: context.sizeDevice.height,
+                  child: Column(
+                      children: [
+                    bodyWidget,
+                    SizedBox(height: defaultPadding / 2),
+                    _buildButtonSubmited(),
+                  ]
+                          .animate(interval: 50.ms)
+                          .slideX(
+                              begin: -0.1,
+                              end: 0,
+                              curve: Curves.easeInOutCubic,
+                              duration: 500.ms)
+                          .fadeIn(
+                              curve: Curves.easeInOutCubic, duration: 500.ms))),
+            )));
+  }
+
+  Widget _buildImage() {
+    return _ImageFood(
+        onTap: () => pickImage(), imageFile: _imageFile, image: _image);
+  }
+
+  Widget _buildButtonSubmited() {
+    var mode = widget.mode;
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       _loading
           ? SpinKitCircle(color: context.colorScheme.secondary, size: 30)
           : FilledButton.icon(
-              onPressed: () => handleCreateTable(),
+              onPressed: () => mode == Mode.create
+                  ? handleCreateTable()
+                  : handleUpdateTable(widget.tableModel!.id!),
               icon: const Icon(Icons.add_box),
-              label: _buildTitle('Thêm bàn'))
+              label: mode == Mode.create
+                  ? _buildTitle('Thêm bàn')
+                  : _buildTitle('Cập nhật'))
     ]);
+  }
+
+  bool existImage() {
+    var exist = false;
+    if (_imageFile != null || _image.isNotEmpty) {
+      exist = true;
+    } else {
+      exist = false;
+    }
+    return exist;
+  }
+
+  Future<void> handleUpdateTable(String idTable) async {
+    final toast = FToast()..init(context);
+
+    if (_formKey.currentState!.validate()) {
+      if (_seat.isEmpty || existImage() == false) {
+        toast.showToast(
+            child:
+                AppAlerts.errorToast(context, msg: 'Chưa thêm hình hoặc ghế!'));
+      } else {
+        setState(() {
+          _loading = true;
+        });
+        await _uploadPicture()
+            .then((value) => value)
+            .catchError((onError) {})
+            .then((value) {
+          var table = TableModel(
+              id: idTable,
+              image: _image,
+              name: _nameController.text,
+              seats: int.parse(_seat));
+          updateTable(table);
+        }).then((value) {
+          setState(() {
+            _loading = false;
+          });
+        });
+      }
+    }
   }
 
   Future<void> handleCreateTable() async {
     final toast = FToast()..init(context);
+
     if (_formKey.currentState!.validate()) {
       if (_seat == '' || _imageFile == null) {
         toast.showToast(
@@ -181,6 +231,32 @@ class _CreateTableState extends State<CreateTable> {
         });
       }
     }
+  }
+
+  void updateTable(TableModel tableModel) {
+    context.read<TableBloc>().add(TableUpdated(table: tableModel));
+    showDialog(
+        context: context,
+        builder: (_) {
+          return BlocBuilder<TableBloc, GenericBlocState<TableModel>>(
+              builder: (context, state) {
+            return switch (state.status) {
+              Status.empty => const SizedBox(),
+              Status.loading => const SizedBox(),
+              Status.failure => RetryDialog(
+                  title: state.error ?? "Error",
+                  onRetryPressed: () => context
+                      .read<TableBloc>()
+                      .add(TableUpdated(table: tableModel))),
+              Status.success => ProgressDialog(
+                  descriptrion: "Đã cập nhật bàn: ${tableModel.name}",
+                  onPressed: () {
+                    pop(context, 2);
+                  },
+                  isProgressed: false)
+            };
+          });
+        });
   }
 
   void createTable(TableModel tableModel) {
@@ -225,52 +301,69 @@ class _CreateTableState extends State<CreateTable> {
 
 class _ImageFood extends StatelessWidget {
   final File? imageFile;
+  final String image;
   final Function()? onTap;
 
-  const _ImageFood({required this.onTap, required this.imageFile});
+  const _ImageFood(
+      {required this.onTap, required this.imageFile, required this.image});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: onTap,
         child: imageFile == null
-            ? Container(
-                height: 155,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(defaultBorderRadius)),
-                child: DottedBorder(
-                    dashPattern: const [6, 6],
-                    color: context.colorScheme.secondary,
-                    strokeWidth: 1,
-                    radius: Radius.circular(defaultBorderRadius),
-                    borderType: BorderType.RRect,
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Align(
-                              alignment: Alignment.topCenter,
-                              child: Container(
-                                  height: 48,
-                                  width: 48,
-                                  decoration: BoxDecoration(
-                                      color: context.colorScheme.primary,
-                                      border: Border.all(
-                                          color: context.colorScheme.primary,
-                                          width: 1),
-                                      borderRadius: BorderRadius.circular(
-                                          defaultBorderRadius)),
-                                  child: Icon(Icons.add,
-                                      color: context.colorScheme.secondary))),
-                          SizedBox(height: defaultPadding / 2),
-                          Text("Hình ảnh món ăn", style: context.textStyleSmall)
-                        ])))
+            ? _buildImage(context)
             : Container(
-                height: 155,
+                height: context.sizeDevice.height * 0.2,
                 width: double.infinity,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(defaultBorderRadius),
                     image: DecorationImage(
                         image: FileImage(imageFile!), fit: BoxFit.cover))));
+  }
+
+  _buildImage(BuildContext context) {
+    return image.isEmpty
+        ? Container(
+            height: context.sizeDevice.height * 0.2,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(defaultBorderRadius)),
+            child: DottedBorder(
+                dashPattern: const [6, 6],
+                color: context.colorScheme.secondary,
+                strokeWidth: 1,
+                radius: Radius.circular(defaultBorderRadius),
+                borderType: BorderType.RRect,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                              height: 48,
+                              width: 48,
+                              decoration: BoxDecoration(
+                                  color: context.colorScheme.primary,
+                                  border: Border.all(
+                                      color: context.colorScheme.primary,
+                                      width: 1),
+                                  borderRadius: BorderRadius.circular(
+                                      defaultBorderRadius)),
+                              child: Icon(Icons.add,
+                                  color: context.colorScheme.secondary))),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Hình ảnh món ăn", style: context.textStyleSmall)
+                    ])))
+        : GestureDetector(
+            onTap: onTap,
+            child: Container(
+                height: context.sizeDevice.height * 0.2,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(defaultBorderRadius),
+                    image: DecorationImage(
+                        image: NetworkImage(image), fit: BoxFit.cover))),
+          );
   }
 }
 

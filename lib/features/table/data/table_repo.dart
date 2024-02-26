@@ -24,4 +24,9 @@ class TableRepo extends FirebaseBase<TableModel> {
     return await createItem(
         _tableRepository.createTable(dataJson: table.toJson()));
   }
+
+  Future<FirebaseResult<bool>> updateTable({required TableModel table}) async {
+    return await updateItem(_tableRepository.updateTable(
+        idTbale: table.id!, dataJson: table.toJson()));
+  }
 }

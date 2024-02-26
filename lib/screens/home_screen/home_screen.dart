@@ -1,12 +1,50 @@
-import 'package:admin_menu_mobile/screens/home_screen/home_view.dart';
+import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
+import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
+import 'package:admin_menu_mobile/screens/create_food_screen/create_food_screen.dart';
+import 'package:admin_menu_mobile/screens/dashboard_screen/dashboard_screen.dart';
+import 'package:admin_menu_mobile/screens/profile_screen/profile_screen.dart';
+import 'package:admin_menu_mobile/screens/table_screen/table_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../order_history_screen/order_history_screen.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final PageController controller = PageController();
+
+  @override
+  void initState() {
+    _updateToken();
+    super.initState();
+  }
+
+  Future<String?> getToken() async {
+    return await FirebaseMessaging.instance.getToken();
+  }
+
+  _updateToken() async {
+    var token = await getToken();
+    _handelUpdate(_getUserID(), token!);
+  }
+
+  String _getUserID() {
+    return context.read<AuthBloc>().state.user.id;
+  }
+
+  _handelUpdate(String userID, String token) {
+    context.read<UserBloc>().add(UpdateToken(userID: userID, token: token));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,4 +91,25 @@ class HomeScreen extends StatelessWidget {
           controller.jumpToPage(index);
         });
   }
+}
+
+class HomeView extends StatelessWidget {
+  HomeView({super.key, required this.controller});
+
+  final PageController controller;
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: controller,
+        children: _widgetOptions);
+  }
+
+  final List<Widget> _widgetOptions = [
+    const DashboardScreen(),
+    const OrderHistoryScreen(),
+    const CreateFoodScreen(),
+    const TableScreen(),
+    const ProfileScreen()
+  ];
 }

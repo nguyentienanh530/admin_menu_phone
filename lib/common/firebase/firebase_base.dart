@@ -19,6 +19,10 @@ abstract class FirebaseBase<T> {
     return _requestMethodTemplate(firebaseCallback);
   }
 
+  Future<FirebaseResult<bool>> updateItem(Future<void> firebaseCallback) async {
+    return _requestMethodTemplate(firebaseCallback);
+  }
+
   Future<FirebaseResult<bool>> deleteItem(Future<void> firebaseCallback) async {
     return _requestMethodTemplate(firebaseCallback);
   }
@@ -33,6 +37,22 @@ abstract class FirebaseBase<T> {
 
       final List<T> typedList =
           dataList.map((item) => getJsonCallback(item)).toList();
+      return FirebaseResult.success(typedList);
+    } on FirebaseException catch (e) {
+      final errorMessage = e.toString();
+      return FirebaseResult.failure(errorMessage);
+    }
+  }
+
+  Future<FirebaseResult<List<T>>> getItem(
+      DocumentSnapshot<Map<String, dynamic>> firebaseCallback,
+      T Function(Map<String, dynamic> json) getJsonCallback) async {
+    List<T> typedList = <T>[];
+    try {
+      if (firebaseCallback.exists) {
+        var dataList = firebaseCallback.data();
+        typedList.add(getJsonCallback(dataList!));
+      }
       return FirebaseResult.success(typedList);
     } on FirebaseException catch (e) {
       final errorMessage = e.toString();

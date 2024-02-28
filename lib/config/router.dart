@@ -1,11 +1,15 @@
-import 'package:admin_menu_mobile/features/food/data/food_model.dart';
 import 'package:admin_menu_mobile/features/table/model/table_model.dart';
+import 'package:admin_menu_mobile/features/user/model/user_model.dart';
 import 'package:admin_menu_mobile/screens/add_food_screen/add_food_screen.dart';
+import 'package:admin_menu_mobile/screens/create_food_screen/create_food_screen.dart';
 import 'package:admin_menu_mobile/screens/food_detail_screen/food_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/order_detail_screen/order_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/order_history_detail_screen/order_history_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/order_screen/order_screen.dart';
-import 'package:admin_menu_mobile/screens/search_food_screen/search_food_screen.dart';
+import 'package:admin_menu_mobile/screens/profile_screen/change_password.dart';
+import 'package:admin_menu_mobile/screens/profile_screen/print_setting.dart';
+import 'package:admin_menu_mobile/screens/profile_screen/update_user.dart';
+import 'package:admin_menu_mobile/screens/food_screen/food_screen.dart';
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
 import 'package:admin_menu_mobile/screens/table_screen/create_or_update_table.dart';
 import 'package:admin_menu_mobile/screens/update_food_screen/update_food_screen.dart';
@@ -13,6 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/bloc/auth_bloc.dart';
+import '../features/food/model/food_model.dart';
 import '../screens/home_screen/home_screen.dart';
 import '../screens/login_screen/login_screen.dart';
 import '../utils/utils.dart';
@@ -31,6 +36,11 @@ class RouteName {
   static const String orderHistoryDetail = '/orderHistoryDetail';
   static const String updateFood = '/updateFood';
   static const String createTable = '/createTable';
+  static const String updateUser = '/updateUser';
+  static const String changePassword = '/changePassword';
+  static const String printSeting = '/printSeting';
+  static const String createFood = '/createFood';
+
   static const publicRoutes = [login, register];
 }
 
@@ -54,7 +64,6 @@ final router = GoRouter(
             final arg = GoRouterState.of(context).extra as Map<String, dynamic>;
             final mode = arg['mode'] as Mode;
             final table = arg['table'] ?? TableModel();
-
             return CreateTable(mode: mode, tableModel: table);
           }),
       GoRoute(
@@ -65,15 +74,23 @@ final router = GoRouter(
           builder: (context, state) => const SignUpScreen()),
       GoRoute(
           path: RouteName.searchFood,
-          builder: (context, state) => const SearchFoodScreen()),
+          builder: (context, state) => const FoodScreen()),
       GoRoute(
           path: RouteName.addFood,
           builder: (context, state) => const AddFoodScreen()),
       GoRoute(
+          path: RouteName.changePassword,
+          builder: (context, state) => ChangePassword()),
+      GoRoute(
+          path: RouteName.printSeting,
+          builder: (context, state) => const PrintSetting()),
+      GoRoute(
+          path: RouteName.createFood,
+          builder: (context, state) => const CreateFoodScreen()),
+      GoRoute(
           path: RouteName.foodDetail,
           builder: (context, state) {
-            final FoodModel foodModel =
-                GoRouterState.of(context).extra as FoodModel;
+            final Food foodModel = GoRouterState.of(context).extra as Food;
             return FoodDetailScreen(food: foodModel);
           }),
       GoRoute(
@@ -97,8 +114,16 @@ final router = GoRouter(
       GoRoute(
           path: RouteName.updateFood,
           builder: (context, state) {
-            final FoodModel foodModel =
-                GoRouterState.of(context).extra as FoodModel;
-            return UpdateFoodScreen(foodModel: foodModel);
+            final data =
+                GoRouterState.of(context).extra as Map<String, dynamic>;
+            final food = data['food'] as Food;
+            final mode = data['mode'] as Mode;
+            return UpdateFoodScreen(food: food, mode: mode);
+          }),
+      GoRoute(
+          path: RouteName.updateUser,
+          builder: (context, state) {
+            final UserModel user = GoRouterState.of(context).extra as UserModel;
+            return UpdateUser(user: user);
           })
     ]);

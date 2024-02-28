@@ -14,7 +14,7 @@ class OrderRepo {
           .map((event) {
         var orders = <OrderModel>[];
         orders.addAll(
-            event.docs.map((e) => OrderModel.fromFirestore(e)).toList());
+            event.docs.map((e) => OrderModel.fromJson(e.data())).toList());
         return orders;
       });
     } catch (e) {
@@ -25,7 +25,7 @@ class OrderRepo {
   Stream<OrderModel> getOrderByID({required String idOrder}) {
     try {
       return _orderRepository.getOrderByID(id: idOrder).map((e) {
-        return OrderModel.fromFirestore(e);
+        return OrderModel.fromJson(e.data()!);
       });
     } catch (e) {
       throw '$e';
@@ -37,7 +37,7 @@ class OrderRepo {
       return _orderRepository.getAllOrderWanting().map((event) {
         var orders = <OrderModel>[];
         orders.addAll(
-            event.docs.map((e) => OrderModel.fromFirestore(e)).toList());
+            event.docs.map((e) => OrderModel.fromJson(e.data())).toList());
         return orders;
       });
     } catch (e) {
@@ -77,7 +77,8 @@ class OrderRepo {
     try {
       var orders = <OrderModel>[];
       var res = await _orderRepository.getHistoryOrder();
-      orders.addAll(res.docs.map((e) => OrderModel.fromFirestore(e)).toList());
+      orders
+          .addAll(res.docs.map((e) => OrderModel.fromJson(e.data())).toList());
       return orders;
     } catch (e) {
       throw '$e';

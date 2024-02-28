@@ -6,11 +6,13 @@ enum Status { empty, loading, failure, success }
 
 @immutable
 class GenericBlocState<T> {
-  final List<T>? data;
+  final List<T>? datas;
+  final T? data;
   final String? error;
   final Status status;
 
-  const GenericBlocState({this.data, this.error, required this.status});
+  const GenericBlocState(
+      {this.data, this.error, required this.status, this.datas});
 
   factory GenericBlocState.empty() =>
       const GenericBlocState(status: Status.empty);
@@ -21,6 +23,6 @@ class GenericBlocState<T> {
   factory GenericBlocState.failure(String error) =>
       GenericBlocState(error: error, status: Status.failure);
 
-  factory GenericBlocState.success(List<T>? data) =>
-      GenericBlocState(data: data, status: Status.success);
+  factory GenericBlocState.success({List<T>? datas, T? data}) =>
+      GenericBlocState(datas: datas, data: data, status: Status.success);
 }

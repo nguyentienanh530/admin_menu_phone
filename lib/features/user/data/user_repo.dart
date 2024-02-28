@@ -20,9 +20,24 @@ class UserRepo extends FirebaseBase<UserModel> {
         _userRepository.updateAdminToken(userID: userID, token: token));
   }
 
-  Future<FirebaseResult<List<UserModel>>> getUser(
-      {required String userID}) async {
+  Future<FirebaseResult<UserModel>> getUser({required String userID}) async {
     return await getItem(
         await _userRepository.getUser(userID: userID), UserModel.fromJson);
+  }
+
+  Future<FirebaseResult<bool>> updateUser({required UserModel user}) async {
+    return await updateItem(
+        _userRepository.updateUser(userID: user.id!, userJson: user.toJson()));
+  }
+
+  Future<FirebaseResult<bool>> updatePassword(
+      {required String currentPass, required String newPass}) async {
+    return await updateItem(_userRepository.updatePassword(
+        currentPassword: currentPass, newPassword: newPass));
+  }
+
+  Future<FirebaseResult<List<UserModel>>> getUsers() async {
+    return await getItems(
+        await _userRepository.getAllUser(), UserModel.fromJson);
   }
 }

@@ -4,7 +4,7 @@ enum FoodStatus { initial, loading, success, failure }
 
 class FoodState extends Equatable {
   const FoodState(
-      {this.foods = const <FoodModel>[],
+      {this.foods = const <Food>[],
       this.food,
       this.error = '',
       this.status = FoodStatus.initial,
@@ -25,8 +25,8 @@ class FoodState extends Equatable {
       this.imageFood3 = '',
       this.isUpdateFood = false,
       this.isDeleteFood = false});
-  final List<FoodModel> foods;
-  final FoodModel? food;
+  final List<Food> foods;
+  final Food? food;
   final String error;
   final FoodStatus status;
   final File? imageFile, imageGallery1, imageGallery2, imageGallery3;
@@ -42,8 +42,8 @@ class FoodState extends Equatable {
   final String imageFood, imageFood1, imageFood2, imageFood3;
 
   FoodState copyWith(
-      {List<FoodModel>? foods,
-      FoodModel? food,
+      {List<Food>? foods,
+      Food? food,
       String? error,
       FoodStatus? status,
       File? imageFile,
@@ -91,7 +91,7 @@ class FoodState extends Equatable {
   List<Object> get props => [
         status,
         foods,
-        food ?? FoodModel(),
+        food ?? Food(),
         error,
         imageFile ?? File(''),
         imageGallery1 ?? File(''),

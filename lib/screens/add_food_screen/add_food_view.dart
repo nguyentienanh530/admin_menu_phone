@@ -7,7 +7,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tiengviet/tiengviet.dart';
 
-import '../../features/food/data/food_model.dart';
+import '../../features/food/model/food_model.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
 
@@ -120,10 +120,10 @@ class AfterSearchUI extends StatelessWidget {
         }));
   }
 
-  Widget _buildItemSearch(BuildContext context, FoodModel food) {
+  Widget _buildItemSearch(BuildContext context, Food food) {
     return InkWell(
         onTap: () {
-          context.pop<FoodModel>(food);
+          context.pop<Food>(food);
         },
         child: Padding(
             padding:
@@ -156,7 +156,7 @@ class AfterSearchUI extends StatelessWidget {
                                 duration: 500.ms))))));
   }
 
-  Widget _buildImage(FoodModel food) {
+  Widget _buildImage(Food food) {
     return Hero(
         tag: 'hero-tag-${food.id}-search',
         child: Material(
@@ -178,19 +178,19 @@ class AfterSearchUI extends StatelessWidget {
                             : BoxFit.fill)))));
   }
 
-  Widget _buildCategory(BuildContext context, FoodModel food) {
+  Widget _buildCategory(BuildContext context, Food food) {
     return FittedBox(
         child: Text(food.category!, style: context.textStyleSmall!));
   }
 
-  Widget _buildTitle(BuildContext context, FoodModel food) {
+  Widget _buildTitle(BuildContext context, Food food) {
     return FittedBox(
         child: Text(food.title!,
             style:
                 context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold)));
   }
 
-  Widget _buildPrice(BuildContext context, FoodModel food) {
+  Widget _buildPrice(BuildContext context, Food food) {
     double discountAmount = (food.price! * food.discount!.toDouble()) / 100;
     double discountedPrice = food.price! - discountAmount;
     return food.isDiscount == false
@@ -219,7 +219,7 @@ class AfterSearchUI extends StatelessWidget {
           ]);
   }
 
-  Widget _buildPercentDiscount(FoodModel food) {
+  Widget _buildPercentDiscount(Food food) {
     return Container(
         height: 80,
         width: 80,

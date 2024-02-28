@@ -44,15 +44,14 @@ abstract class FirebaseBase<T> {
     }
   }
 
-  Future<FirebaseResult<List<T>>> getItem(
+  Future<FirebaseResult<T>> getItem(
       DocumentSnapshot<Map<String, dynamic>> firebaseCallback,
       T Function(Map<String, dynamic> json) getJsonCallback) async {
-    List<T> typedList = <T>[];
     try {
-      if (firebaseCallback.exists) {
-        var dataList = firebaseCallback.data();
-        typedList.add(getJsonCallback(dataList!));
-      }
+      final Map<String, dynamic>? dataList = firebaseCallback.data();
+
+      final T typedList = getJsonCallback(dataList!);
+
       return FirebaseResult.success(typedList);
     } on FirebaseException catch (e) {
       final errorMessage = e.toString();

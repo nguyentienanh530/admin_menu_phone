@@ -12,7 +12,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String? ?? '',
       email: json['email'] as String? ?? '',
       image: json['image'] as String? ?? '',
-      phoneNumber: json['phoneNumber'] as int? ?? 0,
+      phoneNumber: json['phoneNumber'] as String? ?? '',
       role: json['role'] as String? ?? '',
       createAt: json['createAt'] as String? ?? '',
     );

@@ -1,4 +1,4 @@
-import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/features/food/model/food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FoodDto {
@@ -60,7 +60,7 @@ class FoodDto {
         note: data['note']);
   }
 
-  Map<String, dynamic> toJson(FoodModel food) => {
+  Map<String, dynamic> toJson(Food food) => {
         'id': food.id.toString(),
         'timeOrder': food.timeOrder,
         'quantity': food.quantity,

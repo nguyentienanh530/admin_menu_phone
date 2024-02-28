@@ -5,7 +5,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
-import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/features/food/model/food_model.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/features/order/dtos/food_dto.dart';
 import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
@@ -39,11 +39,11 @@ class OrderDetailView extends StatelessWidget {
                 topLeft: Radius.circular(15), topRight: Radius.circular(15))),
         child: Column(children: [
           Expanded(
-              child: order.foods!.isNotEmpty
+              child: order.orderFood!.isNotEmpty
                   ? SingleChildScrollView(
                       child: Column(children: [
                       Column(
-                          children: order.foods!
+                          children: order.orderFood!
                               .map((e) => _ItemFood(orderModel: order, food: e))
                               .toList())
                     ]))
@@ -55,7 +55,7 @@ class OrderDetailView extends StatelessWidget {
 
 class _ItemFood extends StatelessWidget {
   final OrderModel orderModel;
-  final FoodModel food;
+  final Food food;
   const _ItemFood({required this.orderModel, required this.food});
   @override
   Widget build(BuildContext context) {
@@ -81,8 +81,7 @@ class _ItemFood extends StatelessWidget {
             child: _buildItem(context, food, orderModel)));
   }
 
-  Widget _buildItem(
-      BuildContext context, FoodModel food, OrderModel orderModel) {
+  Widget _buildItem(BuildContext context, Food food, OrderModel orderModel) {
     return Card(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -104,7 +103,7 @@ class _ItemFood extends StatelessWidget {
                 ]),
                 Padding(
                   padding: EdgeInsets.only(right: defaultPadding / 2),
-                  child: _PriceFoodItem(foodModel: food),
+                  child: _PriceFoodItem(food: food),
                 ),
               ]),
               food.note!.isNotEmpty
@@ -127,7 +126,7 @@ class _ItemFood extends StatelessWidget {
                 .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms)));
   }
 
-  Widget _buildImage(FoodModel food) {
+  Widget _buildImage(Food food) {
     return Container(
         height: 50,
         width: 50,
@@ -143,7 +142,7 @@ class _ItemFood extends StatelessWidget {
   }
 
   Future _handleDeleteItem(
-      BuildContext context, OrderModel orderModel, FoodModel foodModel) {
+      BuildContext context, OrderModel orderModel, Food food) {
     return showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
@@ -160,10 +159,10 @@ class _ItemFood extends StatelessWidget {
                   onConfirm: () {
                     var orders = <Map<String, dynamic>>[];
                     var totalPrice = 0.0;
-                    orderModel.foods!.remove(foodModel);
-                    orderModel.foods!.map((e) {
+                    orderModel.orderFood!.remove(food);
+                    orderModel.orderFood!.map((e) {
                       orders.add(FoodDto().toJson(e));
-                      totalPrice = totalPrice + e.totalPrice!;
+                      totalPrice = totalPrice + e.totalPrice;
                     }).toList();
 
                     context.read<OrderBloc>().add(UpdateFoodInOrder(
@@ -195,7 +194,7 @@ class _BottomAction extends StatelessWidget {
                         fontWeight: FontWeight.bold))
               ]),
               SizedBox(height: defaultPadding),
-              order.foods!.isNotEmpty
+              order.orderFood!.isNotEmpty
                   ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Expanded(
                           child: _ButtonPaymentAccept(
@@ -215,13 +214,12 @@ class _BottomAction extends StatelessWidget {
 }
 
 class _PriceFoodItem extends StatelessWidget {
-  final FoodModel foodModel;
+  final Food food;
 
-  const _PriceFoodItem({required this.foodModel});
+  const _PriceFoodItem({required this.food});
   @override
   Widget build(BuildContext context) {
-    return Text(
-        Ultils.currencyFormat(double.parse(foodModel.totalPrice.toString())),
+    return Text(Ultils.currencyFormat(double.parse(food.totalPrice.toString())),
         style: context.textStyleMedium!.copyWith(
             color: context.colorScheme.secondary, fontWeight: FontWeight.bold));
   }
@@ -276,10 +274,7 @@ class _ButtonPaymentAccept extends StatelessWidget {
 class _AddFoodButton extends StatelessWidget {
   final OrderModel orderModel;
 
-  const _AddFoodButton({
-    Key? key,
-    required this.orderModel,
-  }) : super(key: key);
+  const _AddFoodButton({required this.orderModel});
   @override
   Widget build(BuildContext context) {
     return FilledButton.icon(
@@ -294,9 +289,9 @@ class _AddFoodButton extends StatelessWidget {
         onPressed: () => _handleAddFood(context));
   }
 
-  bool checkExistFood({FoodModel? food}) {
+  bool checkExistFood({Food? food}) {
     var isExist = false;
-    for (FoodModel e in orderModel.foods!) {
+    for (Food e in orderModel.orderFood!) {
       if (e.id == food!.id) {
         isExist = true;
         break;
@@ -310,12 +305,12 @@ class _AddFoodButton extends StatelessWidget {
     var lstFood = <Map<String, dynamic>>[];
     var totalBill = 0.0;
     context.push(RouteName.addFood).then((food) {
-      if (food is FoodModel) {
+      if (food is Food) {
         var newFood = food;
         if (!checkExistFood(food: food)) {
-          orderModel.foods!.add(newFood);
-          lstFood.addAll(orderModel.foods!.map((e) {
-            totalBill = totalBill + e.totalPrice!;
+          orderModel.orderFood!.add(newFood);
+          lstFood.addAll(orderModel.orderFood!.map((e) {
+            totalBill = totalBill + e.totalPrice;
             return FoodDto().toJson(e);
           }).toList());
 
@@ -331,10 +326,11 @@ class _AddFoodButton extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class _Quantity extends StatelessWidget {
-  final FoodModel food;
+  Food food;
   final OrderModel orderModel;
-  const _Quantity({required this.food, required this.orderModel});
+  _Quantity({required this.food, required this.orderModel});
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -364,18 +360,20 @@ class _Quantity extends StatelessWidget {
   }
 
   void _handleDecrement(BuildContext context) {
-    if (food.quantity! > 1) {
+    if (food.quantity > 1) {
       var totalBill = 0.0;
       var orders = <Map<String, dynamic>>[];
-      for (var element in orderModel.foods!) {
-        if (element.id == food.id) {
-          element.quantity = element.quantity! - 1;
-          element.totalPrice = element.quantity! * food.price!;
-        }
-      }
-      for (var element in orderModel.foods!) {
+      food = food.copyWith(
+          quantity: food.quantity - 1, totalPrice: food.quantity * food.price!);
+      // for (var element in orderModel.foods!) {
+      //   if (element.id == food.id) {
+      //     element.quantity = element.quantity - 1;
+      //     element.totalPrice = element.quantity * food.price!;
+      //   }
+      // }
+      for (var element in orderModel.orderFood!) {
         orders.add(FoodDto().toJson(element));
-        totalBill = totalBill + element.totalPrice!;
+        totalBill = totalBill + element.totalPrice;
       }
       context.read<OrderBloc>().add(UpdateFoodInOrder(
           idOrder: orderModel.id!, json: orders, totalPrice: totalBill));
@@ -385,15 +383,17 @@ class _Quantity extends StatelessWidget {
   void _handleIncrement(BuildContext context) {
     var totalBill = 0.0;
     var orders = <Map<String, dynamic>>[];
-    for (var element in orderModel.foods!) {
-      if (element.id == food.id) {
-        element.quantity = element.quantity! + 1;
-        element.totalPrice = element.quantity! * food.price!;
-      }
-    }
-    for (var element in orderModel.foods!) {
+    food = food.copyWith(
+        quantity: food.quantity - 1, totalPrice: food.quantity * food.price!);
+    // for (var element in orderModel.foods!) {
+    //   if (element.id == food.id) {
+    //     element.quantity = element.quantity! + 1;
+    //     element.totalPrice = element.quantity! * food.price!;
+    //   }
+    // }
+    for (var element in orderModel.orderFood!) {
       orders.add(FoodDto().toJson(element));
-      totalBill = totalBill + element.totalPrice!;
+      totalBill = totalBill + element.totalPrice;
     }
     context.read<OrderBloc>().add(UpdateFoodInOrder(
         idOrder: orderModel.id!, json: orders, totalPrice: totalBill));

@@ -1,12 +1,13 @@
 import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
-import 'package:admin_menu_mobile/screens/create_food_screen/create_food_screen.dart';
 import 'package:admin_menu_mobile/screens/dashboard_screen/dashboard_screen.dart';
+import 'package:admin_menu_mobile/screens/food_screen/food_screen.dart';
 import 'package:admin_menu_mobile/screens/profile_screen/profile_screen.dart';
 import 'package:admin_menu_mobile/screens/table_screen/table_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import '../order_history_screen/order_history_screen.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -57,34 +58,66 @@ class _HomeScreenState extends State<HomeScreen> {
         items: [
           TabItem(
               fontFamily: GoogleFonts.nunito().fontFamily,
-              icon: const Icon(Icons.house_rounded, size: 20),
-              activeIcon: const Icon(Icons.house_rounded, size: 30),
+              icon: SvgPicture.asset('assets/icon/home.svg',
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+              activeIcon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset('assets/icon/home.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcIn))),
               title: "Trang chủ"),
           TabItem(
               fontFamily: GoogleFonts.nunito().fontFamily,
-              icon: const Icon(Icons.history_rounded, size: 20),
-              activeIcon: const Icon(Icons.history_rounded, size: 30),
+              icon: SvgPicture.asset('assets/icon/ordered.svg',
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+              activeIcon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset('assets/icon/ordered.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcIn))),
               title: "Lịch sử"),
           TabItem(
               fontFamily: GoogleFonts.nunito().fontFamily,
-              icon: const Icon(Icons.add_box_rounded, size: 20),
-              activeIcon: const Icon(Icons.add_box_rounded, size: 30),
-              title: "Tạo món"),
+              icon: SvgPicture.asset('assets/icon/food.svg',
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+              activeIcon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset('assets/icon/food.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcIn))),
+              title: "Món ăn"),
           TabItem(
               fontFamily: GoogleFonts.nunito().fontFamily,
-              icon: const Icon(Icons.table_restaurant, size: 20),
-              activeIcon: const Icon(Icons.table_restaurant, size: 30),
+              icon: SvgPicture.asset('assets/icon/chair.svg',
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+              activeIcon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset('assets/icon/chair.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcIn))),
               title: "Bàn ăn"),
           TabItem(
               fontFamily: GoogleFonts.nunito().fontFamily,
-              icon: const Icon(Icons.person, size: 20),
-              activeIcon: const Icon(Icons.person, size: 30),
+              icon: SvgPicture.asset('assets/icon/user.svg',
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+              activeIcon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset('assets/icon/user.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcIn))),
               title: "Hồ sơ")
         ],
         style: TabStyle.reactCircle,
         activeColor: context.colorScheme.primary,
         shadowColor: context.colorScheme.inversePrimary,
         backgroundColor: context.colorScheme.background,
+
+        // color: context.colorScheme.secondary,
         top: -15,
         curveSize: 60,
         onTap: (index) {
@@ -108,7 +141,7 @@ class HomeView extends StatelessWidget {
   final List<Widget> _widgetOptions = [
     const DashboardScreen(),
     const OrderHistoryScreen(),
-    const CreateFoodScreen(),
+    const FoodScreen(),
     const TableScreen(),
     const ProfileScreen()
   ];

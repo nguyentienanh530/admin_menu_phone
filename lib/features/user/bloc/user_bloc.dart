@@ -19,6 +19,9 @@ class UserBloc extends Bloc<UserEvent, GenericBlocState<User>>
     on<UserCreated>(_createUser);
     on<UpdateToken>(_updateToken);
     on<UserFecthed>(_getUser);
+    on<UserUpdated>(_updateUser);
+    on<PasswordChanged>(_changedPassword);
+    on<UsersFetched>(_fetchUsers);
   }
 
   final _userRepository = UserRepo(
@@ -37,5 +40,22 @@ class UserBloc extends Bloc<UserEvent, GenericBlocState<User>>
 
   FutureOr<void> _getUser(UserFecthed event, Emit emit) async {
     await getItem(_userRepository.getUser(userID: event.userID), emit);
+  }
+
+  FutureOr<void> _updateUser(
+      UserUpdated event, Emitter<GenericBlocState<User>> emit) async {
+    await updateItem(_userRepository.updateUser(user: event.user), emit);
+  }
+
+  FutureOr<void> _changedPassword(PasswordChanged event, Emit emit) async {
+    await updateItem(
+        _userRepository.updatePassword(
+            currentPass: event.currentPassword, newPass: event.newPassword),
+        emit);
+  }
+
+  FutureOr<void> _fetchUsers(
+      UsersFetched event, Emitter<GenericBlocState<User>> emit) async {
+    await getItems(_userRepository.getUsers(), emit);
   }
 }

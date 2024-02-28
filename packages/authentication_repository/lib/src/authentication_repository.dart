@@ -162,13 +162,11 @@ class AuthenticationRepository {
       FirebaseFirestore? firebaseFirestore})
       : _cache = cache ?? CacheClient(),
         _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.standard(),
-        _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
+        _googleSignIn = googleSignIn ?? GoogleSignIn.standard();
 
   final CacheClient _cache;
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
-  final FirebaseFirestore _firebaseFirestore;
 
   /// Whether or not the current environment is web
   /// Should only be overridden for testing purposes. Otherwise,
@@ -275,15 +273,6 @@ class AuthenticationRepository {
       ]);
     } catch (_) {
       throw LogOutFailure();
-    }
-  }
-
-  createUserToCloudFirebase({required Map<String, dynamic> userJson}) async {
-    try {
-      var addUser = await _firebaseFirestore.collection('users').add(userJson);
-      addUser.update({'id': addUser.id});
-    } catch (e) {
-      throw CreateUserToCloudFirebaseFailure();
     }
   }
 }

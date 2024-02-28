@@ -4,6 +4,8 @@ import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:admin_menu_mobile/features/table/model/table_model.dart';
+import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
+import 'package:admin_menu_mobile/features/user/model/user_model.dart';
 import 'package:admin_menu_mobile/widgets/empty_screen.dart';
 import 'package:admin_menu_mobile/widgets/error_screen.dart';
 import 'package:admin_menu_mobile/widgets/loading_screen.dart';
@@ -32,15 +34,11 @@ class _MyWidgetState extends State<DashboardView>
       Padding(
           padding: EdgeInsets.only(
               left: defaultPadding, right: defaultPadding, top: defaultPadding),
-          child: Row(children: [
-            const Expanded(child: ItemCirclePercent()),
-            SizedBox(width: defaultPadding),
-            const Expanded(child: ItemCirclePercent())
-          ])),
-      Padding(
-          padding: EdgeInsets.only(
-              left: defaultPadding, right: defaultPadding, top: defaultPadding),
-          child: const ChartPaymentToDay()),
+          child: const DailyRevenue()),
+      // Padding(
+      //     padding: EdgeInsets.only(
+      //         left: defaultPadding, right: defaultPadding, top: defaultPadding),
+      //     child: ChartRevenue()),
       _buildHeader(context),
       _buildTitle(context),
       Padding(
@@ -72,16 +70,30 @@ class _MyWidgetState extends State<DashboardView>
                 children: [
                   Expanded(child: _buildOrderWanting()),
                   SizedBox(width: defaultPadding),
-                  Expanded(
-                      child: _buidItemDashBoard(context,
-                          title: "Người dùng",
-                          title2: "Tài khoản",
-                          value: 10, onTap: () {
-                    // Get.to(() => UserListScreen());
-                  })),
+                  Expanded(child: _buildUserAccount()),
                   SizedBox(width: defaultPadding),
                   Expanded(child: _buildFoods())
                 ])));
+  }
+
+  Widget _buildUserAccount() {
+    var loadingOrInitState = Center(
+        child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
+    return BlocProvider(
+        create: (context) => UserBloc()..add(UsersFetched()),
+        child: BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
+            builder: (context, state) => switch (state.status) {
+                  Status.loading => loadingOrInitState,
+                  Status.empty => Text('Empty', style: context.textStyleSmall),
+                  Status.failure =>
+                    Text('Failure', style: context.textStyleSmall),
+                  Status.success => _buidItemDashBoard(context,
+                        title: "Người dùng",
+                        title2: "Tài khoản",
+                        value: state.datas!.length, onTap: () {
+                      // Get.to(() => UserListScreen());
+                    })
+                }));
   }
 
   Widget _buildFoods() {
@@ -98,7 +110,7 @@ class _MyWidgetState extends State<DashboardView>
                   title: "Số lượng",
                   title2: "Món",
                   value: state.foods.length, onTap: () {
-                context.push(RouteName.searchFood);
+                // context.push(RouteName.searchFood);
               })
           });
         }));
@@ -182,17 +194,120 @@ class _MyWidgetState extends State<DashboardView>
   bool get wantKeepAlive => true;
 }
 
-class ChartPaymentToDay extends StatelessWidget {
-  const ChartPaymentToDay({super.key});
+// class ChartRevenue extends StatelessWidget {
+//   ChartRevenue({super.key});
+//   var showingTooltip = -1;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     title() =>
+//         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+//           Text('Doanh thu ngày'.toUpperCase(), style: context.textStyleSmall),
+//           Row(children: [
+//             Text('Xem chi tiết', style: context.textStyleSmall),
+//             const Icon(Icons.navigate_next_rounded)
+//           ])
+//         ]);
+
+//     price() => Text(Ultils.currencyFormat(134534534),
+//         style: context.titleStyleMedium!.copyWith(
+//             fontWeight: FontWeight.bold, color: context.colorScheme.secondary));
+//     childStatus(String title, String value) => Column(
+//           children: [
+//             Text(title,
+//                 style: context.textStyleSmall!
+//                     .copyWith(color: Colors.white.withOpacity(0.5))),
+//             // const SizedBox(height: 16),
+//             Text(value,
+//                 style: context.textStyleLarge!
+//                     .copyWith(fontWeight: FontWeight.bold)),
+//           ],
+//         );
+//     status() => Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//           children: [
+//             childStatus('Đơn hàng mới', '10'),
+//             childStatus('Tổng đơn/Ngày', '100'),
+//             childStatus('Đơn đang lên', '1'),
+//           ],
+//         );
+
+//     return Card(
+//         child: Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: BarChart(BarChartData(
+//               barGroups: [
+//                 generateGroupData(1, 10),
+//                 generateGroupData(2, 18),
+//                 generateGroupData(3, 4),
+//                 generateGroupData(4, 11),
+//               ],
+//             ))));
+//   }
+
+//   BarChartGroupData generateGroupData(int x, int y) {
+//     return BarChartGroupData(
+//       x: x,
+//       showingTooltipIndicators: showingTooltip == x ? [0] : [],
+//       barRods: [
+//         BarChartRodData(toY: y.toDouble()),
+//       ],
+//     );
+//   }
+// }
+
+class DailyRevenue extends StatelessWidget {
+  const DailyRevenue({super.key});
 
   @override
   Widget build(BuildContext context) {
+    title() =>
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text('Doanh thu ngày'.toUpperCase(), style: context.textStyleSmall),
+          Row(children: [
+            Text('Xem chi tiết', style: context.textStyleSmall),
+            const Icon(Icons.navigate_next_rounded)
+          ])
+        ]);
+
+    price() => Text(Ultils.currencyFormat(134534534),
+        style: context.titleStyleMedium!.copyWith(
+            fontWeight: FontWeight.bold, color: context.colorScheme.secondary));
+    childStatus(String title, String value) => Column(
+          children: [
+            Text(title,
+                style: context.textStyleSmall!
+                    .copyWith(color: Colors.white.withOpacity(0.5))),
+            const SizedBox(height: 8),
+            Text(value,
+                style: context.textStyleLarge!
+                    .copyWith(fontWeight: FontWeight.bold)),
+          ],
+        );
+    status() => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            childStatus('Đơn hàng mới', '10'),
+            childStatus('Tổng đơn/Ngày', '100'),
+            childStatus('Đơn đang lên', '1'),
+          ],
+        );
+
     return Card(
-      child: Container(
-          height: context.sizeDevice.height * 0.2,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(defaultBorderRadius))),
-    );
+        child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+                // height: context.sizeDevice.height * 0.2,
+                width: context.sizeDevice.width,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      title(),
+                      price(),
+                      Divider(color: context.colorScheme.primary),
+                      status()
+                    ]))));
   }
 }
 
@@ -224,7 +339,7 @@ class _ListTable extends StatelessWidget {
                 crossAxisCount: 4,
                 crossAxisSpacing: defaultPadding,
                 mainAxisSpacing: defaultPadding,
-                children: state.data!
+                children: state.datas!
                     .map((e) => _ItemTable(nameTable: e.name))
                     .toList()),
           };

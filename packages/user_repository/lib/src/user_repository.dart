@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserRepository {
   // final _firebaseFirestore = FirebaseFirestore.instance;
@@ -75,6 +76,20 @@ class UserRepository {
           .collection('admin_tokens')
           .doc(userID)
           .set(tokenJson);
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Future<void> updatePassword(
+      {required String currentPassword, required String newPassword}) async {
+    try {
+      final newUser = FirebaseAuth.instance.currentUser;
+      var cred = EmailAuthProvider.credential(
+          email: newUser!.email!, password: currentPassword);
+      newUser.reauthenticateWithCredential(cred).then((value) {
+        newUser.updatePassword(newPassword);
+      });
     } catch (e) {
       throw '$e';
     }

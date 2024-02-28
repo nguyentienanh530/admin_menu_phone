@@ -1,4 +1,4 @@
-import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/features/food/model/food_model.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +74,7 @@ class OrderHistoryDetailView extends StatelessWidget {
                 1: FlexColumnWidth(context.sizeDevice.width * 0.0015),
                 2: const FlexColumnWidth()
               },
-              children: orderModel.foods!
+              children: orderModel.orderFood!
                   .map((e) => _buildTable(context, e))
                   .toList()),
           const SizedBox(height: 20),
@@ -88,7 +88,7 @@ class OrderHistoryDetailView extends StatelessWidget {
         ]));
   }
 
-  TableRow _buildTable(BuildContext context, FoodModel food) {
+  TableRow _buildTable(BuildContext context, Food food) {
     return TableRow(children: <Widget>[
       Container(
           padding: const EdgeInsets.all(5),

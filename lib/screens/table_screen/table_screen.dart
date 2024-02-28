@@ -35,6 +35,8 @@ class _TableScreenState extends State<TableScreen>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+        floatingActionButton: _buildFloatingActionButton(),
+        floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
         appBar: _buildAppbar(context),
         body: const SafeArea(child: TableView()));
   }
@@ -44,25 +46,25 @@ class _TableScreenState extends State<TableScreen>
     context.read<TableBloc>().add(TablesFetched());
   }
 
+  Widget _buildFloatingActionButton() {
+    return FloatingActionButton(
+        heroTag: 'addTable',
+        backgroundColor: context.colorScheme.secondary,
+        onPressed: () async {
+          var result = await context
+              .push<bool>(RouteName.createTable, extra: {'mode': Mode.create});
+          if (result != null && result) {
+            getData();
+          } else {}
+        },
+        child: const Icon(Icons.add));
+  }
+
   _buildAppbar(BuildContext context) => AppBar(
       centerTitle: true,
       title: Text("Bàn ăn",
           style:
-              context.textStyleMedium!.copyWith(fontWeight: FontWeight.bold)),
-      actions: [_buildIconCreateTable()]);
-
-  Widget _buildIconCreateTable() {
-    return SizedBox(
-        child: IconButton(
-            onPressed: () async {
-              var result = await context.push<bool>(RouteName.createTable,
-                  extra: {'mode': Mode.create});
-              if (result != null && result) {
-                getData();
-              } else {}
-            },
-            icon: const Icon(Icons.add)));
-  }
+              context.textStyleMedium!.copyWith(fontWeight: FontWeight.bold)));
 
   @override
   bool get wantKeepAlive => true;
@@ -85,7 +87,7 @@ class TableView extends StatelessWidget {
                 Status.loading => const LoadingScreen(),
                 Status.failure => ErrorScreen(errorMsg: state.error),
                 Status.empty => const EmptyScreen(),
-                Status.success => _buildBody(context, state.data!)
+                Status.success => _buildBody(context, state.datas!)
               });
             }));
   }
@@ -94,7 +96,8 @@ class TableView extends StatelessWidget {
     return Column(children: [
       Expanded(
           child: SingleChildScrollView(
-              child: Column(children: [
+              child: Column(
+                  children: [
         Column(
             children: tables
                 .map((table) => Slidable(
@@ -122,7 +125,14 @@ class TableView extends StatelessWidget {
                         ]),
                     child: _buildItem(context, table)))
                 .toList())
-      ])))
+      ]
+                      .animate(interval: 50.ms)
+                      .slideX(
+                          begin: -0.1,
+                          end: 0,
+                          curve: Curves.easeInOutCubic,
+                          duration: 500.ms)
+                      .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))))
     ]);
   }
 
@@ -194,8 +204,7 @@ class TableView extends StatelessWidget {
         margin: const EdgeInsets.all(0),
         child: SizedBox(
             height: context.sizeDevice.width * 0.15,
-            child: Row(
-                children: [
+            child: Row(children: [
               _buildImage(context, table),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,14 +214,7 @@ class TableView extends StatelessWidget {
                     CommonLineText(
                         title: 'Số ghế: ', value: table.seats.toString())
                   ])
-            ]
-                    .animate(interval: 50.ms)
-                    .slideX(
-                        begin: -0.1,
-                        end: 0,
-                        curve: Curves.easeInOutCubic,
-                        duration: 500.ms)
-                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
+            ])));
   }
 
   Widget _buildImage(BuildContext context, TableModel table) {

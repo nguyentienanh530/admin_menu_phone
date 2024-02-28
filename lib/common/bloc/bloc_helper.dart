@@ -16,7 +16,7 @@ mixin BlocHelper<T> {
         emit(GenericBlocState.failure(failure));
       },
       success: (_) {
-        emit(GenericBlocState.success(null));
+        emit(GenericBlocState.success(datas: null, data: null));
       },
     );
   }
@@ -58,24 +58,24 @@ mixin BlocHelper<T> {
       if (items.isEmpty) {
         emit(GenericBlocState.empty());
       } else {
-        emit(GenericBlocState.success(items));
+        emit(GenericBlocState.success(datas: items));
       }
     });
   }
 
   Future<void> getItem(
-      Future<FirebaseResult<List<T>>> apiCallback, Emit<T> emit) async {
+      Future<FirebaseResult<T>> apiCallback, Emit<T> emit) async {
     operation = ApiOperation.select;
     emit(GenericBlocState.loading());
-    FirebaseResult<List<T>> failureOrSuccess = await apiCallback;
+    FirebaseResult<T> failureOrSuccess = await apiCallback;
 
     failureOrSuccess.when(failure: (String failure) async {
       emit(GenericBlocState.failure(failure));
-    }, success: (List<T> items) async {
-      if (items.isEmpty) {
+    }, success: (T item) async {
+      if (item == null) {
         emit(GenericBlocState.empty());
       } else {
-        emit(GenericBlocState.success(items));
+        emit(GenericBlocState.success(data: item));
       }
     });
   }

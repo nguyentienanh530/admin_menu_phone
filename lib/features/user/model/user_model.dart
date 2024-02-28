@@ -9,7 +9,7 @@ class UserModel with _$UserModel {
       @Default('') String name,
       @Default('') String email,
       @Default('') String image,
-      @Default(0) int phoneNumber,
+      @Default('') String phoneNumber,
       @Default('') String role,
       @Default('') String createAt}) = _UserModel;
 

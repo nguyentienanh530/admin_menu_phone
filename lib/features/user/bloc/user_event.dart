@@ -20,3 +20,18 @@ final class UserFecthed extends UserEvent {
 
   UserFecthed({required this.userID});
 }
+
+final class UserUpdated extends UserEvent {
+  final User user;
+
+  UserUpdated({required this.user});
+}
+
+final class PasswordChanged extends UserEvent {
+  PasswordChanged({required this.currentPassword, required this.newPassword});
+
+  final String currentPassword;
+  final String newPassword;
+}
+
+final class UsersFetched extends UserEvent {}

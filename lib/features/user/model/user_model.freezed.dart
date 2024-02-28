@@ -24,7 +24,7 @@ mixin _$UserModel {
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
-  int get phoneNumber => throw _privateConstructorUsedError;
+  String get phoneNumber => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
   String get createAt => throw _privateConstructorUsedError;
 
@@ -44,7 +44,7 @@ abstract class $UserModelCopyWith<$Res> {
       String name,
       String email,
       String image,
-      int phoneNumber,
+      String phoneNumber,
       String role,
       String createAt});
 }
@@ -90,7 +90,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
       phoneNumber: null == phoneNumber
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       role: null == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
@@ -116,7 +116,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String name,
       String email,
       String image,
-      int phoneNumber,
+      String phoneNumber,
       String role,
       String createAt});
 }
@@ -160,7 +160,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
       phoneNumber: null == phoneNumber
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       role: null == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
@@ -181,7 +181,7 @@ class _$UserModelImpl implements _UserModel {
       this.name = '',
       this.email = '',
       this.image = '',
-      this.phoneNumber = 0,
+      this.phoneNumber = '',
       this.role = '',
       this.createAt = ''});
 
@@ -202,7 +202,7 @@ class _$UserModelImpl implements _UserModel {
   final String image;
   @override
   @JsonKey()
-  final int phoneNumber;
+  final String phoneNumber;
   @override
   @JsonKey()
   final String role;
@@ -256,7 +256,7 @@ abstract class _UserModel implements UserModel {
       final String name,
       final String email,
       final String image,
-      final int phoneNumber,
+      final String phoneNumber,
       final String role,
       final String createAt}) = _$UserModelImpl;
 
@@ -272,7 +272,7 @@ abstract class _UserModel implements UserModel {
   @override
   String get image;
   @override
-  int get phoneNumber;
+  String get phoneNumber;
   @override
   String get role;
   @override

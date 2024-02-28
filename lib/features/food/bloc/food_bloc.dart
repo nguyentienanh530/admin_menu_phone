@@ -10,7 +10,7 @@ import 'package:food_repository/food_repository.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:form_inputs/form_inputs.dart';
-import '../data/food_model.dart';
+import '../model/food_model.dart';
 part 'food_event.dart';
 part 'food_state.dart';
 

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:food_repository/food_repository.dart';
 
-import 'food_model.dart';
+import '../model/food_model.dart';
 
 class FoodRepo {
   final FoodRepository _foodRepository;
@@ -9,22 +9,22 @@ class FoodRepo {
   FoodRepo({required FoodRepository foodRepository})
       : _foodRepository = foodRepository;
 
-  Future<List<FoodModel>> getFoods() async {
+  Future<List<Food>> getFoods() async {
     try {
-      var foods = <FoodModel>[];
+      var foods = <Food>[];
       var res = await _foodRepository.getFoods();
-      foods.addAll(res.docs.map((e) => FoodModel.fromFirestore(e)).toList());
+      foods.addAll(res.docs.map((e) => Food.fromJson(e.data())).toList());
       return foods;
     } catch (e) {
       throw '$e';
     }
   }
 
-  Stream<FoodModel> getFoodByID({required String idFood}) {
+  Stream<Food> getFoodByID({required String idFood}) {
     try {
       return _foodRepository
           .getFoodByID(idFood: idFood)
-          .map((event) => FoodModel.fromFirestore(event));
+          .map((event) => Food.fromJson(event.data()!));
     } catch (e) {
       throw '$e';
     }

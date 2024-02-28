@@ -1,8 +1,7 @@
 import 'package:admin_menu_mobile/config/config.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
-import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/features/food/model/food_model.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
-import 'package:admin_menu_mobile/widgets/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +14,7 @@ import '../../widgets/widgets.dart';
 
 class FoodDetailView extends StatefulWidget {
   const FoodDetailView({super.key, required this.food});
-  final FoodModel food;
+  final Food food;
 
   @override
   State<FoodDetailView> createState() => _FoodDetailViewState();
@@ -24,17 +23,10 @@ class FoodDetailView extends StatefulWidget {
 class _FoodDetailViewState extends State<FoodDetailView> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
-      return (switch (state.status) {
-        FoodStatus.loading => const LoadingScreen(),
-        FoodStatus.initial => const LoadingScreen(),
-        FoodStatus.failure => Center(child: Text(state.error)),
-        FoodStatus.success => _buildBody(context, state.food!)
-      });
-    });
+    return _buildBody(context, widget.food);
   }
 
-  Widget _buildBody(BuildContext context, FoodModel food) {
+  Widget _buildBody(BuildContext context, Food food) {
     return Column(children: [
       Expanded(
           child: SingleChildScrollView(
@@ -69,7 +61,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
     ]);
   }
 
-  Widget _buildDeleteFood(BuildContext context, FoodModel food) {
+  Widget _buildDeleteFood(BuildContext context, Food food) {
     return InkWell(
         onTap: () {
           showModalBottomSheet<void>(
@@ -108,13 +100,14 @@ class _FoodDetailViewState extends State<FoodDetailView> {
             child: Center(child: Text("Xoá", style: context.textStyleMedium))));
   }
 
-  Widget _buildUpdateFood(BuildContext context, FoodModel food) {
+  Widget _buildUpdateFood(BuildContext context, Food food) {
     return InkWell(
         onTap: () {
           // Navigator.of(context).push(PageRouteBuilder(
           //     pageBuilder: (_, __, ___) =>
           //         UpdateFoodDetailScreen(food: widget.food, id: widget.id)));
-          context.push(RouteName.updateFood, extra: food);
+          context.push(RouteName.updateFood,
+              extra: {'food': food, 'mode': Mode.update});
         },
         child: Container(
             height: 50.0,
@@ -126,7 +119,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
                 child: Text("Cập nhật", style: context.textStyleMedium))));
   }
 
-  Widget _buildDescription(BuildContext context, FoodModel food) {
+  Widget _buildDescription(BuildContext context, Food food) {
     return Padding(
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
@@ -147,7 +140,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
         ]));
   }
 
-  Widget _buildTitle(BuildContext context, FoodModel food) {
+  Widget _buildTitle(BuildContext context, Food food) {
     return Padding(
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
@@ -156,7 +149,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
                 context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold)));
   }
 
-  Widget _buildPrice(BuildContext context, FoodModel food) {
+  Widget _buildPrice(BuildContext context, Food food) {
     return Padding(
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
@@ -172,7 +165,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
 
 class _ImageFood extends StatelessWidget {
   const _ImageFood({required this.food});
-  final FoodModel food;
+  final Food food;
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -197,7 +190,7 @@ class _ImageFood extends StatelessWidget {
 
 class _Gallery extends StatelessWidget {
   const _Gallery({required this.food});
-  final FoodModel food;
+  final Food food;
 
   @override
   Widget build(BuildContext context) {
@@ -211,11 +204,26 @@ class _Gallery extends StatelessWidget {
               horizontal: defaultPadding, vertical: defaultPadding / 2),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Expanded(child: _buildImage(context, food.photoGallery![0])),
+            Expanded(
+                child: _buildImage(
+                    context,
+                    food.photoGallery![0].isEmpty
+                        ? noImage
+                        : food.photoGallery![0])),
             SizedBox(width: defaultPadding / 2),
-            Expanded(child: _buildImage(context, food.photoGallery![1])),
+            Expanded(
+                child: _buildImage(
+                    context,
+                    food.photoGallery![1].isEmpty
+                        ? noImage
+                        : food.photoGallery![1])),
             SizedBox(width: defaultPadding / 2),
-            Expanded(child: _buildImage(context, food.photoGallery![2]))
+            Expanded(
+                child: _buildImage(
+                    context,
+                    food.photoGallery![2].isEmpty
+                        ? noImage
+                        : food.photoGallery![2]))
           ]))
     ]);
   }

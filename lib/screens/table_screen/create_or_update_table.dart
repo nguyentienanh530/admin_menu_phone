@@ -103,41 +103,39 @@ class _CreateTableState extends State<CreateTable> {
   Widget _buildBody() {
     var bodyWidget = Expanded(
         child: SingleChildScrollView(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      SizedBox(height: defaultPadding / 2),
-      _buildImage(),
-      SizedBox(height: defaultPadding / 2),
-      _buildTitle('Tên bàn:'),
-      SizedBox(height: defaultPadding / 2),
-      _NameTable(nameController: _nameController),
-      SizedBox(height: defaultPadding / 2),
-      _buildTitle('Số ghế:'),
-      SizedBox(height: defaultPadding / 2),
-      _buildSeats()
-    ])));
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: defaultPadding / 2),
+                  _buildImage(),
+                  SizedBox(height: defaultPadding / 2),
+                  _buildTitle('Tên bàn:'),
+                  SizedBox(height: defaultPadding / 2),
+                  _NameTable(nameController: _nameController),
+                  SizedBox(height: defaultPadding / 2),
+                  _buildTitle('Số ghế:'),
+                  SizedBox(height: defaultPadding / 2),
+                  _buildSeats()
+                ]
+                    .animate(interval: 50.ms)
+                    .slideX(
+                        begin: -0.1,
+                        end: 0,
+                        curve: Curves.easeInOutCubic,
+                        duration: 500.ms)
+                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
     return SafeArea(
         child: Form(
             key: _formKey,
             child: Padding(
-              padding: EdgeInsets.all(defaultPadding),
-              child: SizedBox(
-                  height: context.sizeDevice.height,
-                  child: Column(
-                      children: [
-                    bodyWidget,
-                    SizedBox(height: defaultPadding / 2),
-                    _buildButtonSubmited(),
-                  ]
-                          .animate(interval: 50.ms)
-                          .slideX(
-                              begin: -0.1,
-                              end: 0,
-                              curve: Curves.easeInOutCubic,
-                              duration: 500.ms)
-                          .fadeIn(
-                              curve: Curves.easeInOutCubic, duration: 500.ms))),
-            )));
+                padding: EdgeInsets.all(defaultPadding),
+                child: SizedBox(
+                    height: context.sizeDevice.height,
+                    child: Column(children: [
+                      bodyWidget,
+                      SizedBox(height: defaultPadding / 2),
+                      _buildButtonSubmited(),
+                    ])))));
   }
 
   Widget _buildImage() {

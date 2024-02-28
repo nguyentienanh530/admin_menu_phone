@@ -1,0 +1,76 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'food_model.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$FoodImpl _$$FoodImplFromJson(Map<String, dynamic> json) => _$FoodImpl(
+      ratting: json['ratting'] as num? ?? 0,
+      image: json['image'] as String? ?? '',
+      isImageCrop: json['isImageCrop'] as bool? ?? false,
+      isDiscount: json['isDiscount'] as bool? ?? false,
+      description: json['description'] as String? ?? '',
+      id: json['id'] as String? ?? '',
+      category: json['category'] as String? ?? '',
+      discount: json['discount'] as int? ?? 0,
+      location: json['location'] as String? ?? '',
+      long: (json['long'] as num?)?.toDouble() ?? 0,
+      lat: (json['lat'] as num?)?.toDouble() ?? 0,
+      payment: json['payment'] as String? ?? '',
+      price: json['price'] as num? ?? 0,
+      driver: json['driver'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      count: json['count'] as int? ?? 0,
+      photoGallery: json['photoGallery'] as List<dynamic>? ?? const <dynamic>[],
+      valueAffordable: json['valueAffordable'] as int? ?? 0,
+      valueTaste: json['valueTaste'] as int? ?? 0,
+      valuePackaging: json['valuePackaging'] as int? ?? 0,
+      valueYummy: json['valueYummy'] as int? ?? 0,
+      dateOrder: json['dateOrder'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      photoProfile: json['photoProfile'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      locationUser: json['locationUser'] as String? ?? '',
+      fcm: json['fcm'] as String? ?? '',
+      timeOrder: json['timeOrder'] as int? ?? 0,
+      quantity: json['quantity'] as int? ?? 0,
+      totalPrice: json['totalPrice'] as num? ?? 0,
+      note: json['note'] as String? ?? '',
+    );
+
+Map<String, dynamic> _$$FoodImplToJson(_$FoodImpl instance) =>
+    <String, dynamic>{
+      'ratting': instance.ratting,
+      'image': instance.image,
+      'isImageCrop': instance.isImageCrop,
+      'isDiscount': instance.isDiscount,
+      'description': instance.description,
+      'id': instance.id,
+      'category': instance.category,
+      'discount': instance.discount,
+      'location': instance.location,
+      'long': instance.long,
+      'lat': instance.lat,
+      'payment': instance.payment,
+      'price': instance.price,
+      'driver': instance.driver,
+      'title': instance.title,
+      'count': instance.count,
+      'photoGallery': instance.photoGallery,
+      'valueAffordable': instance.valueAffordable,
+      'valueTaste': instance.valueTaste,
+      'valuePackaging': instance.valuePackaging,
+      'valueYummy': instance.valueYummy,
+      'dateOrder': instance.dateOrder,
+      'name': instance.name,
+      'photoProfile': instance.photoProfile,
+      'status': instance.status,
+      'locationUser': instance.locationUser,
+      'fcm': instance.fcm,
+      'timeOrder': instance.timeOrder,
+      'quantity': instance.quantity,
+      'totalPrice': instance.totalPrice,
+      'note': instance.note,
+    };

@@ -1,21 +1,19 @@
 import 'dart:io';
-import 'package:admin_menu_mobile/utils/app_alerts.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:admin_menu_mobile/features/food/data/food_model.dart';
+import 'package:admin_menu_mobile/features/food/model/food_model.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
-import 'package:go_router/go_router.dart';
-import '../../config/config.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../features/category/bloc/category_bloc.dart';
 import '../../features/food/bloc/food_bloc.dart';
 import '../../widgets/widgets.dart';
 
 class UpdateFoodView extends StatefulWidget {
-  const UpdateFoodView({super.key, required this.foodModel});
-  final FoodModel foodModel;
+  const UpdateFoodView({super.key, required this.food, required this.mode});
+  final Food food;
+  final Mode mode;
   @override
   State<UpdateFoodView> createState() => _UpdateFoodViewState();
 }
@@ -25,20 +23,61 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceCtrl = TextEditingController();
   final TextEditingController _discountController = TextEditingController();
+  var _image = '';
+  var _imageFile, _imageFile1, _imageFile2, _imageFile3;
+  var _category = '';
+  var _imageGallery1 = '';
+  var _imageGallery2 = '';
+  var _imageGallery3 = '';
+  var _isDiscount = false;
+  // var _discount = '';
 
   @override
   void initState() {
+    initData();
     super.initState();
   }
 
-  Widget onSuccess(FoodModel foodModel) {
+  void initData() {
+    if (!mounted) return;
+    if (widget.mode == Mode.update) {
+      _disController.text = widget.food.description ?? '';
+      _nameController.text = widget.food.title ?? '';
+      _priceCtrl.text = widget.food.price.toString();
+      _discountController.text = widget.food.discount.toString();
+      _image = widget.food.image ?? '';
+      _category = widget.food.category ?? '';
+      if (widget.food.photoGallery != null &&
+          widget.food.photoGallery!.isNotEmpty) {
+        _imageGallery1 = widget.food.photoGallery?[0] ?? '';
+        _imageGallery2 = widget.food.photoGallery?[1] ?? '';
+        _imageGallery3 = widget.food.photoGallery?[2] ?? '';
+      }
+      _isDiscount = widget.food.isDiscount ?? false;
+    }
+  }
+
+  Future pickImage() async {
+    final imagePicker = ImagePicker();
+    var imagepicked = await imagePicker.pickImage(
+        source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
+    if (imagepicked != null) {
+      setState(() {
+        _imageFile = File(imagepicked.path);
+      });
+    } else {
+      logger.d('No image selected!');
+    }
+  }
+
+  Widget onSuccess(Food food) {
     return Padding(
         padding: EdgeInsets.all(defaultPadding),
         child: SingleChildScrollView(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _ImageFood(),
+                  _ImageFood(image: _image, imageFile: _imageFile),
                   SizedBox(height: defaultPadding / 2),
                   Text("Tên món ăn:",
                       style: context.textStyleMedium!
@@ -56,7 +95,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                       style: context.textStyleMedium!
                           .copyWith(fontWeight: FontWeight.bold)),
                   SizedBox(height: defaultPadding / 2),
-                  const _Categories(),
+                  _Categories(category: _category),
                   SizedBox(height: defaultPadding / 2),
                   Text("Mô tả chi tiết:",
                       style: context.textStyleMedium!
@@ -68,15 +107,23 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                       style: context.textStyleMedium!
                           .copyWith(fontWeight: FontWeight.bold)),
                   SizedBox(height: defaultPadding / 2),
-                  _PhotoGallery(),
+                  _PhotoGallery(
+                      image1: _imageGallery1,
+                      image2: _imageGallery2,
+                      image3: _imageGallery3,
+                      imageGallery1: _imageFile1,
+                      imageGallery2: _imageFile2,
+                      imageGallery3: _imageFile3),
                   SizedBox(height: defaultPadding / 2),
                   Text("Áp dụng khuyến mãi ?",
                       style: context.textStyleMedium!
                           .copyWith(fontWeight: FontWeight.bold)),
                   SizedBox(height: defaultPadding / 2),
-                  _Discount(_discountController),
+                  _Discount(
+                      discountController: _discountController,
+                      isDiscount: _isDiscount),
                   SizedBox(height: defaultPadding / 2),
-                  _ButtonCreateFood(idFood: foodModel.id!)
+                  _ButtonCreateFood(idFood: food.id!)
                 ]
                     .animate(interval: 50.ms)
                     .slideX(
@@ -89,53 +136,8 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
 
   @override
   Widget build(BuildContext context) {
-    var loadingOrInitState = Center(
-        child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
-    var widgetBody =
-        BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
-      return (switch (state.status) {
-        FoodStatus.loading => loadingOrInitState,
-        FoodStatus.initial => loadingOrInitState,
-        FoodStatus.failure => Center(child: Text(state.error)),
-        FoodStatus.success => onSuccess(state.food!)
-      });
-    });
     return SizedBox(
-        height: context.sizeDevice.height,
-        child: BlocListener<FoodBloc, FoodState>(
-            listenWhen: (previous, current) =>
-                previous.isUpdateFood == true || current.isUpdateFood == true,
-            listener: (context, state) {
-              switch (state.status) {
-                case FoodStatus.loading:
-                  AppAlerts.loadingDialog(context);
-                  break;
-                case FoodStatus.failure:
-                  AppAlerts.failureDialog(context,
-                      title: AppText.errorTitle,
-                      desc: state.error, btnCancelOnPress: () {
-                    context.read<FoodBloc>().add(ResetStatusFood());
-                    context.pushReplacement(RouteName.updateFood,
-                        extra: widget.foodModel);
-                  });
-                  break;
-                case FoodStatus.success:
-                  AppAlerts.successDialog(context,
-                      title: AppText.success,
-                      desc: 'Cập nhật thành công', btnOkOnPress: () {
-                    context.read<FoodBloc>().add(ResetStatusFood());
-                    context.read<FoodBloc>().add(ResetData());
-                    context.pushReplacement(RouteName.updateFood,
-                        extra: widget.foodModel);
-                  });
-                  break;
-                case FoodStatus.initial:
-                  widgetBody;
-                  break;
-                default:
-              }
-            },
-            child: widgetBody));
+        height: context.sizeDevice.height, child: onSuccess(widget.food));
   }
 }
 
@@ -146,16 +148,17 @@ class _PriceFood extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var state = context.watch<FoodBloc>().state;
-    priceCtrl.text = state.priceFood.value;
     return CommonTextField(
         prefixIcon: const Icon(Icons.price_change_outlined),
         hintText: 'Giá bán',
         controller: priceCtrl,
         keyboardType: TextInputType.number,
-        errorText: state.priceFood.displayError != null
-            ? 'Giá bán không hợp lệ'
-            : null,
+        validator: (value) {
+          if (value!.isEmpty || value.contains(RegExp(r'^[0-9]+$'))) {
+            return 'Giá không hợp lệ';
+          }
+          return null;
+        },
         onChanged: (text) =>
             context.read<FoodBloc>().add(PriceFoodChanged(priceFood: text)));
   }
@@ -168,11 +171,11 @@ class _ButtonCreateFood extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var state = context.watch<FoodBloc>().state;
-    return state.isValid &&
-            state.imageFood != '' &&
-            state.imageFood1 != '' &&
-            state.imageFood2 != '' &&
-            state.imageFood3 != ''
+
+    return state.isValid && state.imageFood != ''
+        // state.imageFood1 != '' &&
+        // state.imageFood2 != '' &&
+        // state.imageFood3 != ''
         ? Center(
             child: FilledButton.icon(
                 icon: const Icon(Icons.update),
@@ -189,25 +192,19 @@ class _ButtonCreateFood extends StatelessWidget {
 }
 
 class _Discount extends StatelessWidget {
-  final TextEditingController _discountController;
-
-  const _Discount(this._discountController);
+  final TextEditingController discountController;
+  final bool isDiscount;
+  const _Discount({required this.discountController, required this.isDiscount});
   @override
   Widget build(BuildContext context) {
-    var state = context.watch<FoodBloc>().state;
-    if (state.isDiscount) {
-      _discountController.text = state.discount.value.toString();
-    }
     return Column(children: [
-      _buildDiscount(context, state.isDiscount),
+      _buildDiscount(context),
       SizedBox(height: defaultPadding / 2),
-      state.isDiscount
-          ? _buildTextFeildDiscount(context, state)
-          : const SizedBox()
+      isDiscount ? _buildTextFeildDiscount(context) : const SizedBox()
     ]);
   }
 
-  Widget _buildDiscount(BuildContext context, bool isDiscount) {
+  Widget _buildDiscount(BuildContext context) {
     return Row(children: [
       Radio<bool>(
           value: true,
@@ -228,47 +225,54 @@ class _Discount extends StatelessWidget {
     ]);
   }
 
-  Widget _buildTextFeildDiscount(BuildContext context, FoodState state) {
-    var discount = state.discount.isValid ? int.parse(state.discount.value) : 0;
+  Widget _buildTextFeildDiscount(BuildContext context) {
     return CommonTextField(
         prefixIcon: const Icon(Icons.discount_rounded),
-        controller: _discountController,
+        controller: discountController,
         hintText: 'Giá khuyến mãi (0%-100%)',
         keyboardType: TextInputType.number,
-        errorText: discount > 100 || state.discount.displayError != null
-            ? 'Khuyễn mãi không hợp lệ'
-            : null,
+        // errorText: discount > 100 || state.discount.displayError != null
+        //     ? 'Khuyễn mãi không hợp lệ'
+        //     : null,
         onChanged: (value) =>
             context.read<FoodBloc>().add(DiscountFoodChanged(discount: value)));
   }
 }
 
 class _PhotoGallery extends StatelessWidget {
+  final String image1, image2, image3;
+  final dynamic imageGallery1, imageGallery2, imageGallery3;
+  const _PhotoGallery(
+      {required this.image1,
+      required this.image2,
+      required this.image3,
+      required this.imageGallery1,
+      required this.imageGallery2,
+      required this.imageGallery3});
   @override
   Widget build(BuildContext context) {
-    var state = context.watch<FoodBloc>().state;
     return Row(children: [
       Expanded(
           child: _buildImageGallery(
               context: context,
-              imageFile: state.imageGallery1,
-              image: state.imageFood1,
+              imageFile: imageGallery1,
+              image: image1,
               onTap: () =>
                   context.read<FoodBloc>().add(PickImageFoodGallery1()))),
       SizedBox(width: defaultPadding / 2),
       Expanded(
           child: _buildImageGallery(
               context: context,
-              imageFile: state.imageGallery2,
-              image: state.imageFood2,
+              imageFile: imageGallery2,
+              image: image2,
               onTap: () =>
                   context.read<FoodBloc>().add(PickImageFoodGallery2()))),
       SizedBox(width: defaultPadding / 2),
       Expanded(
           child: _buildImageGallery(
               context: context,
-              imageFile: state.imageGallery3,
-              image: state.imageFood3,
+              imageFile: imageGallery3,
+              image: image3,
               onTap: () =>
                   context.read<FoodBloc>().add(PickImageFoodGallery3())))
     ]);
@@ -318,27 +322,27 @@ class _PhotoGallery extends StatelessWidget {
 }
 
 class _ImageFood extends StatelessWidget {
-  const _ImageFood();
+  const _ImageFood({required this.image, required this.imageFile});
+  final String image;
+  final dynamic imageFile;
   @override
   Widget build(BuildContext context) {
-    var state = context.watch<FoodBloc>().state;
     return GestureDetector(
         onTap: () {
           context.read<FoodBloc>().add(PickImageFood());
         },
-        child: state.imageFile == null
-            ? _buildImage(context, state.imageFood)
+        child: imageFile == null
+            ? _buildImage(context)
             : Container(
                 height: 155,
                 width: double.infinity,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(defaultBorderRadius),
                     image: DecorationImage(
-                        image: FileImage(state.imageFile!), fit: BoxFit.cover)),
-              ));
+                        image: FileImage(imageFile!), fit: BoxFit.cover))));
   }
 
-  Widget _buildImage(BuildContext context, String image) {
+  Widget _buildImage(BuildContext context) {
     return image == ''
         ? Container(
             height: 155,
@@ -389,27 +393,29 @@ class _NameFood extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var state = context.watch<FoodBloc>().state;
-    nameController.text = state.nameFood.value;
     return CommonTextField(
         prefixIcon: const Icon(Icons.food_bank_rounded),
         hintText: 'Tên món ăn',
         controller: nameController,
-        errorText: state.nameFood.displayError != null
-            ? 'Tên món không được để trống'
-            : null,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Tên không được để trống';
+          }
+          return null;
+        },
         onChanged: (text) =>
             context.read<FoodBloc>().add(NameFoodChanged(nameFood: text)));
   }
 }
 
 class _Categories extends StatelessWidget {
-  const _Categories();
+  const _Categories({required this.category});
+  final String category;
 
   @override
   Widget build(BuildContext context) {
     var categoryState = context.watch<CategoryBloc>().state;
-    var category = context.watch<FoodBloc>().state;
+
     return Wrap(
         spacing: 4.0,
         runSpacing: 2.0,
@@ -419,7 +425,7 @@ class _Categories extends StatelessWidget {
                 child: FilledButton(
                     style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(
-                            category.category == e.name
+                            category == e.name
                                 ? context.colorScheme.errorContainer
                                 : context.colorScheme.primaryContainer)),
                     onPressed: () {
@@ -440,15 +446,10 @@ class _Description extends StatelessWidget {
   final TextEditingController _disController;
   @override
   Widget build(BuildContext context) {
-    var state = context.watch<FoodBloc>().state;
-    _disController.text = state.description.value;
     return CommonTextField(
         prefixIcon: const Icon(Icons.description_outlined),
         hintText: "Nhập thông tin",
         controller: _disController,
-        errorText: state.description.displayError != null
-            ? 'Mô tả không được để trống'
-            : null,
         onChanged: (text) => context
             .read<FoodBloc>()
             .add(DescriptionFoodChanged(description: text)));

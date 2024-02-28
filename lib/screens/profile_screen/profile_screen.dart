@@ -1,9 +1,11 @@
+import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
 import 'package:admin_menu_mobile/features/user/model/user_model.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:admin_menu_mobile/widgets/common_bottomsheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -41,19 +43,6 @@ class _ProfileState extends State<ProfileScreen>
     return const Scaffold(body: ProfileView());
   }
 
-  // Widget _buildIconLogout() {
-  //   return BlocBuilder<AuthBloc, AuthState>(
-  //     builder: (context, state) {
-  //       return IconButton(
-  //           onPressed: () {
-  //             context.read<AuthBloc>().add(const AuthLogoutRequested());
-  //             context.go(RouteName.login);
-  //           },
-  //           icon: const Icon(Icons.logout_outlined));
-  //     },
-  //   );
-  // }
-
   @override
   bool get wantKeepAlive => true;
 }
@@ -72,38 +61,69 @@ class _ProfileViewState extends State<ProfileView> {
         child: Padding(
             padding: EdgeInsets.all(defaultPadding),
             child: BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
-              builder: (context, state) {
-                return (switch (state.status) {
-                  Status.loading => const LoadingScreen(),
-                  Status.failure => ErrorScreen(errorMsg: state.error),
-                  Status.empty => const EmptyScreen(),
-                  Status.success => _buildBody(state)
-                });
-              },
-            )));
+                buildWhen: (previous, current) =>
+                    context.read<UserBloc>().operation == ApiOperation.select,
+                builder: (context, state) {
+                  return (switch (state.status) {
+                    Status.loading => const LoadingScreen(),
+                    Status.failure => ErrorScreen(errorMsg: state.error),
+                    Status.empty => const EmptyScreen(),
+                    Status.success => _buildBody(state.data ?? UserModel())
+                  });
+                })));
   }
 
-  Widget _buildBody(GenericBlocState<UserModel> state) {
-    logger.d(state.data?[0].toString());
-    return Column(children: [
-      const _CardProfife(),
+  Widget _buildBody(UserModel user) {
+    return Column(
+        children: [
+      _CardProfife(user: user),
       Expanded(
           child: SingleChildScrollView(
               child: Column(children: [
         _ItemProfile(
             svgPath: 'assets/icon/user_config.svg',
             title: 'Cập nhật thông tin',
-            onTap: () {}),
+            onTap: () => _handleUserUpdated(user)),
+        _ItemProfile(
+            svgPath: 'assets/icon/lock.svg',
+            title: 'Đổi mật khẩu',
+            onTap: () => context.push(RouteName.changePassword)),
         _ItemProfile(
             svgPath: 'assets/icon/print.svg',
             title: 'Cài đặt máy in',
-            onTap: () {}),
+            onTap: () => context.push(RouteName.printSeting)),
         _ItemProfile(
             svgPath: 'assets/icon/logout.svg',
             title: 'Đăng xuất',
             onTap: () => _handleLogout())
       ])))
-    ]);
+    ]
+            .animate(interval: 50.ms)
+            .slideX(
+                begin: -0.1,
+                end: 0,
+                curve: Curves.easeInOutCubic,
+                duration: 500.ms)
+            .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms));
+  }
+
+  _handleUserUpdated(UserModel user) async {
+    var result = await context.push<bool>(RouteName.updateUser, extra: user);
+    if (result is bool && result) {
+      if (!mounted) return;
+      var userID = context.read<AuthBloc>().state.user.id;
+      context.read<UserBloc>().add(UserFecthed(userID: userID));
+    }
+    // late UserModel newUser;
+    // late File imageFile;
+    // bool isUpdate = await updateUserDialog(
+    //     user: user,
+    //     type: Type.update,
+    //     context: context,
+    //     userData: (userModel, image) {
+    //       newUser = userModel;
+    //       imageFile = image;
+    //     });
   }
 
   _handleLogout() {
@@ -132,56 +152,73 @@ class _ItemProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        child: SizedBox(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+        onTap: onTap,
+        child: Card(
+            child: SizedBox(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
               Row(children: [
                 Padding(
                     padding: EdgeInsets.all(defaultPadding),
                     child: SvgPicture.asset(svgPath,
-                        color: context.colorScheme.primary)),
-                Text(title, style: context.textStyleSmall),
+                        colorFilter: ColorFilter.mode(
+                            context.colorScheme.primary, BlendMode.srcIn))),
+                Text(title, style: context.textStyleSmall)
               ]),
               Padding(
-                padding: EdgeInsets.all(defaultPadding),
-                child: const Icon(Icons.arrow_forward_ios_rounded, size: 15),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+                  padding: EdgeInsets.all(defaultPadding),
+                  child: const Icon(Icons.arrow_forward_ios_rounded, size: 15))
+            ]))));
   }
 }
 
 class _CardProfife extends StatelessWidget {
-  const _CardProfife();
-
+  const _CardProfife({required this.user});
+  final UserModel user;
   @override
   Widget build(BuildContext context) {
     return Card(
         child: Padding(
-      padding: EdgeInsets.symmetric(vertical: defaultPadding),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Container(
-            height: context.sizeDevice.width * 0.2,
-            width: context.sizeDevice.width * 0.2,
-            decoration: BoxDecoration(
-                border: Border.all(color: context.colorScheme.primary),
-                shape: BoxShape.circle,
-                image: const DecorationImage(
-                    image: AssetImage('assets/icon/profile.png')))),
-        SizedBox(height: defaultPadding),
-        Text('Nguyen Tien Anh', style: context.textStyleMedium),
-        SizedBox(height: defaultPadding / 4),
-        _buildItem(context, Icons.email_rounded, 'nguyentienanh530@gmail.com'),
-        SizedBox(height: defaultPadding / 4),
-        _buildItem(context, Icons.phone_android_rounded, '0328023993')
-      ]),
-    ));
+            padding: EdgeInsets.symmetric(vertical: defaultPadding),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              user.image.isEmpty
+                  ? _buildImageAsset(context)
+                  : _buildImageNetwork(context),
+              SizedBox(height: defaultPadding),
+              Text(user.name, style: context.textStyleMedium),
+              SizedBox(height: defaultPadding / 4),
+              _buildItem(context, Icons.email_rounded, user.email),
+              SizedBox(height: defaultPadding / 4),
+              user.phoneNumber.isEmpty
+                  ? const SizedBox()
+                  : _buildItem(context, Icons.phone_android_rounded,
+                      user.phoneNumber.toString())
+            ])));
+  }
+
+  Widget _buildImageAsset(BuildContext context) {
+    return Container(
+        height: context.sizeDevice.width * 0.2,
+        width: context.sizeDevice.width * 0.2,
+        decoration: BoxDecoration(
+            border: Border.all(color: context.colorScheme.primary),
+            shape: BoxShape.circle,
+            image: const DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage('assets/icon/profile.png'))));
+  }
+
+  Widget _buildImageNetwork(BuildContext context) {
+    return Container(
+        height: context.sizeDevice.width * 0.2,
+        width: context.sizeDevice.width * 0.2,
+        decoration: BoxDecoration(
+            border: Border.all(color: context.colorScheme.primary),
+            shape: BoxShape.circle,
+            image: DecorationImage(
+                fit: BoxFit.cover, image: NetworkImage(user.image))));
   }
 
   Widget _buildItem(BuildContext context, IconData icon, String title) {

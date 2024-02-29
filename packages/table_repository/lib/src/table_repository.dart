@@ -31,7 +31,7 @@ class TableRepository {
       var documentReference =
           await _firebaseFirestore.collection('table').add(dataJson);
       await updateTable(
-          idTbale: documentReference.id,
+          tableID: documentReference.id,
           dataJson: {'id': documentReference.id});
     } catch (e) {
       throw '$e';
@@ -39,11 +39,11 @@ class TableRepository {
   }
 
   Future<void> updateTable(
-      {required String idTbale, required Map<String, dynamic> dataJson}) async {
+      {required String tableID, required Map<String, dynamic> dataJson}) async {
     try {
       await _firebaseFirestore
           .collection('table')
-          .doc(idTbale)
+          .doc(tableID)
           .update(dataJson);
     } catch (e) {
       throw '$e';

@@ -27,10 +27,10 @@ class FoodRepository {
     }
   }
 
-  Future<DocumentReference<Map<String, dynamic>>> createFood(
-      Map<String, dynamic> data) async {
+  Future<void> createFood(Map<String, dynamic> data) async {
     try {
-      return await _firebaseFirestore.collection('food').add(data);
+      var doc = await _firebaseFirestore.collection('food').add(data);
+      await updateFood(foodID: doc.id, data: {'id': doc.id});
     } catch (e) {
       throw '$e';
     }
@@ -38,16 +38,16 @@ class FoodRepository {
 
   Future deleteFood({required String idFood}) async {
     try {
-      await _firebaseFirestore.collection('food').doc(idFood).delete();
+      return await _firebaseFirestore.collection('food').doc(idFood).delete();
     } catch (e) {
       return false;
     }
   }
 
   Future<void> updateFood(
-      {required String idFood, required Map<String, dynamic> data}) async {
+      {required String foodID, required Map<String, dynamic> data}) async {
     try {
-      await _firebaseFirestore.collection('food').doc(idFood).update(data);
+      await _firebaseFirestore.collection('food').doc(foodID).update(data);
     } catch (e) {
       throw '$e';
     }

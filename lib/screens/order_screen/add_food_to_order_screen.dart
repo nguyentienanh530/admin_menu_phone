@@ -1,15 +1,37 @@
-import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/search_food/cubit/text_search_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
+import 'package:admin_menu_mobile/widgets/empty_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tiengviet/tiengviet.dart';
-
 import '../../features/food/model/food_model.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
+
+class AddFoodToOrderScreen extends StatelessWidget {
+  const AddFoodToOrderScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        // backgroundColor: context.colorScheme.background,
+        appBar: _buildAppbar(context),
+        body: BlocProvider(
+            create: (context) => TextSearchCubit(), child: AddFoodView()));
+  }
+}
+
+_buildAppbar(BuildContext context) {
+  return AppBar(
+      title: Text(AppText.searchFood,
+          style:
+              context.titleStyleMedium!.copyWith(fontWeight: FontWeight.bold)),
+      centerTitle: true);
+}
 
 class AddFoodView extends StatelessWidget {
   AddFoodView({super.key});
@@ -95,24 +117,25 @@ class AfterSearchUI extends StatelessWidget {
     var loadingOrInitState = Center(
         child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
     return BlocProvider(
-        create: (context) => FoodBloc()..add(GetFoods()),
-        child: BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
+        create: (context) => FoodBloc()..add(FoodsFetched()),
+        child: BlocBuilder<FoodBloc, GenericBlocState<Food>>(
+            builder: (context, state) {
           return (switch (state.status) {
-            FoodStatus.loading => loadingOrInitState,
-            FoodStatus.initial => loadingOrInitState,
-            FoodStatus.failure => Center(child: Text(state.error)),
-            FoodStatus.success => ListView.builder(
+            Status.loading => loadingOrInitState,
+            Status.empty => const EmptyScreen(),
+            Status.failure => Center(child: Text(state.error!)),
+            Status.success => ListView.builder(
                 physics: const BouncingScrollPhysics(),
-                itemCount: state.foods.length,
+                itemCount: state.datas!.length,
                 itemBuilder: (context, i) {
-                  if (state.foods[i].title
+                  if (state.datas![i].title
                           .toString()
                           .toLowerCase()
                           .contains(text!.toLowerCase()) ||
                       TiengViet.parse(
-                              state.foods[i].title.toString().toLowerCase())
+                              state.datas![i].title.toString().toLowerCase())
                           .contains(text!.toLowerCase())) {
-                    return _buildItemSearch(context, state.foods[i]);
+                    return _buildItemSearch(context, state.datas![i]);
                   }
                   return const SizedBox();
                 })
@@ -157,25 +180,22 @@ class AfterSearchUI extends StatelessWidget {
   }
 
   Widget _buildImage(Food food) {
-    return Hero(
-        tag: 'hero-tag-${food.id}-search',
-        child: Material(
-            color: Colors.transparent,
-            child: Container(
-                margin: EdgeInsets.all(defaultPadding / 3),
-                height: 45,
-                width: 45,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.black.withOpacity(0.3),
-                    image: DecorationImage(
-                        image: NetworkImage(
-                            food.image == null || food.image == ""
-                                ? noImage
-                                : food.image ?? ""),
-                        fit: food.isImageCrop == true
-                            ? BoxFit.cover
-                            : BoxFit.fill)))));
+    return Material(
+        color: Colors.transparent,
+        child: Container(
+            margin: EdgeInsets.all(defaultPadding / 3),
+            height: 45,
+            width: 45,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black.withOpacity(0.3),
+                image: DecorationImage(
+                    image: NetworkImage(food.image == null || food.image == ""
+                        ? noImage
+                        : food.image ?? ""),
+                    fit: food.isImageCrop == true
+                        ? BoxFit.cover
+                        : BoxFit.fill))));
   }
 
   Widget _buildCategory(BuildContext context, Food food) {

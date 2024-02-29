@@ -14,12 +14,12 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-OrderModel _$OrderModelFromJson(Map<String, dynamic> json) {
-  return _OrderModel.fromJson(json);
+Orders _$OrdersFromJson(Map<String, dynamic> json) {
+  return _Orders.fromJson(json);
 }
 
 /// @nodoc
-mixin _$OrderModel {
+mixin _$Orders {
   String? get id => throw _privateConstructorUsedError;
   bool? get isPay => throw _privateConstructorUsedError;
   String? get table => throw _privateConstructorUsedError;
@@ -28,19 +28,17 @@ mixin _$OrderModel {
   String? get date => throw _privateConstructorUsedError;
   num? get totalPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'order_food')
-  List<Food>? get orderFood => throw _privateConstructorUsedError;
+  List<FoodDto>? get orderFood => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $OrderModelCopyWith<OrderModel> get copyWith =>
-      throw _privateConstructorUsedError;
+  $OrdersCopyWith<Orders> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $OrderModelCopyWith<$Res> {
-  factory $OrderModelCopyWith(
-          OrderModel value, $Res Function(OrderModel) then) =
-      _$OrderModelCopyWithImpl<$Res, OrderModel>;
+abstract class $OrdersCopyWith<$Res> {
+  factory $OrdersCopyWith(Orders value, $Res Function(Orders) then) =
+      _$OrdersCopyWithImpl<$Res, Orders>;
   @useResult
   $Res call(
       {String? id,
@@ -50,13 +48,13 @@ abstract class $OrderModelCopyWith<$Res> {
       String? datePay,
       String? date,
       num? totalPrice,
-      @JsonKey(name: 'order_food') List<Food>? orderFood});
+      @JsonKey(name: 'order_food') List<FoodDto>? orderFood});
 }
 
 /// @nodoc
-class _$OrderModelCopyWithImpl<$Res, $Val extends OrderModel>
-    implements $OrderModelCopyWith<$Res> {
-  _$OrderModelCopyWithImpl(this._value, this._then);
+class _$OrdersCopyWithImpl<$Res, $Val extends Orders>
+    implements $OrdersCopyWith<$Res> {
+  _$OrdersCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -107,17 +105,16 @@ class _$OrderModelCopyWithImpl<$Res, $Val extends OrderModel>
       orderFood: freezed == orderFood
           ? _value.orderFood
           : orderFood // ignore: cast_nullable_to_non_nullable
-              as List<Food>?,
+              as List<FoodDto>?,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$OrderModelImplCopyWith<$Res>
-    implements $OrderModelCopyWith<$Res> {
-  factory _$$OrderModelImplCopyWith(
-          _$OrderModelImpl value, $Res Function(_$OrderModelImpl) then) =
-      __$$OrderModelImplCopyWithImpl<$Res>;
+abstract class _$$OrdersImplCopyWith<$Res> implements $OrdersCopyWith<$Res> {
+  factory _$$OrdersImplCopyWith(
+          _$OrdersImpl value, $Res Function(_$OrdersImpl) then) =
+      __$$OrdersImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -128,15 +125,15 @@ abstract class _$$OrderModelImplCopyWith<$Res>
       String? datePay,
       String? date,
       num? totalPrice,
-      @JsonKey(name: 'order_food') List<Food>? orderFood});
+      @JsonKey(name: 'order_food') List<FoodDto>? orderFood});
 }
 
 /// @nodoc
-class __$$OrderModelImplCopyWithImpl<$Res>
-    extends _$OrderModelCopyWithImpl<$Res, _$OrderModelImpl>
-    implements _$$OrderModelImplCopyWith<$Res> {
-  __$$OrderModelImplCopyWithImpl(
-      _$OrderModelImpl _value, $Res Function(_$OrderModelImpl) _then)
+class __$$OrdersImplCopyWithImpl<$Res>
+    extends _$OrdersCopyWithImpl<$Res, _$OrdersImpl>
+    implements _$$OrdersImplCopyWith<$Res> {
+  __$$OrdersImplCopyWithImpl(
+      _$OrdersImpl _value, $Res Function(_$OrdersImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -151,7 +148,7 @@ class __$$OrderModelImplCopyWithImpl<$Res>
     Object? totalPrice = freezed,
     Object? orderFood = freezed,
   }) {
-    return _then(_$OrderModelImpl(
+    return _then(_$OrdersImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -183,15 +180,15 @@ class __$$OrderModelImplCopyWithImpl<$Res>
       orderFood: freezed == orderFood
           ? _value._orderFood
           : orderFood // ignore: cast_nullable_to_non_nullable
-              as List<Food>?,
+              as List<FoodDto>?,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$OrderModelImpl implements _OrderModel {
-  const _$OrderModelImpl(
+class _$OrdersImpl implements _Orders {
+  const _$OrdersImpl(
       {this.id,
       this.isPay,
       this.table,
@@ -199,11 +196,11 @@ class _$OrderModelImpl implements _OrderModel {
       this.datePay,
       this.date,
       this.totalPrice,
-      @JsonKey(name: 'order_food') final List<Food>? orderFood})
+      @JsonKey(name: 'order_food') final List<FoodDto>? orderFood})
       : _orderFood = orderFood;
 
-  factory _$OrderModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$OrderModelImplFromJson(json);
+  factory _$OrdersImpl.fromJson(Map<String, dynamic> json) =>
+      _$$OrdersImplFromJson(json);
 
   @override
   final String? id;
@@ -219,10 +216,10 @@ class _$OrderModelImpl implements _OrderModel {
   final String? date;
   @override
   final num? totalPrice;
-  final List<Food>? _orderFood;
+  final List<FoodDto>? _orderFood;
   @override
   @JsonKey(name: 'order_food')
-  List<Food>? get orderFood {
+  List<FoodDto>? get orderFood {
     final value = _orderFood;
     if (value == null) return null;
     if (_orderFood is EqualUnmodifiableListView) return _orderFood;
@@ -232,14 +229,14 @@ class _$OrderModelImpl implements _OrderModel {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, isPay: $isPay, table: $table, dateOrder: $dateOrder, datePay: $datePay, date: $date, totalPrice: $totalPrice, orderFood: $orderFood)';
+    return 'Orders(id: $id, isPay: $isPay, table: $table, dateOrder: $dateOrder, datePay: $datePay, date: $date, totalPrice: $totalPrice, orderFood: $orderFood)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$OrderModelImpl &&
+            other is _$OrdersImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isPay, isPay) || other.isPay == isPay) &&
             (identical(other.table, table) || other.table == table) &&
@@ -269,19 +266,19 @@ class _$OrderModelImpl implements _OrderModel {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$OrderModelImplCopyWith<_$OrderModelImpl> get copyWith =>
-      __$$OrderModelImplCopyWithImpl<_$OrderModelImpl>(this, _$identity);
+  _$$OrdersImplCopyWith<_$OrdersImpl> get copyWith =>
+      __$$OrdersImplCopyWithImpl<_$OrdersImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$OrderModelImplToJson(
+    return _$$OrdersImplToJson(
       this,
     );
   }
 }
 
-abstract class _OrderModel implements OrderModel {
-  const factory _OrderModel(
+abstract class _Orders implements Orders {
+  const factory _Orders(
           {final String? id,
           final bool? isPay,
           final String? table,
@@ -289,11 +286,10 @@ abstract class _OrderModel implements OrderModel {
           final String? datePay,
           final String? date,
           final num? totalPrice,
-          @JsonKey(name: 'order_food') final List<Food>? orderFood}) =
-      _$OrderModelImpl;
+          @JsonKey(name: 'order_food') final List<FoodDto>? orderFood}) =
+      _$OrdersImpl;
 
-  factory _OrderModel.fromJson(Map<String, dynamic> json) =
-      _$OrderModelImpl.fromJson;
+  factory _Orders.fromJson(Map<String, dynamic> json) = _$OrdersImpl.fromJson;
 
   @override
   String? get id;
@@ -311,9 +307,9 @@ abstract class _OrderModel implements OrderModel {
   num? get totalPrice;
   @override
   @JsonKey(name: 'order_food')
-  List<Food>? get orderFood;
+  List<FoodDto>? get orderFood;
   @override
   @JsonKey(ignore: true)
-  _$$OrderModelImplCopyWith<_$OrderModelImpl> get copyWith =>
+  _$$OrdersImplCopyWith<_$OrdersImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

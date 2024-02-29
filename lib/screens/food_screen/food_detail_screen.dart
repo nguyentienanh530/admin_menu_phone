@@ -1,16 +1,40 @@
-import 'package:admin_menu_mobile/config/config.dart';
+import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
-import 'package:admin_menu_mobile/features/food/model/food_model.dart';
-import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../common/dialog/progress_dialog.dart';
+import '../../common/dialog/retry_dialog.dart';
+import '../../features/food/model/food_model.dart';
+import '../../utils/utils.dart';
+import 'package:admin_menu_mobile/config/config.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../utils/app_alerts.dart';
 import '../../widgets/widgets.dart';
+
+class FoodDetailScreen extends StatelessWidget {
+  const FoodDetailScreen({super.key, this.food});
+  final Food? food;
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => FoodBloc(),
+      child: Scaffold(
+          appBar: _buildAppbar(context), body: FoodDetailView(food: food!)),
+    );
+  }
+
+  _buildAppbar(BuildContext context) {
+    return AppBar(
+        title: Text(AppText.titleFoodDetail,
+            style: context.titleStyleMedium!
+                .copyWith(fontWeight: FontWeight.bold)),
+        centerTitle: true);
+  }
+}
 
 class FoodDetailView extends StatefulWidget {
   const FoodDetailView({super.key, required this.food});
@@ -30,6 +54,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
     return Column(children: [
       Expanded(
           child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -77,18 +102,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
                         onCancel: () {
                           context.pop();
                         },
-                        onConfirm: () {
-                          context
-                              .read<FoodBloc>()
-                              .add(DeleteFood(idFood: food.id!));
-                          FToast()
-                            ..init(context)
-                            ..showToast(
-                                child: AppAlerts.successToast(
-                                    msg: 'Xóa thành công!'));
-                          context.pop<bool>(true);
-                          context.pop<bool>(true);
-                        }));
+                        onConfirm: () => _handleDeleteFood(food)));
               });
         },
         child: Container(
@@ -100,13 +114,41 @@ class _FoodDetailViewState extends State<FoodDetailView> {
             child: Center(child: Text("Xoá", style: context.textStyleMedium))));
   }
 
+  void _handleDeleteFood(Food food) {
+    context.read<FoodBloc>().add(DeleteFood(foodID: food.id!));
+    showDialog(
+        context: context,
+        builder: (context) => BlocBuilder<FoodBloc, GenericBlocState<Food>>(
+            builder: (context, state) => switch (state.status) {
+                  Status.empty => const SizedBox(),
+                  Status.loading => const ProgressDialog(
+                      isProgressed: true, descriptrion: 'Đang xóa'),
+                  Status.failure => RetryDialog(
+                      title: state.error ?? "Lỗi",
+                      onRetryPressed: () => context
+                          .read<FoodBloc>()
+                          .add(DeleteFood(foodID: food.id!))),
+                  Status.success => ProgressDialog(
+                      descriptrion: 'Xóa thành công',
+                      onPressed: () {
+                        FToast()
+                          ..init(context)
+                          ..showToast(
+                              child: AppAlerts.successToast(
+                                  msg: 'Xóa thành công!'));
+                        pop(context, 3);
+                      },
+                      isProgressed: false)
+                }));
+  }
+
   Widget _buildUpdateFood(BuildContext context, Food food) {
     return InkWell(
         onTap: () {
           // Navigator.of(context).push(PageRouteBuilder(
           //     pageBuilder: (_, __, ___) =>
           //         UpdateFoodDetailScreen(food: widget.food, id: widget.id)));
-          context.push(RouteName.updateFood,
+          context.push(RouteName.createOrUpdateFood,
               extra: {'food': food, 'mode': Mode.update});
         },
         child: Container(
@@ -207,23 +249,29 @@ class _Gallery extends StatelessWidget {
             Expanded(
                 child: _buildImage(
                     context,
-                    food.photoGallery![0].isEmpty
-                        ? noImage
-                        : food.photoGallery![0])),
+                    (food.photoGallery != null && food.photoGallery!.length > 1)
+                        ? (food.photoGallery![0].isEmpty
+                            ? noImage
+                            : food.photoGallery![0])
+                        : noImage)),
             SizedBox(width: defaultPadding / 2),
             Expanded(
                 child: _buildImage(
                     context,
-                    food.photoGallery![1].isEmpty
-                        ? noImage
-                        : food.photoGallery![1])),
+                    (food.photoGallery != null && food.photoGallery!.length > 1)
+                        ? (food.photoGallery![1].isEmpty
+                            ? noImage
+                            : food.photoGallery![1])
+                        : noImage)),
             SizedBox(width: defaultPadding / 2),
             Expanded(
                 child: _buildImage(
                     context,
-                    food.photoGallery![2].isEmpty
-                        ? noImage
-                        : food.photoGallery![2]))
+                    (food.photoGallery != null && food.photoGallery!.length > 2)
+                        ? (food.photoGallery![2].isEmpty
+                            ? noImage
+                            : food.photoGallery![2])
+                        : noImage))
           ]))
     ]);
   }

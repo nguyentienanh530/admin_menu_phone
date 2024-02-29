@@ -1,10 +1,9 @@
 import 'package:admin_menu_mobile/features/table/model/table_model.dart';
 import 'package:admin_menu_mobile/features/user/model/user_model.dart';
-import 'package:admin_menu_mobile/screens/add_food_screen/add_food_screen.dart';
-import 'package:admin_menu_mobile/screens/create_food_screen/create_food_screen.dart';
-import 'package:admin_menu_mobile/screens/food_detail_screen/food_detail_screen.dart';
-import 'package:admin_menu_mobile/screens/order_detail_screen/order_detail_screen.dart';
-import 'package:admin_menu_mobile/screens/order_history_detail_screen/order_history_detail_screen.dart';
+import 'package:admin_menu_mobile/screens/order_screen/add_food_to_order_screen.dart';
+import 'package:admin_menu_mobile/screens/food_screen/food_detail_screen.dart';
+import 'package:admin_menu_mobile/screens/order_screen/order_detail_screen.dart';
+import 'package:admin_menu_mobile/screens/order_screen/order_history_detail_screen.dart';
 import 'package:admin_menu_mobile/screens/order_screen/order_screen.dart';
 import 'package:admin_menu_mobile/screens/profile_screen/change_password.dart';
 import 'package:admin_menu_mobile/screens/profile_screen/print_setting.dart';
@@ -12,7 +11,7 @@ import 'package:admin_menu_mobile/screens/profile_screen/update_user.dart';
 import 'package:admin_menu_mobile/screens/food_screen/food_screen.dart';
 import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
 import 'package:admin_menu_mobile/screens/table_screen/create_or_update_table.dart';
-import 'package:admin_menu_mobile/screens/update_food_screen/update_food_screen.dart';
+import 'package:admin_menu_mobile/screens/food_screen/create_or_update_food_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,12 +33,12 @@ class RouteName {
   static const String orderDetail = '/orderDetail';
   static const String addFood = '/addFood';
   static const String orderHistoryDetail = '/orderHistoryDetail';
-  static const String updateFood = '/updateFood';
+
   static const String createTable = '/createTable';
   static const String updateUser = '/updateUser';
   static const String changePassword = '/changePassword';
   static const String printSeting = '/printSeting';
-  static const String createFood = '/createFood';
+  static const String createOrUpdateFood = '/createOrUpdateFood';
 
   static const publicRoutes = [login, register];
 }
@@ -77,16 +76,13 @@ final router = GoRouter(
           builder: (context, state) => const FoodScreen()),
       GoRoute(
           path: RouteName.addFood,
-          builder: (context, state) => const AddFoodScreen()),
+          builder: (context, state) => const AddFoodToOrderScreen()),
       GoRoute(
           path: RouteName.changePassword,
           builder: (context, state) => ChangePassword()),
       GoRoute(
           path: RouteName.printSeting,
           builder: (context, state) => const PrintSetting()),
-      GoRoute(
-          path: RouteName.createFood,
-          builder: (context, state) => const CreateFoodScreen()),
       GoRoute(
           path: RouteName.foodDetail,
           builder: (context, state) {
@@ -99,26 +95,26 @@ final router = GoRouter(
             final String nametable = GoRouterState.of(context).extra as String;
             return OrderScreen(nameTable: nametable);
           }),
+      // GoRoute(
+      //     path: RouteName.orderDetail,
+      //     builder: (context, state) {
+      //       final String idOrder = GoRouterState.of(context).extra as String;
+      //       return OrderDetailScreen(idOrder: idOrder);
+      //     }),
+      // GoRoute(
+      //     path: RouteName.orderHistoryDetail,
+      //     builder: (context, state) {
+      //       final String idOrder = GoRouterState.of(context).extra as String;
+      //       return OrderHistoryDetailScreen(idOrder: idOrder);
+      //     }),
       GoRoute(
-          path: RouteName.orderDetail,
-          builder: (context, state) {
-            final String idOrder = GoRouterState.of(context).extra as String;
-            return OrderDetailScreen(idOrder: idOrder);
-          }),
-      GoRoute(
-          path: RouteName.orderHistoryDetail,
-          builder: (context, state) {
-            final String idOrder = GoRouterState.of(context).extra as String;
-            return OrderHistoryDetailScreen(idOrder: idOrder);
-          }),
-      GoRoute(
-          path: RouteName.updateFood,
+          path: RouteName.createOrUpdateFood,
           builder: (context, state) {
             final data =
                 GoRouterState.of(context).extra as Map<String, dynamic>;
             final food = data['food'] as Food;
             final mode = data['mode'] as Mode;
-            return UpdateFoodScreen(food: food, mode: mode);
+            return CreateOrUpdateFoodScreen(food: food, mode: mode);
           }),
       GoRoute(
           path: RouteName.updateUser,

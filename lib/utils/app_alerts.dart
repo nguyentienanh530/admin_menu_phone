@@ -41,7 +41,7 @@ class AppAlerts {
           color: context.colorScheme.error),
       child: FittedBox(
           child: Row(children: [
-        FittedBox(child: Icon(Icons.check, color: kWhiteColor, size: 15)),
+        FittedBox(child: Icon(Icons.error, color: kWhiteColor, size: 15)),
         SizedBox(width: defaultPadding / 2),
         FittedBox(child: Text(msg ?? '', style: CommonTextStyle.normal()))
       ])));

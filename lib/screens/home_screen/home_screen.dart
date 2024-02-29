@@ -8,7 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import '../order_history_screen/order_history_screen.dart';
+import '../order_screen/order_history_screen.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -140,7 +140,7 @@ class HomeView extends StatelessWidget {
 
   final List<Widget> _widgetOptions = [
     const DashboardScreen(),
-    const OrderHistoryScreen(),
+    // const OrderHistoryScreen(),
     const FoodScreen(),
     const TableScreen(),
     const ProfileScreen()

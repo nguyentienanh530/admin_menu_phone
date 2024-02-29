@@ -1,4 +1,8 @@
+import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
+import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/features/search_food/cubit/text_search_cubit.dart';
+import 'package:admin_menu_mobile/widgets/empty_screen.dart';
+import 'package:admin_menu_mobile/widgets/error_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:admin_menu_mobile/config/router.dart';
@@ -42,8 +46,20 @@ class _MyWidgetState extends State<FoodScreen>
     return FloatingActionButton(
         heroTag: 'addFood',
         backgroundColor: context.colorScheme.secondary,
-        onPressed: () => context.push(RouteName.createFood),
+        onPressed: () async {
+          var result = await context.push(RouteName.createOrUpdateFood,
+              extra: {'mode': Mode.create, 'food': Food()});
+          if (result is bool && result) {
+            getData();
+          } else {
+            print('ccc');
+          }
+        },
         child: const Icon(Icons.add));
+  }
+
+  getData() {
+    context.read<FoodBloc>().add(FoodsFetched());
   }
 
   _buildAppbar(BuildContext context) {
@@ -121,21 +137,32 @@ class AfterSearchUI extends StatefulWidget {
 }
 
 class _AfterSearchUIState extends State<AfterSearchUI> {
+  getData() {
+    context.read<FoodBloc>().add(FoodsFetched());
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     var text = widget.text;
     var loadingOrInitState = Center(
         child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
-    return BlocProvider(
-        create: (context) => FoodBloc()..add(GetFoods()),
-        child: BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
+    return BlocBuilder<FoodBloc, GenericBlocState<Food>>(
+        buildWhen: (previous, current) =>
+            context.read<FoodBloc>().operation == ApiOperation.select,
+        builder: (context, state) {
           return (switch (state.status) {
-            FoodStatus.loading => loadingOrInitState,
-            FoodStatus.initial => loadingOrInitState,
-            FoodStatus.failure => Center(child: Text(state.error)),
-            FoodStatus.success => _buildBody(state.foods, text!)
+            Status.loading => loadingOrInitState,
+            Status.empty => const EmptyScreen(),
+            Status.failure => ErrorScreen(errorMsg: state.error ?? ''),
+            Status.success => _buildBody(state.datas ?? <Food>[], text ?? '')
           });
-        }));
+        });
   }
 
   _buildBody(List<Food> foods, String text) => ListView.builder(
@@ -159,7 +186,7 @@ class _AfterSearchUIState extends State<AfterSearchUI> {
         onTap: () {
           context.push(RouteName.foodDetail, extra: food).then((value) {
             if (value is bool || value == true) {
-              context.read<FoodBloc>().add(GetFoods());
+              context.read<FoodBloc>().add(FoodsFetched());
             }
           });
         },

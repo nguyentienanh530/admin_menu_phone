@@ -6,8 +6,7 @@ part of 'order_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OrderModelImpl _$$OrderModelImplFromJson(Map<String, dynamic> json) =>
-    _$OrderModelImpl(
+_$OrdersImpl _$$OrdersImplFromJson(Map<String, dynamic> json) => _$OrdersImpl(
       id: json['id'] as String?,
       isPay: json['isPay'] as bool?,
       table: json['table'] as String?,
@@ -16,11 +15,11 @@ _$OrderModelImpl _$$OrderModelImplFromJson(Map<String, dynamic> json) =>
       date: json['date'] as String?,
       totalPrice: json['totalPrice'] as num?,
       orderFood: (json['order_food'] as List<dynamic>?)
-          ?.map((e) => Food.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => FoodDto.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$OrderModelImplToJson(_$OrderModelImpl instance) =>
+Map<String, dynamic> _$$OrdersImplToJson(_$OrdersImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'isPay': instance.isPay,

@@ -21,6 +21,21 @@ class OrderRepository {
     }
   }
 
+  Future<QuerySnapshot<Map<String, dynamic>>> getOrders(
+      {required String nameTable}) {
+    try {
+      return _firebaseFirestore
+          .collection("AllOrder")
+          .where("table", isEqualTo: nameTable)
+          .where("isPay", isEqualTo: false)
+          .get();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
   Future<QuerySnapshot<Map<String, dynamic>>> getHistoryOrder() {
     try {
       return _firebaseFirestore

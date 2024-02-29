@@ -1,20 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:admin_menu_mobile/common/firebase/firebase_result.dart';
 import 'package:food_repository/food_repository.dart';
-
+import '../../../common/firebase/firebase_base.dart';
 import '../model/food_model.dart';
 
-class FoodRepo {
+class FoodRepo extends FirebaseBase<Food> {
   final FoodRepository _foodRepository;
 
   FoodRepo({required FoodRepository foodRepository})
       : _foodRepository = foodRepository;
 
-  Future<List<Food>> getFoods() async {
+  Future<FirebaseResult<List<Food>>> getFoods() async {
     try {
-      var foods = <Food>[];
-      var res = await _foodRepository.getFoods();
-      foods.addAll(res.docs.map((e) => Food.fromJson(e.data())).toList());
-      return foods;
+      return await getItems(await _foodRepository.getFoods(), Food.fromJson);
     } catch (e) {
       throw '$e';
     }
@@ -30,31 +27,20 @@ class FoodRepo {
     }
   }
 
-  Future<DocumentReference<Map<String, dynamic>>> createFood(
-      Map<String, dynamic> data) async {
+  Future<FirebaseResult<bool>> createFood({required Food food}) async {
     try {
-      return await _foodRepository.createFood(data);
+      return await createItem(_foodRepository.createFood(food.toJson()));
     } catch (e) {
       throw '$e';
     }
   }
 
-  Future<bool> deleteFood({required String idFood}) async {
-    try {
-      return await _foodRepository
-          .deleteFood(idFood: idFood)
-          .then((value) => true);
-    } catch (e) {
-      return false;
-    }
+  Future<FirebaseResult<bool>> deleteFood({required String foodID}) async {
+    return await deleteItem(_foodRepository.deleteFood(idFood: foodID));
   }
 
-  Future<void> updateFood(
-      {required String idFood, required Map<String, dynamic> data}) async {
-    try {
-      await _foodRepository.updateFood(idFood: idFood, data: data);
-    } catch (e) {
-      throw '$e';
-    }
+  Future<FirebaseResult<bool>> updateFood({required Food food}) async {
+    return await updateItem(
+        _foodRepository.updateFood(foodID: food.id ?? '', data: food.toJson()));
   }
 }

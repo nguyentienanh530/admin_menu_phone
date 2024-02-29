@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admin_menu_mobile/common/firebase/firebase_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -61,6 +63,20 @@ mixin BlocHelper<T> {
         emit(GenericBlocState.success(datas: items));
       }
     });
+  }
+
+  Future<void> getItemsOnStream(
+      Stream<FirebaseResult<List<T>>> apiCallback, Emit<T> emit) async {
+    operation = ApiOperation.select;
+    emit(GenericBlocState.loading());
+    await emit.forEach(apiCallback,
+        onData: (data) => data.when(
+            success: (data) => data.isEmpty
+                ? GenericBlocState.empty()
+                : GenericBlocState.success(datas: data),
+            failure: (error) => GenericBlocState.failure(error)),
+        onError: (error, stackTrace) =>
+            GenericBlocState.failure(error.toString()));
   }
 
   Future<void> getItem(

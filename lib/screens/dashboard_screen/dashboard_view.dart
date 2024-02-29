@@ -1,7 +1,10 @@
+import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
+import 'package:admin_menu_mobile/features/food/model/food_model.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
+import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:admin_menu_mobile/features/table/model/table_model.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
@@ -26,6 +29,12 @@ class DashboardView extends StatefulWidget {
 
 class _MyWidgetState extends State<DashboardView>
     with AutomaticKeepAliveClientMixin {
+  @override
+  void initState() {
+    context.read<OrderBloc>().add(OrdersWantingFecthed());
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -88,11 +97,10 @@ class _MyWidgetState extends State<DashboardView>
                   Status.failure =>
                     Text('Failure', style: context.textStyleSmall),
                   Status.success => _buidItemDashBoard(context,
-                        title: "Người dùng",
-                        title2: "Tài khoản",
-                        value: state.datas!.length, onTap: () {
-                      // Get.to(() => UserListScreen());
-                    })
+                      title: "Người dùng",
+                      title2: "Tài khoản",
+                      value: state.datas!.length,
+                      onTap: () {})
                 }));
   }
 
@@ -100,16 +108,17 @@ class _MyWidgetState extends State<DashboardView>
     var loadingOrInitState = Center(
         child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
     return BlocProvider(
-        create: (context) => FoodBloc()..add(GetFoods()),
-        child: BlocBuilder<FoodBloc, FoodState>(builder: (context, state) {
+        create: (context) => FoodBloc()..add(FoodsFetched()),
+        child: BlocBuilder<FoodBloc, GenericBlocState<Food>>(
+            builder: (context, state) {
           return (switch (state.status) {
-            FoodStatus.loading => loadingOrInitState,
-            FoodStatus.initial => loadingOrInitState,
-            FoodStatus.failure => Center(child: Text(state.error)),
-            FoodStatus.success => _buidItemDashBoard(context,
+            Status.loading => loadingOrInitState,
+            Status.empty => loadingOrInitState,
+            Status.failure => Center(child: Text(state.error!)),
+            Status.success => _buidItemDashBoard(context,
                   title: "Số lượng",
                   title2: "Món",
-                  value: state.foods.length, onTap: () {
+                  value: state.datas!.length, onTap: () {
                 // context.push(RouteName.searchFood);
               })
           });
@@ -117,42 +126,21 @@ class _MyWidgetState extends State<DashboardView>
   }
 
   Widget _buildOrderWanting() {
-    return BlocProvider(
-        create: (context) => OrderBloc()..add(GetAllOrder()),
-        child: BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
-          return (switch (state.status) {
-            OrderStatus.loading => Center(
-                child: SpinKitCircle(
-                    color: context.colorScheme.primary, size: 30)),
-            OrderStatus.failure => Center(child: Text(state.message)),
-            OrderStatus.success => _buidItemDashBoard(context,
-                title: "Tổng đơn",
-                title2: "Đang chờ",
-                value: state.orders.length,
-                onTap: () {}),
-            OrderStatus.initial => Center(
-                child:
-                    SpinKitCircle(color: context.colorScheme.primary, size: 30))
-          });
-          // switch (state.status) {
-          //   case OrderStatus.loading:
-          //     return Center(
-          //         child: SpinKitCircle(
-          //             color: context.colorScheme.primary, size: 30));
-          //   case OrderStatus.failure:
-          //     return Center(child: Text(state.message));
-          //   case OrderStatus.success:
-          //     return _buidItemDashBoard(context,
-          //         title: "Tổng đơn",
-          //         title2: "Đang chờ",
-          //         value: state.orders.length,
-          //         onTap: () {});
-          //   case OrderStatus.initial:
-          //     return Center(
-          //         child: SpinKitCircle(
-          //             color: context.colorScheme.primary, size: 30));
-          // }
-        }));
+    return BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+        builder: (context, state) {
+      return (switch (state.status) {
+        Status.loading => Center(
+            child: SpinKitCircle(color: context.colorScheme.primary, size: 30)),
+        Status.failure => Center(child: Text(state.error ?? '')),
+        Status.success => _buidItemDashBoard(context,
+            title: "Tổng đơn",
+            title2: "Đang chờ",
+            value: state.datas!.length,
+            onTap: () {}),
+        Status.empty => _buidItemDashBoard(context,
+            title: "Tổng đơn", title2: "Đang chờ", value: 0, onTap: () {})
+      });
+    });
   }
 
   Widget _buidItemDashBoard(BuildContext context,
@@ -355,41 +343,72 @@ class _ItemTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) =>
-            OrderBloc()..add(GetOrderOnTable(nameTable: nameTable)),
-        child: BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
-          switch (state.status) {
-            case OrderStatus.loading:
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-            case OrderStatus.failure:
-              return Center(child: Text(state.message));
-            case OrderStatus.success:
-              return GestureDetector(
-                  onTap: () => context.push(RouteName.order, extra: nameTable),
-                  child: Card(
-                    child: Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(3),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              FittedBox(
-                                  child: Text(nameTable!,
-                                      style: context.textStyleSmall)),
-                              FittedBox(
-                                  child: Text(state.orders.length.toString(),
-                                      style: context.textStyleLarge!.copyWith(
-                                          color: context.colorScheme.secondary,
-                                          fontWeight: FontWeight.bold))),
-                              const SizedBox()
-                            ])),
-                  ));
-            case OrderStatus.initial:
-              return Center(
-                  child: SpinKitCircle(
-                      color: context.colorScheme.primary, size: 30));
-          }
-        }));
+            OrderBloc()..add(OrdersOnTableFecthed(nameTable: nameTable)),
+        child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+            buildWhen: (previous, current) =>
+                context.read<OrderBloc>().operation == ApiOperation.select,
+            builder: (context, state) {
+              logger.d(state.status);
+              switch (state.status) {
+                case Status.loading:
+                  return Center(
+                      child: SpinKitCircle(
+                          color: context.colorScheme.primary, size: 30));
+                case Status.failure:
+                  return Center(child: Text(state.error ?? ''));
+                case Status.success:
+                  logger.d(state.datas);
+                  return GestureDetector(
+                      onTap: () =>
+                          context.push(RouteName.order, extra: nameTable),
+                      child: Card(
+                          child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(3),
+                              child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    FittedBox(
+                                        child: Text(nameTable!,
+                                            style: context.textStyleSmall)),
+                                    FittedBox(
+                                        child: Text(
+                                            state.datas!.length.toString(),
+                                            style: context.textStyleLarge!
+                                                .copyWith(
+                                                    color: context
+                                                        .colorScheme.secondary,
+                                                    fontWeight:
+                                                        FontWeight.bold))),
+                                    const SizedBox()
+                                  ]))));
+                case Status.empty:
+                  return GestureDetector(
+                      onTap: () =>
+                          context.push(RouteName.order, extra: nameTable),
+                      child: Card(
+                          child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(3),
+                              child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    FittedBox(
+                                        child: Text(nameTable!,
+                                            style: context.textStyleSmall)),
+                                    FittedBox(
+                                        child: Text('0',
+                                            style: context.textStyleLarge!
+                                                .copyWith(
+                                                    color: context
+                                                        .colorScheme.secondary,
+                                                    fontWeight:
+                                                        FontWeight.bold))),
+                                    const SizedBox()
+                                  ]))));
+              }
+            }));
   }
 }

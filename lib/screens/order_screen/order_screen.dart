@@ -3,14 +3,11 @@ import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/widgets/error_screen.dart';
 import 'package:admin_menu_mobile/widgets/loading_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/widgets/empty_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/order/dtos/order_model.dart';
 import '../../widgets/widgets.dart';
@@ -71,8 +68,12 @@ class ExpandableListView extends StatelessWidget {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: defaultPadding),
         child: GestureDetector(
-            onTap: () =>
-                context.push(RouteName.orderDetail, extra: orderModel!.id),
+            onTap: () async {
+              await context.push(RouteName.orderDetail, extra: orderModel).then(
+                  (value) => context
+                      .read<OrderBloc>()
+                      .add(OrdersFecthed(tableName: orderModel!.table!)));
+            },
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[

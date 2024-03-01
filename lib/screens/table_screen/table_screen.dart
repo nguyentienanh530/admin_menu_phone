@@ -87,7 +87,8 @@ class TableView extends StatelessWidget {
                 Status.loading => const LoadingScreen(),
                 Status.failure => ErrorScreen(errorMsg: state.error),
                 Status.empty => const EmptyScreen(),
-                Status.success => _buildBody(context, state.datas!)
+                Status.success =>
+                  _buildBody(context, state.datas as List<TableModel>)
               });
             }));
   }

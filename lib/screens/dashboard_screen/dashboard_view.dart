@@ -31,7 +31,7 @@ class _MyWidgetState extends State<DashboardView>
     with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
-    context.read<OrderBloc>().add(OrdersWantingFecthed());
+    // context.read<OrderBloc>().add(OrdersWantingFecthed());
     super.initState();
   }
 
@@ -77,7 +77,7 @@ class _MyWidgetState extends State<DashboardView>
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(child: _buildOrderWanting()),
+                  // Expanded(child: _buildOrderWanting()),
                   SizedBox(width: defaultPadding),
                   Expanded(child: _buildUserAccount()),
                   SizedBox(width: defaultPadding),
@@ -125,23 +125,27 @@ class _MyWidgetState extends State<DashboardView>
         }));
   }
 
-  Widget _buildOrderWanting() {
-    return BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
-        builder: (context, state) {
-      return (switch (state.status) {
-        Status.loading => Center(
-            child: SpinKitCircle(color: context.colorScheme.primary, size: 30)),
-        Status.failure => Center(child: Text(state.error ?? '')),
-        Status.success => _buidItemDashBoard(context,
-            title: "Tổng đơn",
-            title2: "Đang chờ",
-            value: state.datas!.length,
-            onTap: () {}),
-        Status.empty => _buidItemDashBoard(context,
-            title: "Tổng đơn", title2: "Đang chờ", value: 0, onTap: () {})
-      });
-    });
-  }
+  // Widget _buildOrderWanting() {
+  //   return BlocProvider(
+  //       create: (context) => OrderBloc()..add(OrdersWantingFecthed()),
+  //       child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+  //           builder: (context, state) {
+  //         print('dashboard + ${state.status}');
+  //         return (switch (state.status) {
+  //           Status.loading => Center(
+  //               child: SpinKitCircle(
+  //                   color: context.colorScheme.primary, size: 30)),
+  //           Status.failure => Center(child: Text(state.error ?? '')),
+  //           Status.success => _buidItemDashBoard(context,
+  //               title: "Tổng đơn",
+  //               title2: "Đang chờ",
+  //               value: state.datas == null ? 0 : state.datas!.length,
+  //               onTap: () {}),
+  //           Status.empty => _buidItemDashBoard(context,
+  //               title: "Tổng đơn", title2: "Đang chờ", value: 0, onTap: () {})
+  //         });
+  //       }));
+  // }
 
   Widget _buidItemDashBoard(BuildContext context,
       {String? title, String? title2, Function()? onTap, int? value}) {

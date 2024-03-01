@@ -157,7 +157,7 @@ class _UpdateUserDialogState extends State<UpdateUser> {
       updateUser(newUser);
     } else {
       toast.showToast(
-          child: AppAlerts.errorToast(context, msg: 'Chưa nhập đủ thông tin!'));
+          child: AppAlerts.errorToast(msg: 'Chưa nhập đủ thông tin!'));
     }
   }
 

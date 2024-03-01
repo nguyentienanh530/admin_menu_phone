@@ -72,11 +72,10 @@ class OrderRepository {
     }
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> getOrderByID(
-      {required String id}) {
+  Future<DocumentSnapshot<Map<String, dynamic>>> getOrderByID(
+      {required String orderID}) async {
     try {
-      var data = _firebaseFirestore.collection("AllOrder").doc(id).snapshots();
-      return data;
+      return await _firebaseFirestore.collection("AllOrder").doc(orderID).get();
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {
@@ -84,15 +83,13 @@ class OrderRepository {
     }
   }
 
-  Future<void> updateOrderItem(
-      {required String idOrder,
-      required List<Map<String, dynamic>> json,
-      required num totalPrice}) async {
+  Future<void> updateOrder({required Map<String, dynamic> jsonData}) async {
+    var orderID = jsonData['id'];
     try {
       await _firebaseFirestore
           .collection('AllOrder')
-          .doc(idOrder)
-          .update({'order_food': json, 'totalPrice': totalPrice});
+          .doc(orderID)
+          .update(jsonData);
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {

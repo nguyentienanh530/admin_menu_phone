@@ -20,3 +20,17 @@ final class OrdersFecthed extends OrderEvent {
 
   const OrdersFecthed({required this.tableName});
 }
+
+final class OrdersHistoryFecthed extends OrderEvent {}
+
+final class GetOrdersByID extends OrderEvent {
+  final String orderID;
+
+  const GetOrdersByID({required this.orderID});
+}
+
+final class OrderUpdated extends OrderEvent {
+  final Orders orders;
+
+  const OrderUpdated({required this.orders});
+}

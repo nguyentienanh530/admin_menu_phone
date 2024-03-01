@@ -20,58 +20,30 @@ class OrderRepo extends FirebaseBase<Orders> {
         _orderRepository.getAllOrderWanting(), (json) => Orders.fromJson(json));
   }
 
+  Future<FirebaseResult<Orders>> getOrderByID({required String orderID}) async {
+    return getItem(await _orderRepository.getOrderByID(orderID: orderID),
+        (json) => Orders.fromJson(json));
+  }
+
   Future<FirebaseResult<List<Orders>>> getOrders(
       {required String tableName}) async {
     return getItems(await _orderRepository.getOrders(nameTable: tableName),
         (json) => Orders.fromJson(json));
   }
 
-  // Stream<List<Order>> getAllOrderOnWanting() {
-  //   try {
-  //     return _orderRepository.getAllOrderWanting().map((event) {
-  //       var orders = <Order>[];
-  //       orders.addAll(event.docs.map((e) => Orders.fromJson(e.data())).toList());
-  //       return orders;
-  //     });
-  //   } catch (e) {
-  //     throw '$e';
-  //   }
-  // }
+  Future<FirebaseResult<List<Orders>>> getHistoryOrder() async {
+    return getItems(await _orderRepository.getHistoryOrder(),
+        (json) => Orders.fromJson(json));
+  }
 
-  // Future<void> updateFoodInOrder(
-  //     {required String idOrder,
-  //     required List<Map<String, dynamic>> jsonData,
-  //     required num totalPrice}) async {
-  //   try {
-  //     await _orderRepository.updateOrderItem(
-  //         idOrder: idOrder, json: jsonData, totalPrice: totalPrice);
-  //   } catch (e) {
-  //     throw '$e';
-  //   }
-  // }
-
-  // Future<void> deleteOrder({required String idOrder}) async {
-  //   try {
-  //     await _orderRepository.deleteOrder(idOrder: idOrder);
-  //   } catch (e) {
-  //     throw '$e';
-  //   }
-  // }
+  Future<FirebaseResult<bool>> updateOrder({required Orders orders}) async {
+    return await updateItem(
+        _orderRepository.updateOrder(jsonData: orders.toJson()));
+  }
 
   // Future<void> paymentOrder({required String idOrder}) async {
   //   try {
   //     await _orderRepository.paymentOrder(idOrder: idOrder);
-  //   } catch (e) {
-  //     throw '$e';
-  //   }
-  // }
-
-  // Future<List<Order>> getHistoryOrder() async {
-  //   try {
-  //     var orders = <Order>[];
-  //     var res = await _orderRepository.getHistoryOrder();
-  //     orders.addAll(res.docs.map((e) => Order.fromJson(e.data())).toList());
-  //     return orders;
   //   } catch (e) {
   //     throw '$e';
   //   }

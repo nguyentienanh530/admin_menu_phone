@@ -1,3 +1,4 @@
+import 'package:admin_menu_mobile/features/order/dtos/food_dto.dart';
 import 'package:admin_menu_mobile/features/search_food/cubit/text_search_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -146,7 +147,19 @@ class AfterSearchUI extends StatelessWidget {
   Widget _buildItemSearch(BuildContext context, Food food) {
     return InkWell(
         onTap: () {
-          context.pop<Food>(food);
+          var foodDto = FoodDto(
+              id: food.id,
+              discount: food.discount,
+              image: food.image,
+              isDiscount: food.isDiscount,
+              isImageCrop: food.isImageCrop,
+              note: food.note,
+              price: food.price,
+              quantity: food.quantity,
+              timeOrder: food.timeOrder,
+              title: food.title,
+              totalPrice: food.totalPrice);
+          context.pop<FoodDto>(foodDto);
         },
         child: Padding(
             padding:

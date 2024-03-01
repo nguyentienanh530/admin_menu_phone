@@ -388,8 +388,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       updateFood(food);
     } else {
       toast.showToast(
-          child:
-              AppAlerts.errorToast(context, msg: 'Chưa nhập đầy đủ thông tin'));
+          child: AppAlerts.errorToast(msg: 'Chưa nhập đầy đủ thông tin'));
     }
   }
 
@@ -424,8 +423,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       });
     } else {
       toast.showToast(
-          child:
-              AppAlerts.errorToast(context, msg: 'Chưa nhập đầy đủ thông tin'));
+          child: AppAlerts.errorToast(msg: 'Chưa nhập đầy đủ thông tin'));
     }
   }
 

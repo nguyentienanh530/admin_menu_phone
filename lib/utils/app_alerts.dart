@@ -33,12 +33,11 @@ class AppAlerts {
         FittedBox(child: Text(msg ?? '', style: CommonTextStyle.normal()))
       ])));
 
-  static Widget errorToast(BuildContext context, {String? msg}) => Container(
+  static Widget errorToast({String? msg}) => Container(
       margin: EdgeInsets.all(defaultPadding),
       padding: EdgeInsets.all(defaultPadding / 2),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25.0),
-          color: context.colorScheme.error),
+          borderRadius: BorderRadius.circular(25.0), color: Colors.red),
       child: FittedBox(
           child: Row(children: [
         FittedBox(child: Icon(Icons.error, color: kWhiteColor, size: 15)),

@@ -160,7 +160,7 @@ class _AfterSearchUIState extends State<AfterSearchUI> {
             Status.loading => loadingOrInitState,
             Status.empty => const EmptyScreen(),
             Status.failure => ErrorScreen(errorMsg: state.error ?? ''),
-            Status.success => _buildBody(state.datas ?? <Food>[], text ?? '')
+            Status.success => _buildBody(state.datas as List<Food>, text ?? '')
           });
         });
   }

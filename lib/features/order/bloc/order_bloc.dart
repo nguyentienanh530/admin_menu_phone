@@ -18,23 +18,39 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
     on<OrdersOnTableFecthed>(_getOrderOnTable);
     on<OrdersWantingFecthed>(_getOdersWanting);
     on<OrdersFecthed>(_getOrders);
+    on<OrdersHistoryFecthed>(_getIOrderHistory);
+    on<GetOrdersByID>(_getOrderByID);
+    on<OrderUpdated>(_updateOrder);
   }
   final _orderRepository = OrderRepo(
       orderRepository:
           OrderRepository(firebaseFirestore: FirebaseFirestore.instance));
 
   FutureOr<void> _getOrderOnTable(OrdersOnTableFecthed event, Emit emit) async {
-    return getItemsOnStream(
+    await getItemsOnStream(
         _orderRepository.getOrderOnTable(nameTable: event.nameTable), emit);
   }
 
   FutureOr<void> _getOdersWanting(OrdersWantingFecthed event, Emit emit) {
-    return getItemsOnStream(_orderRepository.getOrdersWanting(), emit);
+    // return getItemsOnStream(_orderRepository.getOrdersWanting(), emit);
   }
 
-  FutureOr<void> _getOrders(
-      OrdersFecthed event, Emitter<GenericBlocState<Orders>> emit) async {
-    return await getItems(
+  FutureOr<void> _getOrders(OrdersFecthed event, Emit emit) async {
+    await getItems(
         _orderRepository.getOrders(tableName: event.tableName), emit);
+  }
+
+  FutureOr<void> _getIOrderHistory(
+      OrdersHistoryFecthed event, Emit emit) async {
+    await getItems(_orderRepository.getHistoryOrder(), emit);
+  }
+
+  FutureOr<void> _getOrderByID(
+      GetOrdersByID event, Emitter<GenericBlocState<Orders>> emit) async {
+    await getItem(_orderRepository.getOrderByID(orderID: event.orderID), emit);
+  }
+
+  FutureOr<void> _updateOrder(OrderUpdated event, Emit emit) async {
+    await updateItem(_orderRepository.updateOrder(orders: event.orders), emit);
   }
 }

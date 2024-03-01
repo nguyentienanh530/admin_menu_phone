@@ -63,6 +63,22 @@ abstract class FirebaseBase<T> {
     }
   }
 
+  Stream<FirebaseResult<T>> getItemOnStream(
+      Stream<DocumentSnapshot<Map<String, dynamic>>> firebaseCallback,
+      T Function(Map<String, dynamic> json) getJsonCallback) {
+    try {
+      return firebaseCallback.map((event) {
+        final Map<String, dynamic> dataList = event.data()!;
+
+        final T typedList = getJsonCallback(dataList);
+        return FirebaseResult.success(typedList);
+      });
+    } on FirebaseException catch (e) {
+      final errorMessage = e.toString();
+      throw FirebaseResult.failure(errorMessage);
+    }
+  }
+
   Future<FirebaseResult<T>> getItem(
       DocumentSnapshot<Map<String, dynamic>> firebaseCallback,
       T Function(Map<String, dynamic> json) getJsonCallback) async {

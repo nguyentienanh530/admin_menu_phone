@@ -175,8 +175,7 @@ class _CreateTableState extends State<CreateTable> {
     if (_formKey.currentState!.validate()) {
       if (_seat.isEmpty || existImage() == false) {
         toast.showToast(
-            child:
-                AppAlerts.errorToast(context, msg: 'Chưa thêm hình hoặc ghế!'));
+            child: AppAlerts.errorToast(msg: 'Chưa thêm hình hoặc ghế!'));
       } else {
         setState(() {
           _loading = true;
@@ -206,8 +205,7 @@ class _CreateTableState extends State<CreateTable> {
     if (_formKey.currentState!.validate()) {
       if (_seat == '' || _imageFile == null) {
         toast.showToast(
-            child:
-                AppAlerts.errorToast(context, msg: 'Chưa thêm hình hoặc ghế!'));
+            child: AppAlerts.errorToast(msg: 'Chưa thêm hình hoặc ghế!'));
       } else {
         setState(() {
           _loading = true;

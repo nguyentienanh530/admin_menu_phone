@@ -1,3 +1,4 @@
+import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
 import 'package:admin_menu_mobile/features/table/model/table_model.dart';
 import 'package:admin_menu_mobile/features/user/model/user_model.dart';
 import 'package:admin_menu_mobile/screens/order_screen/add_food_to_order_screen.dart';
@@ -33,7 +34,6 @@ class RouteName {
   static const String orderDetail = '/orderDetail';
   static const String addFood = '/addFood';
   static const String orderHistoryDetail = '/orderHistoryDetail';
-
   static const String createTable = '/createTable';
   static const String updateUser = '/updateUser';
   static const String changePassword = '/changePassword';
@@ -95,18 +95,18 @@ final router = GoRouter(
             final String nametable = GoRouterState.of(context).extra as String;
             return OrderScreen(nameTable: nametable);
           }),
-      // GoRoute(
-      //     path: RouteName.orderDetail,
-      //     builder: (context, state) {
-      //       final String idOrder = GoRouterState.of(context).extra as String;
-      //       return OrderDetailScreen(idOrder: idOrder);
-      //     }),
-      // GoRoute(
-      //     path: RouteName.orderHistoryDetail,
-      //     builder: (context, state) {
-      //       final String idOrder = GoRouterState.of(context).extra as String;
-      //       return OrderHistoryDetailScreen(idOrder: idOrder);
-      //     }),
+      GoRoute(
+          path: RouteName.orderDetail,
+          builder: (context, state) {
+            final Orders orders = GoRouterState.of(context).extra as Orders;
+            return OrderDetailScreen(orders: orders);
+          }),
+      GoRoute(
+          path: RouteName.orderHistoryDetail,
+          builder: (context, state) {
+            final orders = GoRouterState.of(context).extra as Orders;
+            return OrderHistoryDetailScreen(orders: orders);
+          }),
       GoRoute(
           path: RouteName.createOrUpdateFood,
           builder: (context, state) {

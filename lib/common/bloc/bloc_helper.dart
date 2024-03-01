@@ -7,23 +7,24 @@ import 'generic_bloc_state.dart';
 
 typedef Emit<T> = Emitter<GenericBlocState<T>>;
 
-enum ApiOperation { select, create, update, delete }
+enum ApiOperation { select, create, update, delete, itemSelectStream }
 
 mixin BlocHelper<T> {
   ApiOperation operation = ApiOperation.select;
 
-  _checkFailureOrSuccess(FirebaseResult failureOrSuccess, Emit<T> emit) {
+  Future _checkFailureOrSuccess(
+      FirebaseResult failureOrSuccess, Emit<T> emit) async {
     failureOrSuccess.when(
       failure: (String failure) {
         emit(GenericBlocState.failure(failure));
       },
       success: (_) {
-        emit(GenericBlocState.success(datas: null, data: null));
+        emit(GenericBlocState.success());
       },
     );
   }
 
-  _apiOperationTemplate(
+  Future _apiOperationTemplate(
       Future<FirebaseResult> apiCallback, Emit<T> emit) async {
     emit(GenericBlocState.loading());
     FirebaseResult failureOrSuccess = await apiCallback;
@@ -67,13 +68,25 @@ mixin BlocHelper<T> {
 
   Future<void> getItemsOnStream(
       Stream<FirebaseResult<List<T>>> apiCallback, Emit<T> emit) async {
-    operation = ApiOperation.select;
+    operation = ApiOperation.itemSelectStream;
     emit(GenericBlocState.loading());
     await emit.forEach(apiCallback,
         onData: (data) => data.when(
-            success: (data) => data.isEmpty
+            success: (List<T> data) => data.isEmpty
                 ? GenericBlocState.empty()
                 : GenericBlocState.success(datas: data),
+            failure: (error) => GenericBlocState.failure(error)),
+        onError: (error, stackTrace) =>
+            GenericBlocState.failure(error.toString()));
+  }
+
+  Future<void> getItemOnStream(
+      Stream<FirebaseResult<T>> apiCallback, Emit<T> emit) async {
+    operation = ApiOperation.itemSelectStream;
+    emit(GenericBlocState.loading());
+    await emit.forEach(apiCallback,
+        onData: (data) => data.when(
+            success: (T data) => GenericBlocState.success(data: data),
             failure: (error) => GenericBlocState.failure(error)),
         onError: (error, stackTrace) =>
             GenericBlocState.failure(error.toString()));

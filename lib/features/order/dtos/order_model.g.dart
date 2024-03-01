@@ -15,8 +15,9 @@ _$OrdersImpl _$$OrdersImplFromJson(Map<String, dynamic> json) => _$OrdersImpl(
       date: json['date'] as String?,
       totalPrice: json['totalPrice'] as num?,
       orderFood: (json['order_food'] as List<dynamic>?)
-          ?.map((e) => FoodDto.fromJson(e as Map<String, dynamic>))
-          .toList(),
+              ?.map((e) => FoodDto.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <FoodDto>[],
     );
 
 Map<String, dynamic> _$$OrdersImplToJson(_$OrdersImpl instance) =>
@@ -28,5 +29,5 @@ Map<String, dynamic> _$$OrdersImplToJson(_$OrdersImpl instance) =>
       'datePay': instance.datePay,
       'date': instance.date,
       'totalPrice': instance.totalPrice,
-      'order_food': instance.orderFood,
+      'order_food': foodDtoListToJson(instance.orderFood),
     };

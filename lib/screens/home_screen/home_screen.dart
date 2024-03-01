@@ -140,7 +140,7 @@ class HomeView extends StatelessWidget {
 
   final List<Widget> _widgetOptions = [
     const DashboardScreen(),
-    // const OrderHistoryScreen(),
+    const OrderHistoryScreen(),
     const FoodScreen(),
     const TableScreen(),
     const ProfileScreen()

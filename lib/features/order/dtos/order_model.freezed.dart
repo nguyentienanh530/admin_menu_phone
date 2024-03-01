@@ -26,9 +26,10 @@ mixin _$Orders {
   String? get dateOrder => throw _privateConstructorUsedError;
   String? get datePay => throw _privateConstructorUsedError;
   String? get date => throw _privateConstructorUsedError;
-  num? get totalPrice => throw _privateConstructorUsedError;
-  @JsonKey(name: 'order_food')
-  List<FoodDto>? get orderFood => throw _privateConstructorUsedError;
+  num? get totalPrice =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+  List<FoodDto> get orderFood => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -48,7 +49,8 @@ abstract class $OrdersCopyWith<$Res> {
       String? datePay,
       String? date,
       num? totalPrice,
-      @JsonKey(name: 'order_food') List<FoodDto>? orderFood});
+      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+      List<FoodDto> orderFood});
 }
 
 /// @nodoc
@@ -71,7 +73,7 @@ class _$OrdersCopyWithImpl<$Res, $Val extends Orders>
     Object? datePay = freezed,
     Object? date = freezed,
     Object? totalPrice = freezed,
-    Object? orderFood = freezed,
+    Object? orderFood = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -102,10 +104,10 @@ class _$OrdersCopyWithImpl<$Res, $Val extends Orders>
           ? _value.totalPrice
           : totalPrice // ignore: cast_nullable_to_non_nullable
               as num?,
-      orderFood: freezed == orderFood
+      orderFood: null == orderFood
           ? _value.orderFood
           : orderFood // ignore: cast_nullable_to_non_nullable
-              as List<FoodDto>?,
+              as List<FoodDto>,
     ) as $Val);
   }
 }
@@ -125,7 +127,8 @@ abstract class _$$OrdersImplCopyWith<$Res> implements $OrdersCopyWith<$Res> {
       String? datePay,
       String? date,
       num? totalPrice,
-      @JsonKey(name: 'order_food') List<FoodDto>? orderFood});
+      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+      List<FoodDto> orderFood});
 }
 
 /// @nodoc
@@ -146,7 +149,7 @@ class __$$OrdersImplCopyWithImpl<$Res>
     Object? datePay = freezed,
     Object? date = freezed,
     Object? totalPrice = freezed,
-    Object? orderFood = freezed,
+    Object? orderFood = null,
   }) {
     return _then(_$OrdersImpl(
       id: freezed == id
@@ -177,10 +180,10 @@ class __$$OrdersImplCopyWithImpl<$Res>
           ? _value.totalPrice
           : totalPrice // ignore: cast_nullable_to_non_nullable
               as num?,
-      orderFood: freezed == orderFood
+      orderFood: null == orderFood
           ? _value._orderFood
           : orderFood // ignore: cast_nullable_to_non_nullable
-              as List<FoodDto>?,
+              as List<FoodDto>,
     ));
   }
 }
@@ -188,7 +191,7 @@ class __$$OrdersImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$OrdersImpl implements _Orders {
-  const _$OrdersImpl(
+  _$OrdersImpl(
       {this.id,
       this.isPay,
       this.table,
@@ -196,7 +199,8 @@ class _$OrdersImpl implements _Orders {
       this.datePay,
       this.date,
       this.totalPrice,
-      @JsonKey(name: 'order_food') final List<FoodDto>? orderFood})
+      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+      final List<FoodDto> orderFood = const <FoodDto>[]})
       : _orderFood = orderFood;
 
   factory _$OrdersImpl.fromJson(Map<String, dynamic> json) =>
@@ -216,15 +220,15 @@ class _$OrdersImpl implements _Orders {
   final String? date;
   @override
   final num? totalPrice;
-  final List<FoodDto>? _orderFood;
+// ignore: invalid_annotation_target
+  final List<FoodDto> _orderFood;
+// ignore: invalid_annotation_target
   @override
-  @JsonKey(name: 'order_food')
-  List<FoodDto>? get orderFood {
-    final value = _orderFood;
-    if (value == null) return null;
+  @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+  List<FoodDto> get orderFood {
     if (_orderFood is EqualUnmodifiableListView) return _orderFood;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
+    return EqualUnmodifiableListView(_orderFood);
   }
 
   @override
@@ -278,16 +282,16 @@ class _$OrdersImpl implements _Orders {
 }
 
 abstract class _Orders implements Orders {
-  const factory _Orders(
-          {final String? id,
-          final bool? isPay,
-          final String? table,
-          final String? dateOrder,
-          final String? datePay,
-          final String? date,
-          final num? totalPrice,
-          @JsonKey(name: 'order_food') final List<FoodDto>? orderFood}) =
-      _$OrdersImpl;
+  factory _Orders(
+      {final String? id,
+      final bool? isPay,
+      final String? table,
+      final String? dateOrder,
+      final String? datePay,
+      final String? date,
+      final num? totalPrice,
+      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+      final List<FoodDto> orderFood}) = _$OrdersImpl;
 
   factory _Orders.fromJson(Map<String, dynamic> json) = _$OrdersImpl.fromJson;
 
@@ -305,9 +309,9 @@ abstract class _Orders implements Orders {
   String? get date;
   @override
   num? get totalPrice;
-  @override
-  @JsonKey(name: 'order_food')
-  List<FoodDto>? get orderFood;
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+  List<FoodDto> get orderFood;
   @override
   @JsonKey(ignore: true)
   _$$OrdersImplCopyWith<_$OrdersImpl> get copyWith =>

@@ -21,15 +21,14 @@ Orders _$OrdersFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Orders {
   String? get id => throw _privateConstructorUsedError;
-  bool? get isPay => throw _privateConstructorUsedError;
-  String? get table => throw _privateConstructorUsedError;
-  String? get dateOrder => throw _privateConstructorUsedError;
-  String? get datePay => throw _privateConstructorUsedError;
-  String? get date => throw _privateConstructorUsedError;
+  String? get status => throw _privateConstructorUsedError;
+  String? get tableID => throw _privateConstructorUsedError;
+  String? get orderTime => throw _privateConstructorUsedError;
+  String? get payTime => throw _privateConstructorUsedError;
   num? get totalPrice =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
-  @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
-  List<FoodDto> get orderFood => throw _privateConstructorUsedError;
+  @JsonKey(toJson: foodDtoListToJson)
+  List<FoodDto> get foods => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,14 +42,12 @@ abstract class $OrdersCopyWith<$Res> {
   @useResult
   $Res call(
       {String? id,
-      bool? isPay,
-      String? table,
-      String? dateOrder,
-      String? datePay,
-      String? date,
+      String? status,
+      String? tableID,
+      String? orderTime,
+      String? payTime,
       num? totalPrice,
-      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
-      List<FoodDto> orderFood});
+      @JsonKey(toJson: foodDtoListToJson) List<FoodDto> foods});
 }
 
 /// @nodoc
@@ -67,46 +64,41 @@ class _$OrdersCopyWithImpl<$Res, $Val extends Orders>
   @override
   $Res call({
     Object? id = freezed,
-    Object? isPay = freezed,
-    Object? table = freezed,
-    Object? dateOrder = freezed,
-    Object? datePay = freezed,
-    Object? date = freezed,
+    Object? status = freezed,
+    Object? tableID = freezed,
+    Object? orderTime = freezed,
+    Object? payTime = freezed,
     Object? totalPrice = freezed,
-    Object? orderFood = null,
+    Object? foods = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      isPay: freezed == isPay
-          ? _value.isPay
-          : isPay // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      table: freezed == table
-          ? _value.table
-          : table // ignore: cast_nullable_to_non_nullable
+      status: freezed == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      dateOrder: freezed == dateOrder
-          ? _value.dateOrder
-          : dateOrder // ignore: cast_nullable_to_non_nullable
+      tableID: freezed == tableID
+          ? _value.tableID
+          : tableID // ignore: cast_nullable_to_non_nullable
               as String?,
-      datePay: freezed == datePay
-          ? _value.datePay
-          : datePay // ignore: cast_nullable_to_non_nullable
+      orderTime: freezed == orderTime
+          ? _value.orderTime
+          : orderTime // ignore: cast_nullable_to_non_nullable
               as String?,
-      date: freezed == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
+      payTime: freezed == payTime
+          ? _value.payTime
+          : payTime // ignore: cast_nullable_to_non_nullable
               as String?,
       totalPrice: freezed == totalPrice
           ? _value.totalPrice
           : totalPrice // ignore: cast_nullable_to_non_nullable
               as num?,
-      orderFood: null == orderFood
-          ? _value.orderFood
-          : orderFood // ignore: cast_nullable_to_non_nullable
+      foods: null == foods
+          ? _value.foods
+          : foods // ignore: cast_nullable_to_non_nullable
               as List<FoodDto>,
     ) as $Val);
   }
@@ -121,14 +113,12 @@ abstract class _$$OrdersImplCopyWith<$Res> implements $OrdersCopyWith<$Res> {
   @useResult
   $Res call(
       {String? id,
-      bool? isPay,
-      String? table,
-      String? dateOrder,
-      String? datePay,
-      String? date,
+      String? status,
+      String? tableID,
+      String? orderTime,
+      String? payTime,
       num? totalPrice,
-      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
-      List<FoodDto> orderFood});
+      @JsonKey(toJson: foodDtoListToJson) List<FoodDto> foods});
 }
 
 /// @nodoc
@@ -143,46 +133,41 @@ class __$$OrdersImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
-    Object? isPay = freezed,
-    Object? table = freezed,
-    Object? dateOrder = freezed,
-    Object? datePay = freezed,
-    Object? date = freezed,
+    Object? status = freezed,
+    Object? tableID = freezed,
+    Object? orderTime = freezed,
+    Object? payTime = freezed,
     Object? totalPrice = freezed,
-    Object? orderFood = null,
+    Object? foods = null,
   }) {
     return _then(_$OrdersImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      isPay: freezed == isPay
-          ? _value.isPay
-          : isPay // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      table: freezed == table
-          ? _value.table
-          : table // ignore: cast_nullable_to_non_nullable
+      status: freezed == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      dateOrder: freezed == dateOrder
-          ? _value.dateOrder
-          : dateOrder // ignore: cast_nullable_to_non_nullable
+      tableID: freezed == tableID
+          ? _value.tableID
+          : tableID // ignore: cast_nullable_to_non_nullable
               as String?,
-      datePay: freezed == datePay
-          ? _value.datePay
-          : datePay // ignore: cast_nullable_to_non_nullable
+      orderTime: freezed == orderTime
+          ? _value.orderTime
+          : orderTime // ignore: cast_nullable_to_non_nullable
               as String?,
-      date: freezed == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
+      payTime: freezed == payTime
+          ? _value.payTime
+          : payTime // ignore: cast_nullable_to_non_nullable
               as String?,
       totalPrice: freezed == totalPrice
           ? _value.totalPrice
           : totalPrice // ignore: cast_nullable_to_non_nullable
               as num?,
-      orderFood: null == orderFood
-          ? _value._orderFood
-          : orderFood // ignore: cast_nullable_to_non_nullable
+      foods: null == foods
+          ? _value._foods
+          : foods // ignore: cast_nullable_to_non_nullable
               as List<FoodDto>,
     ));
   }
@@ -193,15 +178,14 @@ class __$$OrdersImplCopyWithImpl<$Res>
 class _$OrdersImpl implements _Orders {
   _$OrdersImpl(
       {this.id,
-      this.isPay,
-      this.table,
-      this.dateOrder,
-      this.datePay,
-      this.date,
+      this.status,
+      this.tableID,
+      this.orderTime,
+      this.payTime,
       this.totalPrice,
-      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
-      final List<FoodDto> orderFood = const <FoodDto>[]})
-      : _orderFood = orderFood;
+      @JsonKey(toJson: foodDtoListToJson)
+      final List<FoodDto> foods = const <FoodDto>[]})
+      : _foods = foods;
 
   factory _$OrdersImpl.fromJson(Map<String, dynamic> json) =>
       _$$OrdersImplFromJson(json);
@@ -209,31 +193,29 @@ class _$OrdersImpl implements _Orders {
   @override
   final String? id;
   @override
-  final bool? isPay;
+  final String? status;
   @override
-  final String? table;
+  final String? tableID;
   @override
-  final String? dateOrder;
+  final String? orderTime;
   @override
-  final String? datePay;
-  @override
-  final String? date;
+  final String? payTime;
   @override
   final num? totalPrice;
 // ignore: invalid_annotation_target
-  final List<FoodDto> _orderFood;
+  final List<FoodDto> _foods;
 // ignore: invalid_annotation_target
   @override
-  @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
-  List<FoodDto> get orderFood {
-    if (_orderFood is EqualUnmodifiableListView) return _orderFood;
+  @JsonKey(toJson: foodDtoListToJson)
+  List<FoodDto> get foods {
+    if (_foods is EqualUnmodifiableListView) return _foods;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_orderFood);
+    return EqualUnmodifiableListView(_foods);
   }
 
   @override
   String toString() {
-    return 'Orders(id: $id, isPay: $isPay, table: $table, dateOrder: $dateOrder, datePay: $datePay, date: $date, totalPrice: $totalPrice, orderFood: $orderFood)';
+    return 'Orders(id: $id, status: $status, tableID: $tableID, orderTime: $orderTime, payTime: $payTime, totalPrice: $totalPrice, foods: $foods)';
   }
 
   @override
@@ -242,30 +224,20 @@ class _$OrdersImpl implements _Orders {
         (other.runtimeType == runtimeType &&
             other is _$OrdersImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.isPay, isPay) || other.isPay == isPay) &&
-            (identical(other.table, table) || other.table == table) &&
-            (identical(other.dateOrder, dateOrder) ||
-                other.dateOrder == dateOrder) &&
-            (identical(other.datePay, datePay) || other.datePay == datePay) &&
-            (identical(other.date, date) || other.date == date) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.tableID, tableID) || other.tableID == tableID) &&
+            (identical(other.orderTime, orderTime) ||
+                other.orderTime == orderTime) &&
+            (identical(other.payTime, payTime) || other.payTime == payTime) &&
             (identical(other.totalPrice, totalPrice) ||
                 other.totalPrice == totalPrice) &&
-            const DeepCollectionEquality()
-                .equals(other._orderFood, _orderFood));
+            const DeepCollectionEquality().equals(other._foods, _foods));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      isPay,
-      table,
-      dateOrder,
-      datePay,
-      date,
-      totalPrice,
-      const DeepCollectionEquality().hash(_orderFood));
+  int get hashCode => Object.hash(runtimeType, id, status, tableID, orderTime,
+      payTime, totalPrice, const DeepCollectionEquality().hash(_foods));
 
   @JsonKey(ignore: true)
   @override
@@ -283,35 +255,32 @@ class _$OrdersImpl implements _Orders {
 
 abstract class _Orders implements Orders {
   factory _Orders(
-      {final String? id,
-      final bool? isPay,
-      final String? table,
-      final String? dateOrder,
-      final String? datePay,
-      final String? date,
-      final num? totalPrice,
-      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
-      final List<FoodDto> orderFood}) = _$OrdersImpl;
+          {final String? id,
+          final String? status,
+          final String? tableID,
+          final String? orderTime,
+          final String? payTime,
+          final num? totalPrice,
+          @JsonKey(toJson: foodDtoListToJson) final List<FoodDto> foods}) =
+      _$OrdersImpl;
 
   factory _Orders.fromJson(Map<String, dynamic> json) = _$OrdersImpl.fromJson;
 
   @override
   String? get id;
   @override
-  bool? get isPay;
+  String? get status;
   @override
-  String? get table;
+  String? get tableID;
   @override
-  String? get dateOrder;
+  String? get orderTime;
   @override
-  String? get datePay;
-  @override
-  String? get date;
+  String? get payTime;
   @override
   num? get totalPrice;
   @override // ignore: invalid_annotation_target
-  @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
-  List<FoodDto> get orderFood;
+  @JsonKey(toJson: foodDtoListToJson)
+  List<FoodDto> get foods;
   @override
   @JsonKey(ignore: true)
   _$$OrdersImplCopyWith<_$OrdersImpl> get copyWith =>

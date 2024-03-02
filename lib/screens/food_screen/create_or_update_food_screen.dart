@@ -61,7 +61,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   var _image = '';
   // ignore: prefer_typing_uninitialized_variables
   var _imageFile, _imageFile1, _imageFile2, _imageFile3;
-  var _category = '';
+  var _categoryID = '';
   var _imageGallery1 = '';
   var _imageGallery2 = '';
   var _imageGallery3 = '';
@@ -126,27 +126,26 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   void initData() {
     if (!mounted) return;
     if (widget.mode == Mode.update) {
-      _disController.text = widget.food.description ?? '';
-      _nameController.text = widget.food.title ?? '';
+      _disController.text = widget.food.description;
+      _nameController.text = widget.food.name;
       _priceCtrl.text = widget.food.price.toString();
       _discountController.text = widget.food.discount.toString();
-      _image = widget.food.image ?? '';
-      _category = widget.food.category ?? '';
-      if (widget.food.photoGallery != null &&
-          widget.food.photoGallery!.isNotEmpty) {
-        if (widget.food.photoGallery!.isNotEmpty) {
-          _imageGallery1 = widget.food.photoGallery![0] ?? '';
+      _image = widget.food.image;
+      _categoryID = widget.food.categoryID;
+      if (widget.food.photoGallery.isNotEmpty) {
+        if (widget.food.photoGallery.isNotEmpty) {
+          _imageGallery1 = widget.food.photoGallery[0] ?? '';
         }
 
-        if (widget.food.photoGallery!.length > 1) {
-          _imageGallery2 = widget.food.photoGallery![1] ?? '';
+        if (widget.food.photoGallery.length > 1) {
+          _imageGallery2 = widget.food.photoGallery[1] ?? '';
         }
 
-        if (widget.food.photoGallery!.length > 2) {
-          _imageGallery3 = widget.food.photoGallery![2] ?? '';
+        if (widget.food.photoGallery.length > 2) {
+          _imageGallery3 = widget.food.photoGallery[2] ?? '';
         }
       }
-      _isDiscount = widget.food.isDiscount ?? false;
+      _isDiscount = widget.food.isDiscount;
     }
   }
 
@@ -310,12 +309,12 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                 child: FilledButton(
                     style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(
-                            _category == e.name
+                            _categoryID == e.id
                                 ? context.colorScheme.errorContainer
                                 : context.colorScheme.primaryContainer)),
                     onPressed: () {
                       setState(() {
-                        _category = e.name!;
+                        _categoryID = e.id ?? '';
                       });
                     },
                     child: Text(e.name!, style: context.textStyleSmall))))
@@ -350,17 +349,13 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
 
       // Update the food details
       food = food.copyWith(
-        title: _nameController.text,
+        name: _nameController.text,
         price: num.parse(_priceCtrl.text),
-        category: _category,
+        categoryID: _categoryID,
         description: _disController.text,
-        photoGallery: [
-          _imageGallery1,
-          _imageGallery2,
-          _imageGallery3,
-        ],
+        photoGallery: [_imageGallery1, _imageGallery2, _imageGallery3],
         isDiscount: _isDiscount,
-        discount: _isDiscount ? int.tryParse(_discountController.text) : 0,
+        discount: _isDiscount ? int.tryParse(_discountController.text)! : 0,
       );
 
       if (_imageFile != null) {
@@ -384,8 +379,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
         photoGallery: [_imageGallery1, _imageGallery2, _imageGallery3],
       );
 
-      // Perform the update operation
-      updateFood(food);
+      _updateFood(food);
     } else {
       toast.showToast(
           child: AppAlerts.errorToast(msg: 'Chưa nhập đầy đủ thông tin'));
@@ -400,7 +394,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
         _imageFile1 != null &&
         _imageFile2 != null &&
         _imageFile3 != null &&
-        _category.isNotEmpty) {
+        _categoryID.isNotEmpty) {
       setState(() {
         _isLoading = true;
       });
@@ -410,13 +404,14 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       _imageGallery3 = await _uploadImageFoodGallery3();
       var newFood = food.copyWith(
           image: _image,
-          title: _nameController.text,
+          name: _nameController.text,
           price: num.parse(_priceCtrl.text.toString()),
-          category: _category,
+          categoryID: _categoryID,
           description: _disController.text,
           photoGallery: [_imageGallery1, _imageGallery2, _imageGallery3],
           isDiscount: _isDiscount,
-          discount: _isDiscount ? int.tryParse(_discountController.text) : 0);
+          createAt: DateTime.now().toString(),
+          discount: _isDiscount ? int.tryParse(_discountController.text)! : 0);
       createFood(newFood);
       setState(() {
         _isLoading = false;
@@ -427,7 +422,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
     }
   }
 
-  void updateFood(Food food) {
+  void _updateFood(Food food) {
     context.read<FoodBloc>().add(FoodUpdated(food: food));
 
     showDialog(

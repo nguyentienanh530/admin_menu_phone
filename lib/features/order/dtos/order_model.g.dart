@@ -8,13 +8,12 @@ part of 'order_model.dart';
 
 _$OrdersImpl _$$OrdersImplFromJson(Map<String, dynamic> json) => _$OrdersImpl(
       id: json['id'] as String?,
-      isPay: json['isPay'] as bool?,
-      table: json['table'] as String?,
-      dateOrder: json['dateOrder'] as String?,
-      datePay: json['datePay'] as String?,
-      date: json['date'] as String?,
+      status: json['status'] as String?,
+      tableID: json['tableID'] as String?,
+      orderTime: json['orderTime'] as String?,
+      payTime: json['payTime'] as String?,
       totalPrice: json['totalPrice'] as num?,
-      orderFood: (json['order_food'] as List<dynamic>?)
+      foods: (json['foods'] as List<dynamic>?)
               ?.map((e) => FoodDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const <FoodDto>[],
@@ -23,11 +22,10 @@ _$OrdersImpl _$$OrdersImplFromJson(Map<String, dynamic> json) => _$OrdersImpl(
 Map<String, dynamic> _$$OrdersImplToJson(_$OrdersImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'isPay': instance.isPay,
-      'table': instance.table,
-      'dateOrder': instance.dateOrder,
-      'datePay': instance.datePay,
-      'date': instance.date,
+      'status': instance.status,
+      'tableID': instance.tableID,
+      'orderTime': instance.orderTime,
+      'payTime': instance.payTime,
       'totalPrice': instance.totalPrice,
-      'order_food': foodDtoListToJson(instance.orderFood),
+      'foods': foodDtoListToJson(instance.foods),
     };

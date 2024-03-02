@@ -1,6 +1,7 @@
 import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
+import 'package:admin_menu_mobile/features/table/model/table_model.dart';
 import 'package:admin_menu_mobile/widgets/error_screen.dart';
 import 'package:admin_menu_mobile/widgets/loading_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,21 +15,21 @@ import '../../widgets/widgets.dart';
 import '../../utils/utils.dart';
 
 class OrderScreen extends StatelessWidget {
-  const OrderScreen({super.key, this.nameTable});
-  final String? nameTable;
+  const OrderScreen({super.key, this.tableModel});
+  final TableModel? tableModel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: _buildAppbar(context),
         body: BlocProvider(
             create: (context) =>
-                OrderBloc()..add(OrdersFecthed(tableName: nameTable!)),
+                OrderBloc()..add(OrdersFecthed(tableID: tableModel!.id!)),
             child: const OrderView()));
   }
 
   _buildAppbar(BuildContext context) {
     return AppBar(
-        title: Text(' ${AppText.titleOrder} - $nameTable',
+        title: Text(' ${AppText.titleOrder} - ${tableModel!.name}',
             style: context.titleStyleMedium!
                 .copyWith(fontWeight: FontWeight.bold)),
         centerTitle: true);
@@ -72,7 +73,7 @@ class ExpandableListView extends StatelessWidget {
               await context.push(RouteName.orderDetail, extra: orderModel).then(
                   (value) => context
                       .read<OrderBloc>()
-                      .add(OrdersFecthed(tableName: orderModel!.table!)));
+                      .add(OrdersFecthed(tableID: orderModel!.tableID!)));
             },
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -119,7 +120,7 @@ class ExpandableListView extends StatelessWidget {
           SizedBox(height: defaultPadding / 2),
           CommonLineText(
               title: "Đặt lúc: ",
-              value: Ultils.formatDateTime(orderModel!.dateOrder!))
+              value: Ultils.formatDateTime(orderModel!.orderTime!))
         ]);
   }
 }

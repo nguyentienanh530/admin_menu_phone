@@ -329,30 +329,29 @@ class _ListTable extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 crossAxisCount: 4,
-                crossAxisSpacing: defaultPadding,
-                mainAxisSpacing: defaultPadding,
-                children: state.datas!
-                    .map((e) => _ItemTable(nameTable: e.name))
-                    .toList()),
+                // crossAxisSpacing: defaultPadding,
+                // mainAxisSpacing: defaultPadding,
+                children:
+                    state.datas!.map((e) => _ItemTable(table: e)).toList()),
           };
         }));
   }
 }
 
 class _ItemTable extends StatelessWidget {
-  const _ItemTable({this.nameTable});
-  final String? nameTable;
+  const _ItemTable({this.table});
+  final TableModel? table;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) =>
-            OrderBloc()..add(OrdersOnTableFecthed(nameTable: nameTable)),
+            OrderBloc()..add(OrdersOnTableFecthed(tableID: table!.id!)),
         child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
             buildWhen: (previous, current) =>
                 context.read<OrderBloc>().operation == ApiOperation.select,
             builder: (context, state) {
-              logger.d(state.status);
+              logger.d("ádasd ${state.status} ");
               switch (state.status) {
                 case Status.loading:
                   return Center(
@@ -361,10 +360,8 @@ class _ItemTable extends StatelessWidget {
                 case Status.failure:
                   return Center(child: Text(state.error ?? ''));
                 case Status.success:
-                  logger.d(state.datas);
                   return GestureDetector(
-                      onTap: () =>
-                          context.push(RouteName.order, extra: nameTable),
+                      onTap: () => context.push(RouteName.order, extra: table),
                       child: Card(
                           child: Container(
                               alignment: Alignment.center,
@@ -374,7 +371,7 @@ class _ItemTable extends StatelessWidget {
                                       MainAxisAlignment.spaceAround,
                                   children: [
                                     FittedBox(
-                                        child: Text(nameTable!,
+                                        child: Text(table!.name,
                                             style: context.textStyleSmall)),
                                     FittedBox(
                                         child: Text(
@@ -385,12 +382,16 @@ class _ItemTable extends StatelessWidget {
                                                         .colorScheme.secondary,
                                                     fontWeight:
                                                         FontWeight.bold))),
-                                    const SizedBox()
+                                    FittedBox(
+                                        child: Text(
+                                            Ultils.tableStatus(table!.status),
+                                            style: context.textStyleSmall!
+                                                .copyWith(
+                                                    color: Colors.green))),
                                   ]))));
                 case Status.empty:
                   return GestureDetector(
-                      onTap: () =>
-                          context.push(RouteName.order, extra: nameTable),
+                      onTap: () => context.push(RouteName.order, extra: table),
                       child: Card(
                           child: Container(
                               alignment: Alignment.center,
@@ -400,7 +401,7 @@ class _ItemTable extends StatelessWidget {
                                       MainAxisAlignment.spaceAround,
                                   children: [
                                     FittedBox(
-                                        child: Text(nameTable!,
+                                        child: Text(table!.name,
                                             style: context.textStyleSmall)),
                                     FittedBox(
                                         child: Text('0',
@@ -410,7 +411,12 @@ class _ItemTable extends StatelessWidget {
                                                         .colorScheme.secondary,
                                                     fontWeight:
                                                         FontWeight.bold))),
-                                    const SizedBox()
+                                    FittedBox(
+                                        child: Text(
+                                            Ultils.tableStatus(table!.status),
+                                            style: context.textStyleSmall!
+                                                .copyWith(
+                                                    color: Colors.redAccent)))
                                   ]))));
               }
             }));

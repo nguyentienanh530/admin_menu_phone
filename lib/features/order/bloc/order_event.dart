@@ -8,17 +8,17 @@ sealed class OrderEvent extends Equatable {
 }
 
 final class OrdersOnTableFecthed extends OrderEvent {
-  final String? nameTable;
+  final String? tableID;
 
-  const OrdersOnTableFecthed({required this.nameTable});
+  const OrdersOnTableFecthed({required this.tableID});
 }
 
 final class OrdersWantingFecthed extends OrderEvent {}
 
 final class OrdersFecthed extends OrderEvent {
-  final String tableName;
+  final String tableID;
 
-  const OrdersFecthed({required this.tableName});
+  const OrdersFecthed({required this.tableID});
 }
 
 final class OrdersHistoryFecthed extends OrderEvent {}
@@ -33,4 +33,10 @@ final class OrderUpdated extends OrderEvent {
   final Orders orders;
 
   const OrderUpdated({required this.orders});
+}
+
+final class OrderDeleted extends OrderEvent {
+  final String orderID;
+
+  const OrderDeleted({required this.orderID});
 }

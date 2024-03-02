@@ -1,4 +1,8 @@
-import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
+import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/dialog/progress_dialog.dart';
+import 'package:admin_menu_mobile/common/dialog/retry_dialog.dart';
+import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
+import 'package:admin_menu_mobile/features/food/model/food_model.dart';
 import 'package:admin_menu_mobile/features/order/cubit/total_price_cubit.dart';
 import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
@@ -11,6 +15,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:admin_menu_mobile/features/order/dtos/food_dto.dart';
 import 'package:admin_menu_mobile/utils/app_alerts.dart';
 import '../../config/router.dart';
+import '../../features/order/bloc/order_bloc.dart';
 import '../../widgets/widgets.dart';
 
 class OrderDetailScreen extends StatelessWidget {
@@ -73,6 +78,28 @@ class _DeleteOrder extends StatelessWidget {
                     context.pop();
                   },
                   onConfirm: () {
+                    context
+                        .read<OrderBloc>()
+                        .add(OrderDeleted(orderID: idOrder));
+                    showDialog(
+                        context: context,
+                        builder: (context) => BlocBuilder<OrderBloc,
+                                GenericBlocState<Orders>>(
+                            builder: (context, state) => switch (state.status) {
+                                  Status.loading => const ProgressDialog(
+                                      descriptrion: "Đang xóa...",
+                                      isProgressed: true),
+                                  Status.empty => const SizedBox(),
+                                  Status.failure => RetryDialog(
+                                      title: 'Lỗi',
+                                      onRetryPressed: () => context
+                                          .read<OrderBloc>()
+                                          .add(OrderDeleted(orderID: idOrder))),
+                                  Status.success => ProgressDialog(
+                                      descriptrion: "Xóa thành công!",
+                                      isProgressed: false,
+                                      onPressed: () => pop(context, 2))
+                                }));
                     // context.pop();
                     // context
                     //     .read<OrderBloc>()
@@ -85,13 +112,26 @@ class _DeleteOrder extends StatelessWidget {
   }
 }
 
-class OrderDetailView extends StatelessWidget {
-  const OrderDetailView({super.key, required this.orders});
-  final Orders orders;
+// ignore: must_be_immutable
+class OrderDetailView extends StatefulWidget {
+  OrderDetailView({super.key, required this.orders});
+  Orders orders;
+  @override
+  State<OrderDetailView> createState() => _OrderDetailViewState();
+}
+
+class _OrderDetailViewState extends State<OrderDetailView> {
+  var orders = Orders();
+
+  @override
+  void initState() {
+    orders = widget.orders;
+    context.read<TotalPriceCubit>().onTotalPriceChanged(orders.totalPrice!);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    logger.d('stststs: ${context.read<OrderBloc>().operation}');
-
     return _buildBody(context, orders);
   }
 
@@ -105,8 +145,8 @@ class OrderDetailView extends StatelessWidget {
               child: SingleChildScrollView(
                   child: Column(children: [
             Column(
-                children: order.orderFood
-                    .map((e) => _ItemFood(orderModel: order, food: e))
+                children: order.foods
+                    .map((e) => _buildItemFood(e))
                     .toList()
                     .animate(interval: 50.ms)
                     .slideX(
@@ -116,58 +156,43 @@ class OrderDetailView extends StatelessWidget {
                         duration: 500.ms)
                     .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))
           ]))),
-          _BottomAction(order: order)
+          _buildBottomAction()
         ]));
   }
-}
 
-// ignore: must_be_immutable
-class _ItemFood extends StatefulWidget {
-  _ItemFood({required this.orderModel, required this.food});
-  Orders orderModel;
-  FoodDto food;
-  @override
-  State<_ItemFood> createState() => __ItemFoodState();
-}
-
-class __ItemFoodState extends State<_ItemFood> {
-  var _quantity = 0;
-
-  @override
-  void initState() {
-    _quantity = widget.food.quantity ?? 1;
-    context
-        .read<TotalPriceCubit>()
-        .onTotalPriceChanged(widget.orderModel.totalPrice ?? 1.0);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildItemFood(FoodDto foo) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-        child: Slidable(
-            endActionPane: ActionPane(
-                extentRatio: 0.3,
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                      borderRadius: BorderRadius.circular(defaultBorderRadius),
-                      flex: 1,
-                      // spacing: 8,
-                      padding: EdgeInsets.all(defaultPadding),
-                      onPressed: (ct) {
-                        _handleDeleteItem(
-                            context, widget.orderModel, widget.food);
-                      },
-                      backgroundColor: context.colorScheme.error,
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete_forever)
-                ]),
-            child: _buildItem(context, widget.food, widget.orderModel)));
+        child: BlocProvider(
+            create: (context) =>
+                FoodBloc()..add(GetFoodByID(foodID: foo.foodID)),
+            child: BlocBuilder<FoodBloc, GenericBlocState<Food>>(
+                buildWhen: (previous, current) =>
+                    current.status == Status.success,
+                builder: (context, state) {
+                  return Slidable(
+                      endActionPane: ActionPane(
+                          extentRatio: 0.3,
+                          motion: const ScrollMotion(),
+                          children: [
+                            SlidableAction(
+                                borderRadius:
+                                    BorderRadius.circular(defaultBorderRadius),
+                                flex: 1,
+                                // spacing: 8,
+                                padding: EdgeInsets.all(defaultPadding),
+                                onPressed: (ct) {
+                                  _handleDeleteItem(foo);
+                                },
+                                backgroundColor: context.colorScheme.error,
+                                foregroundColor: Colors.white,
+                                icon: Icons.delete_forever)
+                          ]),
+                      child: _buildItem(state.data ?? Food(), foo));
+                })));
   }
 
-  Widget _buildItem(BuildContext context, FoodDto food, Orders orderModel) {
+  Widget _buildItem(Food food, FoodDto foodDto) {
     return Card(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -178,81 +203,81 @@ class __ItemFoodState extends State<_ItemFood> {
               _buildImage(food),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const SizedBox(),
-                Text(food.title!,
+                Text(food.name,
                     style: context.textStyleMedium!
                         .copyWith(fontWeight: FontWeight.bold)),
                 SizedBox(height: defaultPadding / 2),
-                _buildQuality()
+                _buildQuality(food, foodDto)
               ])
             ]),
             Padding(
                 padding: EdgeInsets.only(right: defaultPadding / 2),
-                child: _PriceFoodItem(food: food))
+                child:
+                    _PriceFoodItem(totalPrice: (foodDto.totalPrice).toString()))
           ]),
-          food.note!.isNotEmpty
-              ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text("Ghi chú: ",
-                      style: context.textStyleMedium!
-                          .copyWith(fontWeight: FontWeight.bold)),
-                  Text(food.note!, style: context.textStyleSmall)
-                ])
+          foodDto.note.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Divider(),
+                        Text("Ghi chú: ",
+                            style: context.textStyleMedium!
+                                .copyWith(fontWeight: FontWeight.bold)),
+                        Text(foodDto.note, style: context.textStyleSmall)
+                      ]),
+                )
               : const SizedBox()
         ]));
   }
 
-  Widget _buildImage(FoodDto food) {
-    return Container(
-        height: 50,
-        width: 50,
-        margin: EdgeInsets.all(defaultPadding / 2),
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.black.withOpacity(0.3),
-            image: DecorationImage(
-                image: NetworkImage(food.image == null || food.image == ""
-                    ? noImage
-                    : food.image ?? ""),
-                fit: food.isImageCrop == true ? BoxFit.cover : BoxFit.fill)));
+  void _handleDeleteItem(FoodDto foodDto) {
+    showModalBottomSheet<void>(
+            context: context,
+            builder: (BuildContext context) {
+              return SizedBox(
+                  height: 200,
+                  child: CommonBottomSheet(
+                      title: "Bạn có muốn xóa món ăn này không?",
+                      textConfirm: 'Xóa',
+                      textCancel: "Hủy",
+                      textConfirmColor: context.colorScheme.errorContainer,
+                      onCancel: () {
+                        context.pop();
+                      },
+                      onConfirm: () {
+                        var foods = <FoodDto>[];
+                        foods.addAll(orders.foods);
+                        var totalPrice = 0.0;
+                        foods.removeWhere(
+                            (element) => element.foodID == foodDto.foodID);
+
+                        for (FoodDto foo in foods) {
+                          totalPrice += foo.totalPrice;
+                        }
+                        setState(() {
+                          orders = orders.copyWith(
+                              foods: foods, totalPrice: totalPrice);
+                        });
+
+                        context
+                            .read<OrderBloc>()
+                            .add(OrderUpdated(orders: orders));
+                        context.pop();
+                      }));
+            })
+        .then((value) => context
+            .read<TotalPriceCubit>()
+            .onTotalPriceChanged(orders.totalPrice!));
   }
 
-  Future _handleDeleteItem(
-      BuildContext context, Orders orderModel, FoodDto food) {
-    return showModalBottomSheet<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return SizedBox(
-              height: 200,
-              child: CommonBottomSheet(
-                  title: "Bạn có muốn xóa món ăn này không?",
-                  textConfirm: 'Xóa',
-                  textCancel: "Hủy",
-                  textConfirmColor: context.colorScheme.errorContainer,
-                  onCancel: () {
-                    context.pop();
-                  },
-                  onConfirm: () {
-                    var orders = <Map<String, dynamic>>[];
-                    var totalPrice = 0.0;
-                    orderModel.orderFood.remove(food);
-                    orderModel.orderFood.map((e) {
-                      orders.add(FoodDto().toJson());
-                      totalPrice = totalPrice + e.totalPrice!;
-                    }).toList();
-
-                    // context.read<OrderBloc>().add(UpdateFoodInOrder(
-                    //     idOrder: orderModel.id!,
-                    //     json: orders,
-                    //     totalPrice: totalPrice));
-                    context.pop();
-                  }));
-        });
-  }
-
-  Widget _buildQuality() {
+  Widget _buildQuality(Food food, FoodDto foodDto) {
+    var quantity = foodDto.quantity;
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       // LineText(title: "Số lượng: ", value: food.quantity.toString()),
       InkWell(
-          onTap: () => _handleDecrement(context),
+          onTap: () => _handleDecrement(food, foodDto, quantity),
           child: Container(
               height: 20,
               width: 20,
@@ -261,11 +286,11 @@ class __ItemFoodState extends State<_ItemFood> {
               child: const Icon(Icons.remove, size: 20))),
       Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: Text('$_quantity',
+          child: Text('$quantity',
               style: context.textStyleSmall!
                   .copyWith(fontWeight: FontWeight.bold))),
       InkWell(
-          onTap: () => _handleIncrement(context),
+          onTap: () => _handleIncrement(food, foodDto, quantity),
           child: Container(
               height: 20,
               width: 20,
@@ -275,70 +300,73 @@ class __ItemFoodState extends State<_ItemFood> {
     ]);
   }
 
-  void _handleDecrement(BuildContext context) {
-    if (widget.food.quantity! > 1) {
-      widget.food = widget.food.copyWith(
-        quantity: widget.food.quantity! - 1,
-        totalPrice: (widget.food.quantity! - 1) * widget.food.price!,
-      );
+  void _handleDecrement(Food food, FoodDto foodDto, int quantity) {
+    if (quantity > 1) {
+      setState(() {
+        quantity = quantity - 1;
+      });
+      foodDto = foodDto.copyWith(
+          quantity: quantity, totalPrice: quantity * food.price);
 
-      widget.orderModel = widget.orderModel.copyWith(
-          orderFood: widget.orderModel.orderFood.map((element) {
-        if (element.id == widget.food.id) {
+      orders = orders.copyWith(
+          foods: orders.foods.map((element) {
+        if (element.foodID == foodDto.foodID) {
           return element.copyWith(
-              quantity: widget.food.quantity,
-              totalPrice: widget.food.totalPrice);
+              quantity: foodDto.quantity, totalPrice: foodDto.totalPrice);
         }
         return element;
       }).toList());
-
-      var totalBill = widget.orderModel.orderFood
-          .fold(0.0, (newsum, current) => newsum + current.totalPrice!);
-
-      widget.orderModel = widget.orderModel.copyWith(totalPrice: totalBill);
-      setState(() {
-        _quantity = widget.food.quantity ?? 1;
-      });
-      context.read<TotalPriceCubit>().onTotalPriceChanged(totalBill);
-      context.read<OrderBloc>().add(OrderUpdated(orders: widget.orderModel));
-      // context.read<OrderBloc>().add(GetOrdersByID(orderID: orderModel.id!));
+      var totalprice = 0.0;
+      for (FoodDto foo in orders.foods) {
+        totalprice += foo.totalPrice;
+      }
+      orders = orders.copyWith(totalPrice: totalprice);
+      context.read<TotalPriceCubit>().onTotalPriceChanged(totalprice);
+      context.read<OrderBloc>().add(OrderUpdated(orders: orders));
     }
   }
 
-  void _handleIncrement(BuildContext context) {
-    widget.food = widget.food.copyWith(
-      quantity: widget.food.quantity! + 1,
-      totalPrice: (widget.food.quantity! + 1) * widget.food.price!,
-    );
+  void _handleIncrement(Food food, FoodDto foodDto, int quantity) {
+    setState(() {
+      quantity++;
+    });
+    foodDto =
+        foodDto.copyWith(quantity: quantity, totalPrice: quantity * food.price);
 
-    widget.orderModel = widget.orderModel.copyWith(
-        orderFood: widget.orderModel.orderFood.map((element) {
-      if (element.id == widget.food.id) {
+    orders = orders.copyWith(
+        foods: orders.foods.map((element) {
+      if (element.foodID == foodDto.foodID) {
         return element.copyWith(
-            quantity: widget.food.quantity, totalPrice: widget.food.totalPrice);
+            quantity: foodDto.quantity, totalPrice: foodDto.totalPrice);
       }
       return element;
     }).toList());
 
-    var totalBill = widget.orderModel.orderFood
-        .fold(0.0, (newsum, current) => newsum + current.totalPrice!);
+    var totalprice = 0.0;
 
-    widget.orderModel = widget.orderModel.copyWith(totalPrice: totalBill);
-    setState(() {
-      _quantity = widget.food.quantity ?? 1;
-    });
-    context.read<TotalPriceCubit>().onTotalPriceChanged(totalBill);
-    context.read<OrderBloc>().add(OrderUpdated(orders: widget.orderModel));
+    for (FoodDto foo in orders.foods) {
+      totalprice += foo.totalPrice;
+    }
+    orders = orders.copyWith(totalPrice: totalprice);
+    context.read<TotalPriceCubit>().onTotalPriceChanged(totalprice);
+    context.read<OrderBloc>().add(OrderUpdated(orders: orders));
     // context.read<OrderBloc>().add(GetOrdersByID(orderID: orderModel.id!));
   }
-}
 
-class _BottomAction extends StatelessWidget {
-  final Orders order;
+  Widget _buildImage(Food food) {
+    return Container(
+        height: 50,
+        width: 50,
+        margin: EdgeInsets.all(defaultPadding / 2),
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.black.withOpacity(0.3),
+            image: DecorationImage(
+                image: NetworkImage(food.image == "" ? noImage : food.image),
+                fit: BoxFit.cover)));
+  }
 
-  const _BottomAction({required this.order});
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildBottomAction() {
     return Card(
         child: Padding(
             padding: EdgeInsets.all(defaultPadding),
@@ -356,29 +384,83 @@ class _BottomAction extends StatelessWidget {
                 })
               ]),
               SizedBox(height: defaultPadding),
-              order.orderFood.isNotEmpty
+              orders.foods.isNotEmpty
                   ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Expanded(
                           child: _ButtonPaymentAccept(
-                              totalPrice: order.totalPrice.toString(),
-                              idOrder: order.id!)),
+                              totalPrice: orders.totalPrice.toString(),
+                              idOrder: orders.id!)),
                       SizedBox(width: defaultPadding / 3),
-                      Expanded(child: _AddFoodButton(orderModel: order))
+                      Expanded(child: _buildButtonAddFood())
                     ])
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [_AddFoodButton(orderModel: order)])
+                      children: [_buildButtonAddFood()])
             ])));
+  }
+
+  Widget _buildButtonAddFood() {
+    final FToast fToast = FToast()..init(context);
+    return FilledButton.icon(
+        style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(
+                context.colorScheme.secondaryContainer)),
+        icon: const Icon(Icons.add_box_rounded, size: 15),
+        label: FittedBox(
+            child: Text('Thêm món',
+                style: context.textStyleLarge!
+                    .copyWith(fontWeight: FontWeight.bold))),
+        onPressed: () async {
+          await context.push(RouteName.addFood).then((result) {
+            if (result is FoodDto) {
+              if (!checkExistFood(food: result)) {
+                _handleAddFood(result);
+                context
+                    .read<FoodBloc>()
+                    .add(GetFoodByID(foodID: result.foodID));
+              } else {
+                fToast.showToast(
+                    child: AppAlerts.errorToast(msg: 'Món ăn đã có trong đơn'));
+              }
+            }
+            return setState(() {});
+          });
+        });
+  }
+
+  bool checkExistFood({FoodDto? food}) {
+    var isExist = false;
+    for (FoodDto e in orders.foods) {
+      if (e.foodID == food!.foodID) {
+        isExist = true;
+        break;
+      }
+    }
+    return isExist;
+  }
+
+  void _handleAddFood(FoodDto foodDto) {
+    List<FoodDto> foods = [...orders.foods, foodDto];
+
+    var totalPrice = 0.0;
+    for (FoodDto foo in foods) {
+      totalPrice += foo.totalPrice;
+    }
+    orders = orders.copyWith(foods: foods, totalPrice: totalPrice);
+
+    logger.d(orders.toString());
+    context.read<OrderBloc>().add(OrderUpdated(orders: orders));
   }
 }
 
 class _PriceFoodItem extends StatelessWidget {
-  final FoodDto food;
+  final String totalPrice;
 
-  const _PriceFoodItem({required this.food});
+  const _PriceFoodItem({required this.totalPrice});
+  // food.totalPrice.toString()
   @override
   Widget build(BuildContext context) {
-    return Text(Ultils.currencyFormat(double.parse(food.totalPrice.toString())),
+    return Text(Ultils.currencyFormat(double.parse(totalPrice)),
         style: context.textStyleMedium!.copyWith(
             color: context.colorScheme.secondary, fontWeight: FontWeight.bold));
   }
@@ -406,74 +488,24 @@ class _ButtonPaymentAccept extends StatelessWidget {
   Future _handleButtonAccepted(BuildContext context) {
     final FToast fToast = FToast()..init(context);
     return showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return SizedBox(
-            height: 200,
-            child: CommonBottomSheet(
-                title: "Xác nhận thanh toán?",
-                textConfirm: 'Thanh toán',
-                textCancel: "Hủy",
-                onCancel: () {
-                  context.pop();
-                },
-                onConfirm: () {
-                  // context.read<OrderBloc>().add(PaymentOrder(idOrder: idOrder));
-                  // fToast.showToast(
-                  //     child:
-                  //         AppAlerts.successToast(msg: 'Thanh toán thành công'));
-                  context.pop();
-                  context.pop();
-                }));
-      },
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class _AddFoodButton extends StatelessWidget {
-  Orders orderModel;
-
-  _AddFoodButton({required this.orderModel});
-  @override
-  Widget build(BuildContext context) {
-    final FToast fToast = FToast()..init(context);
-    return FilledButton.icon(
-        style: ButtonStyle(
-            backgroundColor: MaterialStatePropertyAll(
-                context.colorScheme.secondaryContainer)),
-        icon: const Icon(Icons.add_box_rounded, size: 15),
-        label: FittedBox(
-            child: Text('Thêm món',
-                style: context.textStyleLarge!
-                    .copyWith(fontWeight: FontWeight.bold))),
-        onPressed: () async {
-          var result = await context.push(RouteName.addFood);
-          if (result is FoodDto) {
-            if (!checkExistFood(food: result)) {
-              _handleAddFood(result);
-            } else {
-              fToast.showToast(
-                  child: AppAlerts.errorToast(msg: 'Món ăn đã có trong đơn'));
-            }
-          }
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+              height: 200,
+              child: CommonBottomSheet(
+                  title: "Xác nhận thanh toán?",
+                  textConfirm: 'Thanh toán',
+                  textCancel: "Hủy",
+                  onCancel: () {
+                    context.pop();
+                  },
+                  onConfirm: () {
+                    // context.read<OrderBloc>().add(PaymentOrder(idOrder: idOrder));
+                    // fToast.showToast(
+                    //     child:
+                    //         AppAlerts.successToast(msg: 'Thanh toán thành công'));
+                    pop(context, 2);
+                  }));
         });
-  }
-
-  bool checkExistFood({FoodDto? food}) {
-    var isExist = false;
-    for (FoodDto e in orderModel.orderFood) {
-      if (e.id == food!.id) {
-        isExist = true;
-        break;
-      }
-    }
-    return isExist;
-  }
-
-  void _handleAddFood(FoodDto foodDto) {
-    List<FoodDto> a = [...orderModel.orderFood, foodDto];
-    orderModel = orderModel.copyWith(orderFood: a);
-    logger.d(orderModel.orderFood.toString());
   }
 }

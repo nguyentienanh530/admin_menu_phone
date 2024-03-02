@@ -19,6 +19,7 @@ class FoodBloc extends Bloc<FoodEvent, GenericBlocState<Food>>
     on<ResetData>(_resetData);
     on<DeleteFood>(_deleteFood);
     on<FoodUpdated>(_updateFood);
+    on<GetFoodByID>(_getFoodByID);
   }
   final _foodRepository = FoodRepo(
       foodRepository:
@@ -42,5 +43,9 @@ class FoodBloc extends Bloc<FoodEvent, GenericBlocState<Food>>
 
   FutureOr<void> _updateFood(FoodUpdated event, Emit emit) async {
     await updateItem(_foodRepository.updateFood(food: event.food), emit);
+  }
+
+  FutureOr<void> _getFoodByID(GetFoodByID event, Emit emit) async {
+    await getItem(_foodRepository.getFoodByID(foodID: event.foodID), emit);
   }
 }

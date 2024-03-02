@@ -92,8 +92,8 @@ final router = GoRouter(
       GoRoute(
           path: RouteName.order,
           builder: (context, state) {
-            final String nametable = GoRouterState.of(context).extra as String;
-            return OrderScreen(nameTable: nametable);
+            final table = GoRouterState.of(context).extra as TableModel;
+            return OrderScreen(tableModel: table);
           }),
       GoRoute(
           path: RouteName.orderDetail,

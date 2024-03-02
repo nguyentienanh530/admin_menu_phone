@@ -22,8 +22,8 @@ TableModel _$TableModelFromJson(Map<String, dynamic> json) {
 mixin _$TableModel {
   String? get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get image => throw _privateConstructorUsedError;
   int get seats => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -37,7 +37,7 @@ abstract class $TableModelCopyWith<$Res> {
           TableModel value, $Res Function(TableModel) then) =
       _$TableModelCopyWithImpl<$Res, TableModel>;
   @useResult
-  $Res call({String? id, String name, String image, int seats});
+  $Res call({String? id, String name, int seats, String status});
 }
 
 /// @nodoc
@@ -55,8 +55,8 @@ class _$TableModelCopyWithImpl<$Res, $Val extends TableModel>
   $Res call({
     Object? id = freezed,
     Object? name = null,
-    Object? image = null,
     Object? seats = null,
+    Object? status = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -67,14 +67,14 @@ class _$TableModelCopyWithImpl<$Res, $Val extends TableModel>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
       seats: null == seats
           ? _value.seats
           : seats // ignore: cast_nullable_to_non_nullable
               as int,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -87,7 +87,7 @@ abstract class _$$TableModelImplCopyWith<$Res>
       __$$TableModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? id, String name, String image, int seats});
+  $Res call({String? id, String name, int seats, String status});
 }
 
 /// @nodoc
@@ -103,8 +103,8 @@ class __$$TableModelImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? name = null,
-    Object? image = null,
     Object? seats = null,
+    Object? status = null,
   }) {
     return _then(_$TableModelImpl(
       id: freezed == id
@@ -115,14 +115,14 @@ class __$$TableModelImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
       seats: null == seats
           ? _value.seats
           : seats // ignore: cast_nullable_to_non_nullable
               as int,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -130,26 +130,28 @@ class __$$TableModelImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$TableModelImpl with DiagnosticableTreeMixin implements _TableModel {
-  _$TableModelImpl({this.id, this.name = '', this.image = '', this.seats = 0});
+  _$TableModelImpl(
+      {this.id = '', this.name = '', this.seats = 0, this.status = ''});
 
   factory _$TableModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$TableModelImplFromJson(json);
 
   @override
+  @JsonKey()
   final String? id;
   @override
   @JsonKey()
   final String name;
   @override
   @JsonKey()
-  final String image;
+  final int seats;
   @override
   @JsonKey()
-  final int seats;
+  final String status;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TableModel(id: $id, name: $name, image: $image, seats: $seats)';
+    return 'TableModel(id: $id, name: $name, seats: $seats, status: $status)';
   }
 
   @override
@@ -159,8 +161,8 @@ class _$TableModelImpl with DiagnosticableTreeMixin implements _TableModel {
       ..add(DiagnosticsProperty('type', 'TableModel'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('image', image))
-      ..add(DiagnosticsProperty('seats', seats));
+      ..add(DiagnosticsProperty('seats', seats))
+      ..add(DiagnosticsProperty('status', status));
   }
 
   @override
@@ -170,13 +172,13 @@ class _$TableModelImpl with DiagnosticableTreeMixin implements _TableModel {
             other is _$TableModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.image, image) || other.image == image) &&
-            (identical(other.seats, seats) || other.seats == seats));
+            (identical(other.seats, seats) || other.seats == seats) &&
+            (identical(other.status, status) || other.status == status));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, image, seats);
+  int get hashCode => Object.hash(runtimeType, id, name, seats, status);
 
   @JsonKey(ignore: true)
   @override
@@ -196,8 +198,8 @@ abstract class _TableModel implements TableModel {
   factory _TableModel(
       {final String? id,
       final String name,
-      final String image,
-      final int seats}) = _$TableModelImpl;
+      final int seats,
+      final String status}) = _$TableModelImpl;
 
   factory _TableModel.fromJson(Map<String, dynamic> json) =
       _$TableModelImpl.fromJson;
@@ -207,9 +209,9 @@ abstract class _TableModel implements TableModel {
   @override
   String get name;
   @override
-  String get image;
-  @override
   int get seats;
+  @override
+  String get status;
   @override
   @JsonKey(ignore: true)
   _$$TableModelImplCopyWith<_$TableModelImpl> get copyWith =>

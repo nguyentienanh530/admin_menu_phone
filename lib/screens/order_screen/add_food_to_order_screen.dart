@@ -129,12 +129,12 @@ class AfterSearchUI extends StatelessWidget {
                 physics: const BouncingScrollPhysics(),
                 itemCount: state.datas!.length,
                 itemBuilder: (context, i) {
-                  if (state.datas![i].title
+                  if (state.datas![i].name
                           .toString()
                           .toLowerCase()
                           .contains(text!.toLowerCase()) ||
                       TiengViet.parse(
-                              state.datas![i].title.toString().toLowerCase())
+                              state.datas![i].name.toString().toLowerCase())
                           .contains(text!.toLowerCase())) {
                     return _buildItemSearch(context, state.datas![i]);
                   }
@@ -148,17 +148,13 @@ class AfterSearchUI extends StatelessWidget {
     return InkWell(
         onTap: () {
           var foodDto = FoodDto(
-              id: food.id,
-              discount: food.discount,
-              image: food.image,
-              isDiscount: food.isDiscount,
-              isImageCrop: food.isImageCrop,
-              note: food.note,
-              price: food.price,
-              quantity: food.quantity,
-              timeOrder: food.timeOrder,
-              title: food.title,
-              totalPrice: food.totalPrice);
+              foodID: food.id,
+              quantity: 1,
+              note: '',
+              totalPrice: Ultils.foodPrice(
+                  isDiscount: food.isDiscount,
+                  foodPrice: food.price,
+                  discount: food.discount));
           context.pop<FoodDto>(foodDto);
         },
         child: Padding(
@@ -203,29 +199,25 @@ class AfterSearchUI extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: Colors.black.withOpacity(0.3),
                 image: DecorationImage(
-                    image: NetworkImage(food.image == null || food.image == ""
-                        ? noImage
-                        : food.image ?? ""),
-                    fit: food.isImageCrop == true
-                        ? BoxFit.cover
-                        : BoxFit.fill))));
+                    image:
+                        NetworkImage(food.image == "" ? noImage : food.image),
+                    fit: BoxFit.cover))));
   }
 
   Widget _buildCategory(BuildContext context, Food food) {
-    return FittedBox(
-        child: Text(food.category!, style: context.textStyleSmall!));
+    return FittedBox(child: Text('asdasdasd', style: context.textStyleSmall!));
   }
 
   Widget _buildTitle(BuildContext context, Food food) {
     return FittedBox(
-        child: Text(food.title!,
+        child: Text(food.name,
             style:
                 context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold)));
   }
 
   Widget _buildPrice(BuildContext context, Food food) {
-    double discountAmount = (food.price! * food.discount!.toDouble()) / 100;
-    double discountedPrice = food.price! - discountAmount;
+    double discountAmount = (food.price * food.discount.toDouble()) / 100;
+    double discountedPrice = food.price - discountAmount;
     return food.isDiscount == false
         ? Text(Ultils.currencyFormat(double.parse(food.price.toString())),
             style: context.textStyleSmall!.copyWith(

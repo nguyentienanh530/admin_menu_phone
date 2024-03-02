@@ -7,12 +7,12 @@ class CategoryRepo {
   CategoryRepo({required CategoryRepository categoryRepository})
       : _categoryRepository = categoryRepository;
 
-  Future<List<CategoryModel>> getAllCategory() async {
+  Future<List<Categories>> getAllCategory() async {
     try {
-      var categories = <CategoryModel>[];
+      var categories = <Categories>[];
       var res = await _categoryRepository.getAllCategory();
       categories
-          .addAll(res.docs.map((e) => CategoryModel.fromFirestore(e)).toList());
+          .addAll(res.docs.map((e) => Categories.fromJson(e.data())).toList());
       return categories;
     } catch (e) {
       throw '$e';

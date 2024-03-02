@@ -5,13 +5,11 @@ import 'package:admin_menu_mobile/features/table/model/table_model.dart';
 import 'package:admin_menu_mobile/utils/app_alerts.dart';
 import 'package:admin_menu_mobile/utils/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../common/bloc/generic_bloc_state.dart';
 import '../../common/dialog/retry_dialog.dart';
@@ -31,8 +29,7 @@ class _CreateTableState extends State<CreateTable> {
   final _seats = ['2', '4', '6', '8', '10', '12', '14', '16', '18', '20'];
   var _seat = '';
   final _formKey = GlobalKey<FormState>();
-  File? _imageFile;
-  var _image = '';
+
   var _loading = false;
   //  = BlocProvider.of<IsLoadingCubit>(context);
 
@@ -45,32 +42,8 @@ class _CreateTableState extends State<CreateTable> {
   void initValue() {
     if (widget.tableModel != null && widget.mode == Mode.update) {
       _seat = widget.tableModel!.seats.toString();
-      _image = widget.tableModel!.image;
+      // _image = widget.tableModel!.image;
       _nameController.text = widget.tableModel!.name;
-    }
-  }
-
-  Future _uploadPicture() async {
-    Reference storageReference =
-        FirebaseStorage.instance.ref().child('table/${DateTime.now()}+"1"');
-    UploadTask uploadTask = storageReference.putFile(_imageFile!);
-    await uploadTask.whenComplete(() async {
-      var url = await storageReference.getDownloadURL();
-      var imageUrl = url.toString();
-      _image = imageUrl;
-    });
-  }
-
-  Future pickImage() async {
-    final imagePicker = ImagePicker();
-    var imagepicked = await imagePicker.pickImage(
-        source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
-    if (imagepicked != null) {
-      setState(() {
-        _imageFile = File(imagepicked.path);
-      });
-    } else {
-      logger.d('No image selected!');
     }
   }
 
@@ -107,7 +80,6 @@ class _CreateTableState extends State<CreateTable> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: defaultPadding / 2),
-                  _buildImage(),
                   SizedBox(height: defaultPadding / 2),
                   _buildTitle('Tên bàn:'),
                   SizedBox(height: defaultPadding / 2),
@@ -138,11 +110,6 @@ class _CreateTableState extends State<CreateTable> {
                     ])))));
   }
 
-  Widget _buildImage() {
-    return _ImageFood(
-        onTap: () => pickImage(), imageFile: _imageFile, image: _image);
-  }
-
   Widget _buildButtonSubmited() {
     var mode = widget.mode;
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -159,42 +126,23 @@ class _CreateTableState extends State<CreateTable> {
     ]);
   }
 
-  bool existImage() {
-    var exist = false;
-    if (_imageFile != null || _image.isNotEmpty) {
-      exist = true;
-    } else {
-      exist = false;
-    }
-    return exist;
-  }
-
   Future<void> handleUpdateTable(String idTable) async {
     final toast = FToast()..init(context);
 
     if (_formKey.currentState!.validate()) {
-      if (_seat.isEmpty || existImage() == false) {
-        toast.showToast(
-            child: AppAlerts.errorToast(msg: 'Chưa thêm hình hoặc ghế!'));
+      if (_seat.isEmpty) {
+        toast.showToast(child: AppAlerts.errorToast(msg: 'Chưa chọn số ghế!'));
       } else {
         setState(() {
           _loading = true;
         });
-        await _uploadPicture()
-            .then((value) => value)
-            .catchError((onError) {})
-            .then((value) {
-          var table = TableModel(
-              id: idTable,
-              image: _image,
-              name: _nameController.text,
-              seats: int.parse(_seat));
-          updateTable(table);
-        }).then((value) {
-          setState(() {
-            _loading = false;
-          });
-        });
+
+        var table = TableModel(
+            id: idTable,
+            // image: _image,
+            name: _nameController.text,
+            seats: int.parse(_seat));
+        updateTable(table);
       }
     }
   }
@@ -203,34 +151,27 @@ class _CreateTableState extends State<CreateTable> {
     final toast = FToast()..init(context);
 
     if (_formKey.currentState!.validate()) {
-      if (_seat == '' || _imageFile == null) {
-        toast.showToast(
-            child: AppAlerts.errorToast(msg: 'Chưa thêm hình hoặc ghế!'));
+      if (_seat == '') {
+        toast.showToast(child: AppAlerts.errorToast(msg: 'Chưa chọn số ghế!'));
       } else {
         setState(() {
           _loading = true;
         });
-        await _uploadPicture()
-            .then((value) => value)
-            .catchError((onError) {})
-            .then((value) {
-          var table = TableModel(
-              id: '',
-              image: _image,
-              name: _nameController.text,
-              seats: int.parse(_seat));
-          createTable(table);
-        }).then((value) {
-          setState(() {
-            _loading = false;
-          });
-        });
+        var table = TableModel(
+            id: '',
+            name: _nameController.text,
+            seats: int.parse(_seat),
+            status: AppText.tableStatusAvailable);
+        createTable(table);
       }
     }
   }
 
   void updateTable(TableModel tableModel) {
     context.read<TableBloc>().add(TableUpdated(table: tableModel));
+    setState(() {
+      _loading = false;
+    });
     showDialog(
         context: context,
         builder: (_) {
@@ -257,6 +198,9 @@ class _CreateTableState extends State<CreateTable> {
 
   void createTable(TableModel tableModel) {
     context.read<TableBloc>().add(TableCreated(tableModel: tableModel));
+    setState(() {
+      _loading = false;
+    });
     showDialog(
         context: context,
         builder: (_) {

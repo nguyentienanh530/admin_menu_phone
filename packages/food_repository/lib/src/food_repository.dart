@@ -16,10 +16,10 @@ class FoodRepository {
     }
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> getFoodByID(
-      {required String idFood}) {
+  Future<DocumentSnapshot<Map<String, dynamic>>> getFoodByID(
+      {required String foodID}) {
     try {
-      return _firebaseFirestore.collection('food').doc(idFood).snapshots();
+      return _firebaseFirestore.collection('food').doc(foodID).get();
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {

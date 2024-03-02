@@ -1,24 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+part 'category_model.freezed.dart';
+part 'category_model.g.dart';
 
-class CategoryModel {
-  String? id;
-  String? name;
+@freezed
+class Categories with _$Categories {
+  factory Categories(
+      {String? id,
+      String? name,
+      String? image,
+      String? description}) = _Categories;
 
-  String? image;
-
-  CategoryModel({
-    this.id,
-    this.name,
-    this.image,
-  });
-
-  factory CategoryModel.fromFirestore(DocumentSnapshot snapshot) {
-    Map data = snapshot.data() as Map<dynamic, dynamic>;
-
-    return CategoryModel(
-      id: snapshot.id,
-      name: data['name'] ?? '',
-      image: data['image'] ?? '',
-    );
-  }
+  factory Categories.fromJson(Map<String, dynamic> json) =>
+      _$CategoriesFromJson(json);
 }

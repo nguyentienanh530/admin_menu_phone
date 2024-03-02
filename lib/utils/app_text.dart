@@ -53,4 +53,7 @@ class AppText {
 
   static String titleFoodDetail = 'Chi tiết món ăn';
   static String titleOrder = 'Đơn hàng';
+
+  static String tableStatusOccupied = 'occupied';
+  static String tableStatusAvailable = 'available';
 }

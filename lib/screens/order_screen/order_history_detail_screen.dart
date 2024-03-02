@@ -38,12 +38,12 @@ class OrderHistoryDetailView extends StatelessWidget {
         child: ListView(children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text("Thời gian đặt:", style: context.textStyleSmall),
-            Text(Ultils.formatDateTime(orderModel.dateOrder!),
+            Text(Ultils.formatDateTime(orderModel.orderTime!),
                 style: context.textStyleSmall)
           ]),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text("Thời gian thanh toán:", style: context.textStyleSmall),
-            Text(Ultils.formatDateTime(orderModel.datePay!),
+            Text(Ultils.formatDateTime(orderModel.orderTime!),
                 style: context.textStyleSmall)
           ]),
           SizedBox(height: defaultPadding),
@@ -82,8 +82,8 @@ class OrderHistoryDetailView extends StatelessWidget {
                 1: FlexColumnWidth(context.sizeDevice.width * 0.0015),
                 2: const FlexColumnWidth()
               },
-              children: orderModel.orderFood
-                  .map((e) => _buildTable(context, e))
+              children: orderModel.foods
+                  .map((e) => _buildTable(context, FoodDto()))
                   .toList()),
           const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -101,7 +101,7 @@ class OrderHistoryDetailView extends StatelessWidget {
       Container(
           padding: const EdgeInsets.all(5),
           height: 40,
-          child: Text(food.title!, style: context.textStyleSmall)),
+          child: Text('food.name!', style: context.textStyleSmall)),
       Container(
           padding: const EdgeInsets.all(5),
           alignment: Alignment.center,
@@ -111,8 +111,8 @@ class OrderHistoryDetailView extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           alignment: Alignment.center,
           height: 40,
-          child: Text(
-              Ultils.currencyFormat(double.parse(food.totalPrice.toString())),
+          // food.totalPrice.toString()
+          child: Text(Ultils.currencyFormat(double.parse("0")),
               style: context.textStyleSmall))
     ]);
   }

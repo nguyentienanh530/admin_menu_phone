@@ -4,19 +4,11 @@ part 'food_dto.g.dart';
 
 @freezed
 class FoodDto with _$FoodDto {
-  factory FoodDto({
-    final String? image,
-    final bool? isDiscount,
-    final String? id,
-    final int? discount,
-    final bool? isImageCrop,
-    final num? price,
-    final String? title,
-    final int? timeOrder,
-    final int? quantity,
-    final num? totalPrice,
-    final String? note,
-  }) = _FoodDto;
+  factory FoodDto(
+      {@Default('') String foodID,
+      @Default(1) int quantity,
+      @Default('') String note,
+      @Default(0) num totalPrice}) = _FoodDto;
 
   factory FoodDto.fromJson(Map<String, dynamic> json) =>
       _$FoodDtoFromJson(json);

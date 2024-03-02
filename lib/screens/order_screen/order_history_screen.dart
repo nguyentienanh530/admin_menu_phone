@@ -60,16 +60,16 @@ class OrderHistoryView extends StatelessWidget {
   Widget _buildBody(BuildContext context, List<Orders> orders) {
     return GroupedListView(
         elements: orders,
-        groupBy: (element) => Ultils.formatToDate(element.datePay!),
+        groupBy: (element) => Ultils.formatToDate(element.payTime!),
         itemComparator: (element1, element2) =>
-            element2.datePay!.compareTo(element1.datePay!),
+            element2.payTime!.compareTo(element1.payTime!),
         order: GroupedListOrder.DESC,
         useStickyGroupSeparators: true,
         floatingHeader: true,
         groupSeparatorBuilder: (String value) {
           var totalPrice = 0.0;
           for (var element in orders) {
-            if (Ultils.formatToDate(element.datePay!) == value) {
+            if (Ultils.formatToDate(element.payTime!) == value) {
               totalPrice =
                   totalPrice + double.parse(element.totalPrice.toString());
             }
@@ -105,15 +105,15 @@ class OrderHistoryView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CommonLineText(title: 'ID: ', value: orderModel!.id!),
-                        CommonLineText(
-                            title: 'Bàn: ', value: orderModel.table!),
+                        const CommonLineText(
+                            title: 'Bàn: ', value: 'orderModel.table!'),
                         CommonLineText(
                             title: 'Thời gian đặt: ',
                             value:
-                                Ultils.formatDateTime(orderModel.dateOrder!)),
+                                Ultils.formatDateTime(orderModel.orderTime!)),
                         CommonLineText(
                             title: 'Thời thanh toán: ',
-                            value: Ultils.formatDateTime(orderModel.datePay!))
+                            value: Ultils.formatDateTime(orderModel.orderTime!))
                       ]),
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.end,

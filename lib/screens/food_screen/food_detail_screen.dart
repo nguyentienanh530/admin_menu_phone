@@ -186,7 +186,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
     return Padding(
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
-        child: Text(food.title!,
+        child: Text(food.name!,
             style:
                 context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold)));
   }

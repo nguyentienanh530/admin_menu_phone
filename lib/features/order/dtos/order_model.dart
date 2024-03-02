@@ -7,20 +7,21 @@ List<Map<String, dynamic>> foodDtoListToJson(List<FoodDto> foods) {
   return foods.map((food) => food.toJson()).toList();
 }
 
+// enum OrdersStatus { isWanting, isNew, isPaymented }
+
 @freezed
 class Orders with _$Orders {
   factory Orders(
       {final String? id,
-      final bool? isPay,
-      final String? table,
-      final String? dateOrder,
-      final String? datePay,
-      final String? date,
+      final String? status,
+      final String? tableID,
+      final String? orderTime,
+      final String? payTime,
       final num? totalPrice,
       // ignore: invalid_annotation_target
-      @JsonKey(name: 'order_food', toJson: foodDtoListToJson)
+      @JsonKey(toJson: foodDtoListToJson)
       @Default(<FoodDto>[])
-      List<FoodDto> orderFood}) = _Orders;
+      List<FoodDto> foods}) = _Orders;
 
   factory Orders.fromJson(Map<String, dynamic> json) => _$OrdersFromJson(json);
 }

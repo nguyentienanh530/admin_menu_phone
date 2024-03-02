@@ -17,14 +17,9 @@ class FoodRepo extends FirebaseBase<Food> {
     }
   }
 
-  Stream<Food> getFoodByID({required String idFood}) {
-    try {
-      return _foodRepository
-          .getFoodByID(idFood: idFood)
-          .map((event) => Food.fromJson(event.data()!));
-    } catch (e) {
-      throw '$e';
-    }
+  Future<FirebaseResult<Food>> getFoodByID({required String foodID}) async {
+    return await getItem(await _foodRepository.getFoodByID(foodID: foodID),
+        (json) => Food.fromJson(json));
   }
 
   Future<FirebaseResult<bool>> createFood({required Food food}) async {

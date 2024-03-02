@@ -51,8 +51,6 @@ class _MyWidgetState extends State<FoodScreen>
               extra: {'mode': Mode.create, 'food': Food()});
           if (result is bool && result) {
             getData();
-          } else {
-            print('ccc');
           }
         },
         child: const Icon(Icons.add));
@@ -160,7 +158,7 @@ class _AfterSearchUIState extends State<AfterSearchUI> {
             Status.loading => loadingOrInitState,
             Status.empty => const EmptyScreen(),
             Status.failure => ErrorScreen(errorMsg: state.error ?? ''),
-            Status.success => _buildBody(state.datas as List<Food>, text ?? '')
+            Status.success => _buildBody(state.datas ?? <Food>[], text ?? '')
           });
         });
   }
@@ -170,11 +168,11 @@ class _AfterSearchUIState extends State<AfterSearchUI> {
       itemCount: foods.length,
       itemBuilder: (context, i) {
         if (foods[i]
-                .title
+                .name
                 .toString()
                 .toLowerCase()
                 .contains(text.toLowerCase()) ||
-            TiengViet.parse(foods[i].title.toString().toLowerCase())
+            TiengViet.parse(foods[i].name.toString().toLowerCase())
                 .contains(text.toLowerCase())) {
           return _buildItemSearch(context, foods[i]);
         }
@@ -233,17 +231,16 @@ class _AfterSearchUIState extends State<AfterSearchUI> {
                 image: NetworkImage(food.image == null || food.image == ""
                     ? noImage
                     : food.image ?? ""),
-                fit: food.isImageCrop == true ? BoxFit.cover : BoxFit.fill)));
+                fit: BoxFit.cover)));
   }
 
   Widget _buildCategory(BuildContext context, Food food) {
-    return FittedBox(
-        child: Text(food.category!, style: context.textStyleSmall!));
+    return FittedBox(child: Text('asdasd', style: context.textStyleSmall!));
   }
 
   Widget _buildTitle(BuildContext context, Food food) {
     return FittedBox(
-        child: Text(food.title!,
+        child: Text(food.name ?? '',
             style:
                 context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold)));
   }

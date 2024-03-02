@@ -201,33 +201,29 @@ class TableView extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, TableModel table) {
     return Card(
+        color: table.status == AppText.tableStatusOccupied
+            ? context.colorScheme.primaryContainer
+            : null,
         shape: const OutlineInputBorder(borderRadius: BorderRadius.zero),
         margin: const EdgeInsets.all(0),
-        child: SizedBox(
-            height: context.sizeDevice.width * 0.15,
-            child: Row(children: [
-              _buildImage(context, table),
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    CommonLineText(title: 'Tên bàn: ', value: table.name),
-                    CommonLineText(
-                        title: 'Số ghế: ', value: table.seats.toString())
-                  ])
-            ])));
-  }
-
-  Widget _buildImage(BuildContext context, TableModel table) {
-    return Container(
-        height: context.sizeDevice.width * 0.15,
-        width: context.sizeDevice.width * 0.15,
-        margin: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.black.withOpacity(0.3),
-            image: DecorationImage(
-                image: NetworkImage(table.image == "" ? noImage : table.image),
-                fit: BoxFit.cover)));
+        child: Container(
+            width: context.sizeDevice.width,
+            padding: const EdgeInsets.all(15),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  CommonLineText(title: 'Tên bàn: ', value: table.name),
+                  CommonLineText(
+                      title: 'Số ghế: ', value: table.seats.toString()),
+                  CommonLineText(
+                      title: 'Trạng thái: ',
+                      value: Ultils.tableStatus(table.status),
+                      valueStyle: table.status == AppText.tableStatusOccupied
+                          ? context.textStyleSmall!
+                              .copyWith(color: Colors.greenAccent)
+                          : context.textStyleSmall!
+                              .copyWith(color: Colors.redAccent))
+                ])));
   }
 }

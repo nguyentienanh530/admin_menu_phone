@@ -29,6 +29,27 @@ class Ultils {
     final dateTime = inputFormat.parse(dateTimeString);
     return outputFormat.format(dateTime);
   }
+
+  static String tableStatus(String tableStatus) {
+    switch (tableStatus) {
+      case 'available':
+        return 'Trống';
+      case 'occupied':
+        return 'Sử dụng';
+      default:
+        return 'Trống';
+    }
+  }
+
+  static num foodPrice(
+      {required bool isDiscount,
+      required num foodPrice,
+      required int discount}) {
+    double discountAmount = (foodPrice * discount.toDouble()) / 100;
+    num discountedPrice = foodPrice - discountAmount;
+
+    return isDiscount ? discountedPrice : foodPrice;
+  }
 }
 
 Future pop(BuildContext context, int returnedLevel) async {

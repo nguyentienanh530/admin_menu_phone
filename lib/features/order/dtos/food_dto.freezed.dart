@@ -20,17 +20,10 @@ FoodDto _$FoodDtoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$FoodDto {
-  String? get image => throw _privateConstructorUsedError;
-  bool? get isDiscount => throw _privateConstructorUsedError;
-  String? get id => throw _privateConstructorUsedError;
-  int? get discount => throw _privateConstructorUsedError;
-  bool? get isImageCrop => throw _privateConstructorUsedError;
-  num? get price => throw _privateConstructorUsedError;
-  String? get title => throw _privateConstructorUsedError;
-  int? get timeOrder => throw _privateConstructorUsedError;
-  int? get quantity => throw _privateConstructorUsedError;
-  num? get totalPrice => throw _privateConstructorUsedError;
-  String? get note => throw _privateConstructorUsedError;
+  String get foodID => throw _privateConstructorUsedError;
+  int get quantity => throw _privateConstructorUsedError;
+  String get note => throw _privateConstructorUsedError;
+  num get totalPrice => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -42,18 +35,7 @@ abstract class $FoodDtoCopyWith<$Res> {
   factory $FoodDtoCopyWith(FoodDto value, $Res Function(FoodDto) then) =
       _$FoodDtoCopyWithImpl<$Res, FoodDto>;
   @useResult
-  $Res call(
-      {String? image,
-      bool? isDiscount,
-      String? id,
-      int? discount,
-      bool? isImageCrop,
-      num? price,
-      String? title,
-      int? timeOrder,
-      int? quantity,
-      num? totalPrice,
-      String? note});
+  $Res call({String foodID, int quantity, String note, num totalPrice});
 }
 
 /// @nodoc
@@ -69,63 +51,28 @@ class _$FoodDtoCopyWithImpl<$Res, $Val extends FoodDto>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? image = freezed,
-    Object? isDiscount = freezed,
-    Object? id = freezed,
-    Object? discount = freezed,
-    Object? isImageCrop = freezed,
-    Object? price = freezed,
-    Object? title = freezed,
-    Object? timeOrder = freezed,
-    Object? quantity = freezed,
-    Object? totalPrice = freezed,
-    Object? note = freezed,
+    Object? foodID = null,
+    Object? quantity = null,
+    Object? note = null,
+    Object? totalPrice = null,
   }) {
     return _then(_value.copyWith(
-      image: freezed == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isDiscount: freezed == isDiscount
-          ? _value.isDiscount
-          : isDiscount // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      id: freezed == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String?,
-      discount: freezed == discount
-          ? _value.discount
-          : discount // ignore: cast_nullable_to_non_nullable
-              as int?,
-      isImageCrop: freezed == isImageCrop
-          ? _value.isImageCrop
-          : isImageCrop // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      price: freezed == price
-          ? _value.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as num?,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      timeOrder: freezed == timeOrder
-          ? _value.timeOrder
-          : timeOrder // ignore: cast_nullable_to_non_nullable
-              as int?,
-      quantity: freezed == quantity
+      foodID: null == foodID
+          ? _value.foodID
+          : foodID // ignore: cast_nullable_to_non_nullable
+              as String,
+      quantity: null == quantity
           ? _value.quantity
           : quantity // ignore: cast_nullable_to_non_nullable
-              as int?,
-      totalPrice: freezed == totalPrice
-          ? _value.totalPrice
-          : totalPrice // ignore: cast_nullable_to_non_nullable
-              as num?,
-      note: freezed == note
+              as int,
+      note: null == note
           ? _value.note
           : note // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
+      totalPrice: null == totalPrice
+          ? _value.totalPrice
+          : totalPrice // ignore: cast_nullable_to_non_nullable
+              as num,
     ) as $Val);
   }
 }
@@ -137,18 +84,7 @@ abstract class _$$FoodDtoImplCopyWith<$Res> implements $FoodDtoCopyWith<$Res> {
       __$$FoodDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String? image,
-      bool? isDiscount,
-      String? id,
-      int? discount,
-      bool? isImageCrop,
-      num? price,
-      String? title,
-      int? timeOrder,
-      int? quantity,
-      num? totalPrice,
-      String? note});
+  $Res call({String foodID, int quantity, String note, num totalPrice});
 }
 
 /// @nodoc
@@ -162,63 +98,28 @@ class __$$FoodDtoImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? image = freezed,
-    Object? isDiscount = freezed,
-    Object? id = freezed,
-    Object? discount = freezed,
-    Object? isImageCrop = freezed,
-    Object? price = freezed,
-    Object? title = freezed,
-    Object? timeOrder = freezed,
-    Object? quantity = freezed,
-    Object? totalPrice = freezed,
-    Object? note = freezed,
+    Object? foodID = null,
+    Object? quantity = null,
+    Object? note = null,
+    Object? totalPrice = null,
   }) {
     return _then(_$FoodDtoImpl(
-      image: freezed == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isDiscount: freezed == isDiscount
-          ? _value.isDiscount
-          : isDiscount // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      id: freezed == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String?,
-      discount: freezed == discount
-          ? _value.discount
-          : discount // ignore: cast_nullable_to_non_nullable
-              as int?,
-      isImageCrop: freezed == isImageCrop
-          ? _value.isImageCrop
-          : isImageCrop // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      price: freezed == price
-          ? _value.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as num?,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      timeOrder: freezed == timeOrder
-          ? _value.timeOrder
-          : timeOrder // ignore: cast_nullable_to_non_nullable
-              as int?,
-      quantity: freezed == quantity
+      foodID: null == foodID
+          ? _value.foodID
+          : foodID // ignore: cast_nullable_to_non_nullable
+              as String,
+      quantity: null == quantity
           ? _value.quantity
           : quantity // ignore: cast_nullable_to_non_nullable
-              as int?,
-      totalPrice: freezed == totalPrice
-          ? _value.totalPrice
-          : totalPrice // ignore: cast_nullable_to_non_nullable
-              as num?,
-      note: freezed == note
+              as int,
+      note: null == note
           ? _value.note
           : note // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
+      totalPrice: null == totalPrice
+          ? _value.totalPrice
+          : totalPrice // ignore: cast_nullable_to_non_nullable
+              as num,
     ));
   }
 }
@@ -227,47 +128,30 @@ class __$$FoodDtoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$FoodDtoImpl implements _FoodDto {
   _$FoodDtoImpl(
-      {this.image,
-      this.isDiscount,
-      this.id,
-      this.discount,
-      this.isImageCrop,
-      this.price,
-      this.title,
-      this.timeOrder,
-      this.quantity,
-      this.totalPrice,
-      this.note});
+      {this.foodID = '',
+      this.quantity = 1,
+      this.note = '',
+      this.totalPrice = 0});
 
   factory _$FoodDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$FoodDtoImplFromJson(json);
 
   @override
-  final String? image;
+  @JsonKey()
+  final String foodID;
   @override
-  final bool? isDiscount;
+  @JsonKey()
+  final int quantity;
   @override
-  final String? id;
+  @JsonKey()
+  final String note;
   @override
-  final int? discount;
-  @override
-  final bool? isImageCrop;
-  @override
-  final num? price;
-  @override
-  final String? title;
-  @override
-  final int? timeOrder;
-  @override
-  final int? quantity;
-  @override
-  final num? totalPrice;
-  @override
-  final String? note;
+  @JsonKey()
+  final num totalPrice;
 
   @override
   String toString() {
-    return 'FoodDto(image: $image, isDiscount: $isDiscount, id: $id, discount: $discount, isImageCrop: $isImageCrop, price: $price, title: $title, timeOrder: $timeOrder, quantity: $quantity, totalPrice: $totalPrice, note: $note)';
+    return 'FoodDto(foodID: $foodID, quantity: $quantity, note: $note, totalPrice: $totalPrice)';
   }
 
   @override
@@ -275,29 +159,18 @@ class _$FoodDtoImpl implements _FoodDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$FoodDtoImpl &&
-            (identical(other.image, image) || other.image == image) &&
-            (identical(other.isDiscount, isDiscount) ||
-                other.isDiscount == isDiscount) &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.discount, discount) ||
-                other.discount == discount) &&
-            (identical(other.isImageCrop, isImageCrop) ||
-                other.isImageCrop == isImageCrop) &&
-            (identical(other.price, price) || other.price == price) &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.timeOrder, timeOrder) ||
-                other.timeOrder == timeOrder) &&
+            (identical(other.foodID, foodID) || other.foodID == foodID) &&
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
+            (identical(other.note, note) || other.note == note) &&
             (identical(other.totalPrice, totalPrice) ||
-                other.totalPrice == totalPrice) &&
-            (identical(other.note, note) || other.note == note));
+                other.totalPrice == totalPrice));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, image, isDiscount, id, discount,
-      isImageCrop, price, title, timeOrder, quantity, totalPrice, note);
+  int get hashCode =>
+      Object.hash(runtimeType, foodID, quantity, note, totalPrice);
 
   @JsonKey(ignore: true)
   @override
@@ -315,42 +188,21 @@ class _$FoodDtoImpl implements _FoodDto {
 
 abstract class _FoodDto implements FoodDto {
   factory _FoodDto(
-      {final String? image,
-      final bool? isDiscount,
-      final String? id,
-      final int? discount,
-      final bool? isImageCrop,
-      final num? price,
-      final String? title,
-      final int? timeOrder,
-      final int? quantity,
-      final num? totalPrice,
-      final String? note}) = _$FoodDtoImpl;
+      {final String foodID,
+      final int quantity,
+      final String note,
+      final num totalPrice}) = _$FoodDtoImpl;
 
   factory _FoodDto.fromJson(Map<String, dynamic> json) = _$FoodDtoImpl.fromJson;
 
   @override
-  String? get image;
+  String get foodID;
   @override
-  bool? get isDiscount;
+  int get quantity;
   @override
-  String? get id;
+  String get note;
   @override
-  int? get discount;
-  @override
-  bool? get isImageCrop;
-  @override
-  num? get price;
-  @override
-  String? get title;
-  @override
-  int? get timeOrder;
-  @override
-  int? get quantity;
-  @override
-  num? get totalPrice;
-  @override
-  String? get note;
+  num get totalPrice;
   @override
   @JsonKey(ignore: true)
   _$$FoodDtoImplCopyWith<_$FoodDtoImpl> get copyWith =>

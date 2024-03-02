@@ -10,9 +10,9 @@ sealed class FoodEvent extends Equatable {
 final class FoodsFetched extends FoodEvent {}
 
 final class GetFoodByID extends FoodEvent {
-  final String idFood;
+  final String foodID;
 
-  const GetFoodByID({required this.idFood});
+  const GetFoodByID({required this.foodID});
 }
 
 final class ResetData extends FoodEvent {}

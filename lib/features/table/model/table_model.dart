@@ -6,10 +6,10 @@ part 'table_model.g.dart';
 @freezed
 class TableModel with _$TableModel {
   factory TableModel(
-      {final String? id,
+      {@Default('') String? id,
       @Default('') String name,
-      @Default('') String image,
-      @Default(0) int seats}) = _TableModel;
+      @Default(0) int seats,
+      @Default('') String status}) = _TableModel;
 
   factory TableModel.fromJson(Map<String, dynamic> json) =>
       _$TableModelFromJson(json);

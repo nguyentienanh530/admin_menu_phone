@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
-import 'package:admin_menu_mobile/features/order/data/order_repo.dart';
-import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
+import 'package:admin_menu_mobile/features/order/data/provider/remote/order_repo.dart';
+import 'package:admin_menu_mobile/features/order/data/model/order_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

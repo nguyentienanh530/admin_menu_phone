@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
-import 'package:admin_menu_mobile/features/user/data/user_repo.dart';
-import 'package:admin_menu_mobile/features/user/model/user_model.dart';
+import 'package:admin_menu_mobile/features/user/data/provider/remote/user_repo.dart';
+import 'package:admin_menu_mobile/features/user/data/model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_repository/user_repository.dart';

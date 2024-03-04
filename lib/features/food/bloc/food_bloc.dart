@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
-import 'package:admin_menu_mobile/features/food/data/food_repo.dart';
+import 'package:admin_menu_mobile/features/food/data/provider/remote/food_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_repository/food_repository.dart';
-import '../model/food_model.dart';
+import '../data/model/food_model.dart';
 part 'food_event.dart';
 
 typedef Emit = Emitter<GenericBlocState<Food>>;

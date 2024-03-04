@@ -1,4 +1,4 @@
-import 'package:admin_menu_mobile/utils/utils.dart';
+import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 

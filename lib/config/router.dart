@@ -1,26 +1,26 @@
-import 'package:admin_menu_mobile/features/order/dtos/order_model.dart';
-import 'package:admin_menu_mobile/features/table/model/table_model.dart';
-import 'package:admin_menu_mobile/features/user/model/user_model.dart';
-import 'package:admin_menu_mobile/screens/order_screen/add_food_to_order_screen.dart';
-import 'package:admin_menu_mobile/screens/food_screen/food_detail_screen.dart';
-import 'package:admin_menu_mobile/screens/order_screen/order_detail_screen.dart';
-import 'package:admin_menu_mobile/screens/order_screen/order_history_detail_screen.dart';
-import 'package:admin_menu_mobile/screens/order_screen/order_screen.dart';
-import 'package:admin_menu_mobile/screens/profile_screen/change_password.dart';
-import 'package:admin_menu_mobile/screens/profile_screen/print_setting.dart';
-import 'package:admin_menu_mobile/screens/profile_screen/update_user.dart';
-import 'package:admin_menu_mobile/screens/food_screen/food_screen.dart';
-import 'package:admin_menu_mobile/screens/sign_up_screen/signup_screen.dart';
-import 'package:admin_menu_mobile/screens/table_screen/create_or_update_table.dart';
-import 'package:admin_menu_mobile/screens/food_screen/create_or_update_food_screen.dart';
+import 'package:admin_menu_mobile/features/order/data/model/order_model.dart';
+import 'package:admin_menu_mobile/features/table/data/model/table_model.dart';
+import 'package:admin_menu_mobile/features/user/data/model/user_model.dart';
+import 'package:admin_menu_mobile/features/order/view/screen/add_food_to_order_screen.dart';
+import 'package:admin_menu_mobile/features/food/view/screen/food_detail_screen.dart';
+import 'package:admin_menu_mobile/features/order/view/screen/order_detail_screen.dart';
+import 'package:admin_menu_mobile/features/order/view/screen/order_history_detail_screen.dart';
+import 'package:admin_menu_mobile/features/order/view/screen/order_screen.dart';
+import 'package:admin_menu_mobile/features/user/view/screen/change_password.dart';
+import 'package:admin_menu_mobile/features/print/view/screen/print_setting.dart';
+import 'package:admin_menu_mobile/features/user/view/screen/update_user.dart';
+import 'package:admin_menu_mobile/features/food/view/screen/food_screen.dart';
+import 'package:admin_menu_mobile/features/register/view/screen/signup_screen.dart';
+import 'package:admin_menu_mobile/features/table/view/screen/create_or_update_table.dart';
+import 'package:admin_menu_mobile/features/food/view/screen/create_or_update_food_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/bloc/auth_bloc.dart';
-import '../features/food/model/food_model.dart';
-import '../screens/home_screen/home_screen.dart';
-import '../screens/login_screen/login_screen.dart';
-import '../utils/utils.dart';
+import '../features/food/data/model/food_model.dart';
+import '../features/home/view/screen/home_screen.dart';
+import '../features/login/view/screen/login_screen.dart';
+import '../core/utils/utils.dart';
 
 class RouteName {
   static const String home = '/';

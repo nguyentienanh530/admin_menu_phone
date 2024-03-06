@@ -15,6 +15,7 @@ class Orders with _$Orders {
       {final String? id,
       final String? status,
       final String? tableID,
+      @Default('') String tableName,
       final String? orderTime,
       final String? payTime,
       final num? totalPrice,

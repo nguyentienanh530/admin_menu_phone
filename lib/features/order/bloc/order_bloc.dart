@@ -22,6 +22,7 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
     on<GetOrdersByID>(_getOrderByID);
     on<OrderUpdated>(_updateOrder);
     on<OrderDeleted>(_deleteOrder);
+    on<AllOrderFetched>(_getAllOrder);
   }
   final _orderRepository = OrderRepo(
       orderRepository:
@@ -37,7 +38,8 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
   }
 
   FutureOr<void> _getOrders(OrdersFecthed event, Emit emit) async {
-    await getItems(_orderRepository.getOrders(tableID: event.tableID), emit);
+    await getItems(
+        _orderRepository.getOrdersOnTable(tableID: event.tableID), emit);
   }
 
   FutureOr<void> _getIOrderHistory(
@@ -58,5 +60,10 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
       OrderDeleted event, Emitter<GenericBlocState<Orders>> emit) async {
     await deleteItem(
         _orderRepository.deleteOrder(orderID: event.orderID), emit);
+  }
+
+  FutureOr<void> _getAllOrder(
+      AllOrderFetched event, Emitter<GenericBlocState<Orders>> emit) async {
+    await getItems(_orderRepository.getAllOrder(), emit);
   }
 }

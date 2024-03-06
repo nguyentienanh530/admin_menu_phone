@@ -40,3 +40,5 @@ final class OrderDeleted extends OrderEvent {
 
   const OrderDeleted({required this.orderID});
 }
+
+final class AllOrderFetched extends OrderEvent {}

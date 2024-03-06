@@ -24,7 +24,7 @@ class OrderRepo extends FirebaseBase<Orders> {
         (json) => Orders.fromJson(json));
   }
 
-  Future<FirebaseResult<List<Orders>>> getOrders(
+  Future<FirebaseResult<List<Orders>>> getOrdersOnTable(
       {required String tableID}) async {
     return getItems(await _orderRepository.getOrders(tableID: tableID),
         (json) => Orders.fromJson(json));
@@ -44,11 +44,8 @@ class OrderRepo extends FirebaseBase<Orders> {
     return await deleteItem(_orderRepository.deleteOrder(orderID: orderID));
   }
 
-  // Future<void> paymentOrder({required String idOrder}) async {
-  //   try {
-  //     await _orderRepository.paymentOrder(idOrder: idOrder);
-  //   } catch (e) {
-  //     throw '$e';
-  //   }
-  // }
+  Future<FirebaseResult<List<Orders>>> getAllOrder() async {
+    return await getItems(
+        await _orderRepository.getAllOrder(), Orders.fromJson);
+  }
 }

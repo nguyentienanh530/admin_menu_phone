@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+
+import 'utils.dart';
 
 class Ultils {
   static String currencyFormat(double double) {
@@ -56,4 +62,30 @@ Future pop(BuildContext context, int returnedLevel) async {
   for (var i = 0; i < returnedLevel; ++i) {
     context.pop<bool>(true);
   }
+}
+
+Future<String> uploadImage({required String path, required File file}) async {
+  var image = '';
+  Reference storageReference =
+      FirebaseStorage.instance.ref().child('$path${file.path.split('/').last}');
+  UploadTask uploadTask = storageReference.putFile(file);
+  await uploadTask.whenComplete(() async {
+    var url = await storageReference.getDownloadURL();
+    image = url.toString();
+  });
+  return image;
+}
+
+Future<dynamic> pickImage() async {
+  // ignore: prefer_typing_uninitialized_variables
+  var imageFile;
+  final imagePicker = ImagePicker();
+  var imagepicked = await imagePicker.pickImage(
+      source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
+  if (imagepicked != null) {
+    imageFile = File(imagepicked.path);
+  } else {
+    logger.d('No image selected!');
+  }
+  return imageFile;
 }

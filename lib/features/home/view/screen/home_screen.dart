@@ -1,4 +1,5 @@
 import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
+import 'package:admin_menu_mobile/features/order/view/screen/order_screen.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
 import 'package:admin_menu_mobile/features/dashboard/view/screen/dashboard_screen.dart';
 import 'package:admin_menu_mobile/features/food/view/screen/food_screen.dart';
@@ -8,7 +9,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import '../../../order/view/screen/order_history_screen.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: SvgPicture.asset('assets/icon/ordered.svg',
                       colorFilter: const ColorFilter.mode(
                           Colors.white, BlendMode.srcIn))),
-              title: "Lịch sử"),
+              title: "Đơn"),
           TabItem(
               fontFamily: GoogleFonts.nunito().fontFamily,
               icon: SvgPicture.asset('assets/icon/food.svg',
@@ -140,7 +140,7 @@ class HomeView extends StatelessWidget {
 
   final List<Widget> _widgetOptions = [
     const DashboardScreen(),
-    const OrderHistoryScreen(),
+    const OrderScreen(),
     const FoodScreen(),
     const TableScreen(),
     const ProfileScreen()

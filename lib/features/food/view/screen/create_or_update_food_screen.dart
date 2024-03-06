@@ -4,7 +4,6 @@ import 'package:admin_menu_mobile/common/dialog/retry_dialog.dart';
 import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/model/food_model.dart';
 import 'package:admin_menu_mobile/common/dialog/app_alerts.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io';
@@ -13,7 +12,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../../../common/bloc/bloc_helper.dart';
 import '../../../../common/widget/common_text_field.dart';
 import '../../bloc/food_bloc.dart';
@@ -61,66 +59,18 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   var _image = '';
   // ignore: prefer_typing_uninitialized_variables
   var _imageFile, _imageFile1, _imageFile2, _imageFile3;
+
   var _categoryID = '';
   var _imageGallery1 = '';
   var _imageGallery2 = '';
   var _imageGallery3 = '';
   var _isDiscount = false;
   var _isLoading = false;
-  final _imagePicker = ImagePicker();
 
   @override
   void initState() {
     initData();
     super.initState();
-  }
-
-  Future<String> _uploadImageFood() async {
-    var image = '';
-    Reference storageReference =
-        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"0"');
-    UploadTask uploadTask = storageReference.putFile(_imageFile);
-    await uploadTask.whenComplete(() async {
-      var url = await storageReference.getDownloadURL();
-      image = url.toString();
-    });
-    return image;
-  }
-
-  Future<String> _uploadImageFoodGallery1() async {
-    var image = '';
-    Reference storageReference =
-        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"1"');
-    UploadTask uploadTask = storageReference.putFile(_imageFile1);
-    await uploadTask.whenComplete(() async {
-      var url = await storageReference.getDownloadURL();
-      image = url.toString();
-    });
-    return image;
-  }
-
-  Future<String> _uploadImageFoodGallery2() async {
-    var image = '';
-    Reference storageReference =
-        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"2"');
-    UploadTask uploadTask = storageReference.putFile(_imageFile2);
-    await uploadTask.whenComplete(() async {
-      var url = await storageReference.getDownloadURL();
-      image = url.toString();
-    });
-    return image;
-  }
-
-  Future<String> _uploadImageFoodGallery3() async {
-    var image = '';
-    Reference storageReference =
-        FirebaseStorage.instance.ref().child('food/${DateTime.now()}+"3"');
-    UploadTask uploadTask = storageReference.putFile(_imageFile3);
-    await uploadTask.whenComplete(() async {
-      var url = await storageReference.getDownloadURL();
-      image = url.toString();
-    });
-    return image;
   }
 
   void initData() {
@@ -158,143 +108,109 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
     super.dispose();
   }
 
-  Future pickImage() async {
-    var imagepicked = await _imagePicker.pickImage(
-        source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
-    if (imagepicked != null) {
-      setState(() {
-        _imageFile = File(imagepicked.path);
-      });
-    } else {
-      logger.d('No image selected!');
-    }
-  }
-
-  Future<void> _pickImageGallery1() async {
-    var imagepicked = await _imagePicker.pickImage(
-        source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
-    if (imagepicked != null) {
-      setState(() {
-        _imageFile1 = File(imagepicked.path);
-      });
-    } else {
-      logger.d('No image selected!');
-    }
-  }
-
-  Future<void> _pickImageGallery2() async {
-    var imagepicked = await _imagePicker.pickImage(
-        source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
-    if (imagepicked != null) {
-      setState(() {
-        _imageFile2 = File(imagepicked.path);
-      });
-    } else {
-      logger.d('No image selected!');
-    }
-  }
-
-  Future<void> _pickImageGallery3() async {
-    var imagepicked = await _imagePicker.pickImage(
-        source: ImageSource.gallery, maxHeight: 500, maxWidth: 500);
-    if (imagepicked != null) {
-      setState(() {
-        _imageFile3 = File(imagepicked.path);
-      });
-    } else {
-      logger.d('No image selected!');
-    }
-  }
-
   Widget onSuccess(Food food) {
     return Padding(
         padding: EdgeInsets.all(defaultPadding),
         child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Form(
-              key: _formKey,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Hình ảnh: (*)",
-                        style: context.textStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)),
-                    SizedBox(height: defaultPadding / 2),
-                    _ImageFood(
-                        image: _image,
-                        imageFile: _imageFile,
-                        onTap: () => pickImage()),
-                    SizedBox(height: defaultPadding / 2),
-                    Text("Tên món ăn: (*)",
-                        style: context.textStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)),
-                    SizedBox(height: defaultPadding / 2),
-                    _NameFood(nameController: _nameController),
-                    SizedBox(height: defaultPadding / 2),
-                    Text("Gía bán: (*)",
-                        style: context.textStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)),
-                    SizedBox(height: defaultPadding / 2),
-                    _PriceFood(priceCtrl: _priceCtrl),
-                    SizedBox(height: defaultPadding / 2),
-                    Text("Danh mục: (*)",
-                        style: context.textStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)),
-                    SizedBox(height: defaultPadding / 2),
-                    _categories(),
-                    SizedBox(height: defaultPadding / 2),
-                    Text("Mô tả chi tiết:",
-                        style: context.textStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)),
-                    SizedBox(height: defaultPadding / 2),
-                    _Description(_disController),
-                    SizedBox(height: defaultPadding / 2),
-                    Text("Album hình ảnh: (*)",
-                        style: context.textStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)),
-                    SizedBox(height: defaultPadding / 2),
-                    _PhotoGallery(
-                        image1: _imageGallery1,
-                        image2: _imageGallery2,
-                        image3: _imageGallery3,
-                        imageGallery1: _imageFile1,
-                        imageGallery2: _imageFile2,
-                        imageGallery3: _imageFile3,
-                        onTapImage1: () => _pickImageGallery1(),
-                        onTapImage2: () => _pickImageGallery2(),
-                        onTapImage3: () => _pickImageGallery3()),
-                    SizedBox(height: defaultPadding / 2),
-                    Text("Áp dụng khuyến mãi ? (*)",
-                        style: context.textStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)),
-                    SizedBox(height: defaultPadding / 2),
-                    _Discount(
-                        discountController: _discountController,
-                        isDiscount: _isDiscount,
-                        onChanged: (value) {
-                          setState(() {
-                            _isDiscount = value ?? false;
-                          });
-                        }),
-                    SizedBox(height: defaultPadding / 2),
-                    _buttonCreateOUpdateFood(),
-                    SizedBox(height: defaultPadding / 2),
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text("(*): thông tin không được để trống.",
-                          style: context.textStyleMedium!.copyWith(
-                              fontStyle: FontStyle.italic,
-                              color: context.colorScheme.error))
-                    ]),
-                    SizedBox(height: defaultPadding / 2)
-                  ]
-                      .animate(interval: 50.ms)
-                      .slideX(
-                          begin: -0.1,
-                          end: 0,
-                          curve: Curves.easeInOutCubic,
-                          duration: 500.ms)
-                      .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms)),
-            )));
+                key: _formKey,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Hình ảnh: (*)",
+                          style: context.textStyleMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      SizedBox(height: defaultPadding / 2),
+                      _ImageFood(
+                          image: _image,
+                          imageFile: _imageFile,
+                          onTap: () async =>
+                              await pickImage().then((file) => setState(() {
+                                    _imageFile = file;
+                                  }))),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Tên món ăn: (*)",
+                          style: context.textStyleMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      SizedBox(height: defaultPadding / 2),
+                      _NameFood(nameController: _nameController),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Gía bán: (*)",
+                          style: context.textStyleMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      SizedBox(height: defaultPadding / 2),
+                      _PriceFood(priceCtrl: _priceCtrl),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Danh mục: (*)",
+                          style: context.textStyleMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      SizedBox(height: defaultPadding / 2),
+                      _categories(),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Mô tả chi tiết:",
+                          style: context.textStyleMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      SizedBox(height: defaultPadding / 2),
+                      _Description(_disController),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Album hình ảnh: (*)",
+                          style: context.textStyleMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      SizedBox(height: defaultPadding / 2),
+                      _PhotoGallery(
+                          image1: _imageGallery1,
+                          image2: _imageGallery2,
+                          image3: _imageGallery3,
+                          imageGallery1: _imageFile1,
+                          imageGallery2: _imageFile2,
+                          imageGallery3: _imageFile3,
+                          onTapImage1: () async =>
+                              await pickImage().then((file) => setState(() {
+                                    _imageFile1 = file;
+                                  })),
+                          onTapImage2: () async =>
+                              await pickImage().then((file) => setState(() {
+                                    _imageFile2 = file;
+                                  })),
+                          onTapImage3: () async =>
+                              await pickImage().then((file) => setState(() {
+                                    _imageFile3 = file;
+                                  }))),
+                      SizedBox(height: defaultPadding / 2),
+                      Text("Áp dụng khuyến mãi ? (*)",
+                          style: context.textStyleMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
+                      SizedBox(height: defaultPadding / 2),
+                      _Discount(
+                          discountController: _discountController,
+                          isDiscount: _isDiscount,
+                          onChanged: (value) {
+                            setState(() {
+                              _isDiscount = value ?? false;
+                            });
+                          }),
+                      SizedBox(height: defaultPadding / 2),
+                      _buttonCreateOUpdateFood(),
+                      SizedBox(height: defaultPadding / 2),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("(*): thông tin không được để trống.",
+                                style: context.textStyleMedium!.copyWith(
+                                    fontStyle: FontStyle.italic,
+                                    color: context.colorScheme.error))
+                          ]),
+                      SizedBox(height: defaultPadding / 2)
+                    ]
+                        .animate(interval: 50.ms)
+                        .slideX(
+                            begin: -0.1,
+                            end: 0,
+                            curve: Curves.easeInOutCubic,
+                            duration: 500.ms)
+                        .fadeIn(
+                            curve: Curves.easeInOutCubic, duration: 500.ms)))));
   }
 
   Widget _categories() {
@@ -359,20 +275,20 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       );
 
       if (_imageFile != null) {
-        _image = await _uploadImageFood();
+        _image = await uploadImage(path: 'food/', file: _imageFile);
         food = food.copyWith(image: _image);
       }
 
       if (_imageFile1 != null) {
-        _imageGallery1 = await _uploadImageFoodGallery1();
+        _imageGallery1 = await uploadImage(path: 'food/', file: _imageFile1);
       }
 
       if (_imageFile2 != null) {
-        _imageGallery2 = await _uploadImageFoodGallery2();
+        _imageGallery2 = await uploadImage(path: 'food/', file: _imageFile2);
       }
 
       if (_imageFile3 != null) {
-        _imageGallery3 = await _uploadImageFoodGallery3();
+        _imageGallery3 = await uploadImage(path: 'food/', file: _imageFile3);
       }
 
       food = food.copyWith(
@@ -398,10 +314,10 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       setState(() {
         _isLoading = true;
       });
-      _image = await _uploadImageFood();
-      _imageGallery1 = await _uploadImageFoodGallery1();
-      _imageGallery2 = await _uploadImageFoodGallery2();
-      _imageGallery3 = await _uploadImageFoodGallery3();
+      _image = await uploadImage(path: 'food/', file: _imageFile);
+      _imageGallery1 = await uploadImage(path: 'food/', file: _imageFile1);
+      _imageGallery2 = await uploadImage(path: 'food/', file: _imageFile2);
+      _imageGallery3 = await uploadImage(path: 'food/', file: _imageFile3);
       var newFood = food.copyWith(
           image: _image,
           name: _nameController.text,
@@ -664,7 +580,7 @@ class _ImageFood extends StatelessWidget {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(defaultBorderRadius),
                     image: DecorationImage(
-                        image: FileImage(imageFile!), fit: BoxFit.cover))));
+                        image: FileImage(imageFile), fit: BoxFit.cover))));
   }
 
   Widget _buildImage(BuildContext context) {

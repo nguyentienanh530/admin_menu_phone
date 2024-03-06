@@ -361,7 +361,8 @@ class _ItemTable extends StatelessWidget {
                   return Center(child: Text(state.error ?? ''));
                 case Status.success:
                   return GestureDetector(
-                      onTap: () => context.push(RouteName.order, extra: table),
+                      onTap: () =>
+                          context.push(RouteName.orderOnTable, extra: table),
                       child: Card(
                           child: Container(
                               alignment: Alignment.center,
@@ -391,7 +392,8 @@ class _ItemTable extends StatelessWidget {
                                   ]))));
                 case Status.empty:
                   return GestureDetector(
-                      onTap: () => context.push(RouteName.order, extra: table),
+                      onTap: () =>
+                          context.push(RouteName.orderOnTable, extra: table),
                       child: Card(
                           child: Container(
                               alignment: Alignment.center,

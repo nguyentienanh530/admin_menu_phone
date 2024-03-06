@@ -64,9 +64,12 @@ class OrderRepository {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllOrder() {
+  Future<QuerySnapshot<Map<String, dynamic>>> getAllOrder() {
     try {
-      return _firebaseFirestore.collection("orders").snapshots();
+      return _firebaseFirestore
+          .collection("orders")
+          .where('status', isEqualTo: 'new')
+          .get();
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {

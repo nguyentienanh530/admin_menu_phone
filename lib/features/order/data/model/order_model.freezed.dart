@@ -23,6 +23,7 @@ mixin _$Orders {
   String? get id => throw _privateConstructorUsedError;
   String? get status => throw _privateConstructorUsedError;
   String? get tableID => throw _privateConstructorUsedError;
+  String get tableName => throw _privateConstructorUsedError;
   String? get orderTime => throw _privateConstructorUsedError;
   String? get payTime => throw _privateConstructorUsedError;
   num? get totalPrice =>
@@ -44,6 +45,7 @@ abstract class $OrdersCopyWith<$Res> {
       {String? id,
       String? status,
       String? tableID,
+      String tableName,
       String? orderTime,
       String? payTime,
       num? totalPrice,
@@ -66,6 +68,7 @@ class _$OrdersCopyWithImpl<$Res, $Val extends Orders>
     Object? id = freezed,
     Object? status = freezed,
     Object? tableID = freezed,
+    Object? tableName = null,
     Object? orderTime = freezed,
     Object? payTime = freezed,
     Object? totalPrice = freezed,
@@ -84,6 +87,10 @@ class _$OrdersCopyWithImpl<$Res, $Val extends Orders>
           ? _value.tableID
           : tableID // ignore: cast_nullable_to_non_nullable
               as String?,
+      tableName: null == tableName
+          ? _value.tableName
+          : tableName // ignore: cast_nullable_to_non_nullable
+              as String,
       orderTime: freezed == orderTime
           ? _value.orderTime
           : orderTime // ignore: cast_nullable_to_non_nullable
@@ -115,6 +122,7 @@ abstract class _$$OrdersImplCopyWith<$Res> implements $OrdersCopyWith<$Res> {
       {String? id,
       String? status,
       String? tableID,
+      String tableName,
       String? orderTime,
       String? payTime,
       num? totalPrice,
@@ -135,6 +143,7 @@ class __$$OrdersImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? status = freezed,
     Object? tableID = freezed,
+    Object? tableName = null,
     Object? orderTime = freezed,
     Object? payTime = freezed,
     Object? totalPrice = freezed,
@@ -153,6 +162,10 @@ class __$$OrdersImplCopyWithImpl<$Res>
           ? _value.tableID
           : tableID // ignore: cast_nullable_to_non_nullable
               as String?,
+      tableName: null == tableName
+          ? _value.tableName
+          : tableName // ignore: cast_nullable_to_non_nullable
+              as String,
       orderTime: freezed == orderTime
           ? _value.orderTime
           : orderTime // ignore: cast_nullable_to_non_nullable
@@ -180,6 +193,7 @@ class _$OrdersImpl implements _Orders {
       {this.id,
       this.status,
       this.tableID,
+      this.tableName = '',
       this.orderTime,
       this.payTime,
       this.totalPrice,
@@ -196,6 +210,9 @@ class _$OrdersImpl implements _Orders {
   final String? status;
   @override
   final String? tableID;
+  @override
+  @JsonKey()
+  final String tableName;
   @override
   final String? orderTime;
   @override
@@ -215,7 +232,7 @@ class _$OrdersImpl implements _Orders {
 
   @override
   String toString() {
-    return 'Orders(id: $id, status: $status, tableID: $tableID, orderTime: $orderTime, payTime: $payTime, totalPrice: $totalPrice, foods: $foods)';
+    return 'Orders(id: $id, status: $status, tableID: $tableID, tableName: $tableName, orderTime: $orderTime, payTime: $payTime, totalPrice: $totalPrice, foods: $foods)';
   }
 
   @override
@@ -226,6 +243,8 @@ class _$OrdersImpl implements _Orders {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.tableID, tableID) || other.tableID == tableID) &&
+            (identical(other.tableName, tableName) ||
+                other.tableName == tableName) &&
             (identical(other.orderTime, orderTime) ||
                 other.orderTime == orderTime) &&
             (identical(other.payTime, payTime) || other.payTime == payTime) &&
@@ -236,8 +255,16 @@ class _$OrdersImpl implements _Orders {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, status, tableID, orderTime,
-      payTime, totalPrice, const DeepCollectionEquality().hash(_foods));
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      status,
+      tableID,
+      tableName,
+      orderTime,
+      payTime,
+      totalPrice,
+      const DeepCollectionEquality().hash(_foods));
 
   @JsonKey(ignore: true)
   @override
@@ -258,6 +285,7 @@ abstract class _Orders implements Orders {
           {final String? id,
           final String? status,
           final String? tableID,
+          final String tableName,
           final String? orderTime,
           final String? payTime,
           final num? totalPrice,
@@ -272,6 +300,8 @@ abstract class _Orders implements Orders {
   String? get status;
   @override
   String? get tableID;
+  @override
+  String get tableName;
   @override
   String? get orderTime;
   @override

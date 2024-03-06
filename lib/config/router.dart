@@ -1,4 +1,5 @@
 import 'package:admin_menu_mobile/features/order/data/model/order_model.dart';
+import 'package:admin_menu_mobile/features/order/view/screen/order_on_table.dart';
 import 'package:admin_menu_mobile/features/table/data/model/table_model.dart';
 import 'package:admin_menu_mobile/features/user/data/model/user_model.dart';
 import 'package:admin_menu_mobile/features/order/view/screen/add_food_to_order_screen.dart';
@@ -39,6 +40,7 @@ class RouteName {
   static const String changePassword = '/changePassword';
   static const String printSeting = '/printSeting';
   static const String createOrUpdateFood = '/createOrUpdateFood';
+  static const String orderOnTable = '/orderOnTable';
 
   static const publicRoutes = [login, register];
 }
@@ -91,9 +93,12 @@ final router = GoRouter(
           }),
       GoRoute(
           path: RouteName.order,
+          builder: (context, state) => const OrderScreen()),
+      GoRoute(
+          path: RouteName.orderOnTable,
           builder: (context, state) {
             final table = GoRouterState.of(context).extra as TableModel;
-            return OrderScreen(tableModel: table);
+            return OrderOnTable(tableModel: table);
           }),
       GoRoute(
           path: RouteName.orderDetail,

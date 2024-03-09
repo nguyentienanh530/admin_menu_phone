@@ -10,8 +10,9 @@ abstract class FirebaseBase<T> {
       await firebaseCallback;
       return const FirebaseResult.success(true);
     } on FirebaseException catch (e) {
-      final errorMessage = e.toString();
-      return FirebaseResult.failure(errorMessage);
+      return FirebaseResult.failure(e.toString());
+    } catch (e) {
+      return FirebaseResult.failure(e.toString());
     }
   }
 
@@ -41,6 +42,8 @@ abstract class FirebaseBase<T> {
     } on FirebaseException catch (e) {
       final errorMessage = e.toString();
       return FirebaseResult.failure(errorMessage);
+    } catch (e) {
+      return FirebaseResult.failure(e.toString());
     }
   }
 
@@ -60,6 +63,8 @@ abstract class FirebaseBase<T> {
     } on FirebaseException catch (e) {
       final errorMessage = e.toString();
       throw FirebaseResult.failure(errorMessage);
+    } catch (e) {
+      throw FirebaseResult.failure(e.toString());
     }
   }
 
@@ -76,6 +81,8 @@ abstract class FirebaseBase<T> {
     } on FirebaseException catch (e) {
       final errorMessage = e.toString();
       throw FirebaseResult.failure(errorMessage);
+    } catch (e) {
+      throw FirebaseResult.failure(e.toString());
     }
   }
 
@@ -91,6 +98,8 @@ abstract class FirebaseBase<T> {
     } on FirebaseException catch (e) {
       final errorMessage = e.toString();
       return FirebaseResult.failure(errorMessage);
+    } catch (e) {
+      return FirebaseResult.failure(e.toString());
     }
   }
 }

@@ -7,7 +7,11 @@ sealed class FoodEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class FoodsFetched extends FoodEvent {}
+final class FoodsFetched extends FoodEvent {
+  final bool isShowFood;
+
+  const FoodsFetched({required this.isShowFood});
+}
 
 final class GetFoodByID extends FoodEvent {
   final String foodID;

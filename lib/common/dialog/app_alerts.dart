@@ -51,6 +51,7 @@ class AppAlerts {
       Function()? btnCancelOnPress,
       Function()? btnOkOnPress}) {
     AwesomeDialog(
+      dialogBackgroundColor: context.colorScheme.primary.withOpacity(0.3),
       dismissOnTouchOutside: false,
       titleTextStyle:
           context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold),

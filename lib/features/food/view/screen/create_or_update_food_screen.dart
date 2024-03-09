@@ -1,6 +1,4 @@
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
-import 'package:admin_menu_mobile/common/dialog/progress_dialog.dart';
-import 'package:admin_menu_mobile/common/dialog/retry_dialog.dart';
 import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/model/food_model.dart';
 import 'package:admin_menu_mobile/common/dialog/app_alerts.dart';
@@ -12,7 +10,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../../../../common/bloc/bloc_helper.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../common/widget/common_text_field.dart';
 import '../../bloc/food_bloc.dart';
 
@@ -25,6 +23,7 @@ class CreateOrUpdateFoodScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
+          BlocProvider(create: (context) => FoodBloc()),
           BlocProvider(
               create: (context) => CategoryBloc()..add(FetchCategories())),
         ],
@@ -65,7 +64,8 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   var _imageGallery2 = '';
   var _imageGallery3 = '';
   var _isDiscount = false;
-  var _isLoading = false;
+  final _isLoading = ValueNotifier(false);
+  final _isShowFood = ValueNotifier(true);
 
   @override
   void initState() {
@@ -82,6 +82,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       _discountController.text = widget.food.discount.toString();
       _image = widget.food.image;
       _categoryID = widget.food.categoryID;
+      _isShowFood.value = widget.food.isShowFood;
       if (widget.food.photoGallery.isNotEmpty) {
         if (widget.food.photoGallery.isNotEmpty) {
           _imageGallery1 = widget.food.photoGallery[0] ?? '';
@@ -141,6 +142,8 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                               .copyWith(fontWeight: FontWeight.bold)),
                       SizedBox(height: defaultPadding / 2),
                       _PriceFood(priceCtrl: _priceCtrl),
+                      SizedBox(height: defaultPadding / 2),
+                      _buildStatusFood(),
                       SizedBox(height: defaultPadding / 2),
                       Text("Danh mục: (*)",
                           style: context.textStyleMedium!
@@ -213,6 +216,34 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                             curve: Curves.easeInOutCubic, duration: 500.ms)))));
   }
 
+  Widget _buildStatusFood() {
+    return ValueListenableBuilder(
+        valueListenable: _isShowFood,
+        builder: (context, value, child) => Row(children: [
+              Text('Trạng thái: ',
+                  style: context.textStyleMedium!
+                      .copyWith(fontWeight: FontWeight.bold)),
+              Row(children: [
+                Radio<bool>(
+                    value: true,
+                    groupValue: _isShowFood.value,
+                    activeColor: context.colorScheme.secondary,
+                    onChanged: (value) {
+                      _isShowFood.value = value ?? false;
+                    }),
+                Text('Hiển thị', style: context.textStyleSmall),
+                Radio<bool>(
+                    value: false,
+                    activeColor: context.colorScheme.secondary,
+                    groupValue: _isShowFood.value,
+                    onChanged: (value) {
+                      _isShowFood.value = value ?? false;
+                    }),
+                Text('Không hiển thị', style: context.textStyleSmall)
+              ])
+            ]));
+  }
+
   Widget _categories() {
     var categoryState = context.watch<CategoryBloc>().state;
 
@@ -238,20 +269,23 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   }
 
   Widget _buttonCreateOUpdateFood() {
-    return Center(
-        child: FilledButton(
-            style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.green)),
-            onPressed: () async => widget.mode == Mode.create
-                ? _handelCreateFood(widget.food)
-                : _handleUpdateFood(widget.food),
-            child: _isLoading
-                ? const SizedBox(
-                    height: 30,
-                    width: 30,
-                    child: SpinKitCircle(color: Colors.white, size: 30))
-                : Text(widget.mode == Mode.create ? 'Tạo món' : 'Cập nhật món',
-                    style: context.textStyleMedium)));
+    return ValueListenableBuilder(
+        valueListenable: _isLoading,
+        builder: (context, value, child) => Center(
+            child: FilledButton(
+                style: const ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Colors.green)),
+                onPressed: () async => widget.mode == Mode.create
+                    ? _handelCreateFood(widget.food)
+                    : _handleUpdateFood(widget.food),
+                child: value
+                    ? const SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: SpinKitCircle(color: Colors.white, size: 30))
+                    : Text(
+                        widget.mode == Mode.create ? 'Tạo món' : 'Cập nhật món',
+                        style: context.textStyleMedium))));
   }
 
   void _handleUpdateFood(Food food) async {
@@ -259,12 +293,11 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
     var isValid = _formKey.currentState?.validate() ?? false;
 
     if (isValid) {
-      setState(() {
-        _isLoading = true;
-      });
+      _isLoading.value = true;
 
       // Update the food details
       food = food.copyWith(
+        isShowFood: _isShowFood.value,
         name: _nameController.text,
         price: num.parse(_priceCtrl.text),
         categoryID: _categoryID,
@@ -275,20 +308,20 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       );
 
       if (_imageFile != null) {
-        _image = await uploadImage(path: 'food/', file: _imageFile);
+        _image = await uploadImage(path: 'food', file: _imageFile);
         food = food.copyWith(image: _image);
       }
 
       if (_imageFile1 != null) {
-        _imageGallery1 = await uploadImage(path: 'food/', file: _imageFile1);
+        _imageGallery1 = await uploadImage(path: 'food', file: _imageFile1);
       }
 
       if (_imageFile2 != null) {
-        _imageGallery2 = await uploadImage(path: 'food/', file: _imageFile2);
+        _imageGallery2 = await uploadImage(path: 'food', file: _imageFile2);
       }
 
       if (_imageFile3 != null) {
-        _imageGallery3 = await uploadImage(path: 'food/', file: _imageFile3);
+        _imageGallery3 = await uploadImage(path: 'food', file: _imageFile3);
       }
 
       food = food.copyWith(
@@ -311,14 +344,14 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
         _imageFile2 != null &&
         _imageFile3 != null &&
         _categoryID.isNotEmpty) {
-      setState(() {
-        _isLoading = true;
-      });
+      _isLoading.value = true;
+
       _image = await uploadImage(path: 'food/', file: _imageFile);
-      _imageGallery1 = await uploadImage(path: 'food/', file: _imageFile1);
-      _imageGallery2 = await uploadImage(path: 'food/', file: _imageFile2);
-      _imageGallery3 = await uploadImage(path: 'food/', file: _imageFile3);
+      _imageGallery1 = await uploadImage(path: 'food', file: _imageFile1);
+      _imageGallery2 = await uploadImage(path: 'food', file: _imageFile2);
+      _imageGallery3 = await uploadImage(path: 'food', file: _imageFile3);
       var newFood = food.copyWith(
+          isShowFood: _isShowFood.value,
           image: _image,
           name: _nameController.text,
           price: num.parse(_priceCtrl.text.toString()),
@@ -329,9 +362,8 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
           createAt: DateTime.now().toString(),
           discount: _isDiscount ? int.tryParse(_discountController.text)! : 0);
       createFood(newFood);
-      setState(() {
-        _isLoading = false;
-      });
+
+      _isLoading.value = false;
     } else {
       toast.showToast(
           child: AppAlerts.errorToast(msg: 'Chưa nhập đầy đủ thông tin'));
@@ -340,67 +372,32 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
 
   void _updateFood(Food food) {
     context.read<FoodBloc>().add(FoodUpdated(food: food));
-
-    showDialog(
-        context: context,
-        builder: (context) => BlocBuilder<FoodBloc, GenericBlocState<Food>>(
-            buildWhen: (previous, current) =>
-                context.read<FoodBloc>().operation == ApiOperation.update,
-            builder: (context, state) {
-              switch (state.status) {
-                case Status.loading:
-                  return const ProgressDialog(
-                      descriptrion: 'Đang cập nhật món...', isProgressed: true);
-                case Status.empty:
-                  return const SizedBox();
-                case Status.failure:
-                  return RetryDialog(
-                      title: 'Lỗi',
-                      onRetryPressed: () => context
-                          .read<FoodBloc>()
-                          .add(FoodUpdated(food: food)));
-                case Status.success:
-                  return ProgressDialog(
-                      descriptrion: 'Cập nhật thành công',
-                      isProgressed: false,
-                      onPressed: () {
-                        pop(context, 3);
-                      });
-                default:
-                  return const SizedBox();
-              }
-            }));
   }
 
   void createFood(Food food) {
     context.read<FoodBloc>().add(FoodCreated(food: food));
-    showDialog(
-        context: context,
-        builder: (context) => BlocBuilder<FoodBloc, GenericBlocState<Food>>(
-            buildWhen: (previous, current) =>
-                context.read<FoodBloc>().operation == ApiOperation.create,
-            builder: (context, state) => switch (state.status) {
-                  Status.loading => const ProgressDialog(
-                      descriptrion: 'Đang tạo món...', isProgressed: true),
-                  Status.empty => const SizedBox(),
-                  Status.failure => RetryDialog(
-                      title: 'Lỗi',
-                      onRetryPressed: () => context
-                          .read<FoodBloc>()
-                          .add(FoodCreated(food: food))),
-                  Status.success => ProgressDialog(
-                      descriptrion: 'Thành công',
-                      isProgressed: false,
-                      onPressed: () {
-                        pop(context, 2);
-                      })
-                }));
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: context.sizeDevice.height, child: onSuccess(widget.food));
+        height: context.sizeDevice.height,
+        child: BlocListener<FoodBloc, GenericBlocState<Food>>(
+            listener: (context, state) => (switch (state.status) {
+                  Status.loading => AppAlerts.loadingDialog(context),
+                  Status.empty => const SizedBox(),
+                  Status.failure =>
+                    AppAlerts.failureDialog(context, btnOkOnPress: () {
+                      context.pop();
+                      _isLoading.value = false;
+                    }),
+                  Status.success =>
+                    AppAlerts.successDialog(context, btnOkOnPress: () {
+                      _isLoading.value = false;
+                      pop(context, 3);
+                    })
+                }),
+            child: onSuccess(widget.food)));
   }
 }
 

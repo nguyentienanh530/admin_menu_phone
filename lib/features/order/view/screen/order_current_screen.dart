@@ -5,6 +5,7 @@ import 'package:admin_menu_mobile/common/widget/empty_screen.dart';
 import 'package:admin_menu_mobile/common/widget/error_screen.dart';
 import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:admin_menu_mobile/config/config.dart';
 import 'package:go_router/go_router.dart';
@@ -38,19 +39,22 @@ class OrderHistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
-        builder: (context, state) {
-      return (switch (state.status) {
-        Status.loading => const LoadingScreen(),
-        Status.empty => const EmptyScreen(),
-        Status.failure => ErrorScreen(errorMsg: state.error),
-        Status.success => _buildBody(context, state.datas as List<Orders>),
-      });
-    });
+    return RefreshIndicator.adaptive(
+        onRefresh: () async => context.read<OrderBloc>().add(AllOrderFetched()),
+        child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+            builder: (context, state) {
+          return (switch (state.status) {
+            Status.loading => const LoadingScreen(),
+            Status.empty => const EmptyScreen(),
+            Status.failure => ErrorScreen(errorMsg: state.error),
+            Status.success => _buildBody(context, state.datas as List<Orders>)
+          });
+        }));
   }
 
   Widget _buildBody(BuildContext context, List<Orders> orders) {
     return GroupedListView(
+        physics: const BouncingScrollPhysics(),
         elements: orders,
         groupBy: (element) => element.tableName,
         itemComparator: (element1, element2) =>
@@ -59,13 +63,6 @@ class OrderHistoryView extends StatelessWidget {
         useStickyGroupSeparators: true,
         floatingHeader: true,
         groupSeparatorBuilder: (String value) {
-          // var totalPrice = 0.0;
-          // for (var element in orders) {
-          //   // if (Ultils.formatToDate(element.tableID!) == value) {
-          //   //   totalPrice =
-          //   //       totalPrice + double.parse(element.totalPrice.toString());
-          //   // }
-          // }
           return Container(
               width: context.sizeDevice.width * 3 / 4,
               decoration: BoxDecoration(
@@ -80,51 +77,66 @@ class OrderHistoryView extends StatelessWidget {
                       fontWeight: FontWeight.bold)));
         },
         itemBuilder: (context, element) {
-          return _buildItemListView(context, element);
+          return _buildItemListView(context, element)
+              .animate()
+              .slideX(
+                  begin: -0.1,
+                  end: 0,
+                  curve: Curves.easeInOutCubic,
+                  duration: 500.ms)
+              .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms);
         });
   }
 
   Widget _buildItemListView(BuildContext context, Orders? orderModel) {
     return GestureDetector(
-      onTap: () => context.push(RouteName.orderDetail, extra: orderModel),
-      child: Card(
-          child: Container(
-              padding: EdgeInsets.all(defaultPadding / 2),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  // crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CommonLineText(title: 'ID: ', value: orderModel!.id!),
-                          CommonLineText(
-                              title: 'Bàn: ', value: orderModel.tableName),
-                          CommonLineText(
-                              title: 'Đặt lúc: ',
-                              value:
-                                  Ultils.formatDateTime(orderModel.orderTime!)),
-                        ]),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(children: [
-                            Text('Xem chi tiết', style: context.textStyleSmall),
-                            const Icon(Icons.navigate_next)
+        onTap: () async {
+          await context
+              .push(RouteName.orderDetail, extra: orderModel)
+              .then((value) {
+            if (!context.mounted) return;
+            context.read<OrderBloc>().add(AllOrderFetched());
+          });
+        },
+        child: Card(
+            child: Container(
+                padding: EdgeInsets.all(defaultPadding / 2),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CommonLineText(
+                                title: 'ID: ', value: orderModel!.id!),
+                            CommonLineText(
+                                title: 'Bàn: ', value: orderModel.tableName),
+                            CommonLineText(
+                                title: 'Đặt lúc: ',
+                                value: Ultils.formatDateTime(
+                                    orderModel.orderTime!)),
                           ]),
-                          CommonLineText(
-                              color: context.colorScheme.secondaryContainer,
-                              title: 'Tổng tiền: ',
-                              valueStyle: context.textStyleMedium!.copyWith(
-                                  color: context.colorScheme.secondary,
-                                  fontWeight: FontWeight.bold),
-                              value: Ultils.currencyFormat(double.parse(
-                                  orderModel.totalPrice!.toString()))),
-                          SizedBox(height: defaultPadding / 2)
-                        ])
-                  ]))),
-    );
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(children: [
+                              Text('Xem chi tiết',
+                                  style: context.textStyleSmall),
+                              const Icon(Icons.navigate_next)
+                            ]),
+                            CommonLineText(
+                                color: context.colorScheme.secondaryContainer,
+                                title: 'Tổng tiền: ',
+                                valueStyle: context.textStyleMedium!.copyWith(
+                                    color: context.colorScheme.secondary,
+                                    fontWeight: FontWeight.bold),
+                                value: Ultils.currencyFormat(double.parse(
+                                    orderModel.totalPrice!.toString()))),
+                            SizedBox(height: defaultPadding / 2)
+                          ])
+                    ]))));
   }
 }

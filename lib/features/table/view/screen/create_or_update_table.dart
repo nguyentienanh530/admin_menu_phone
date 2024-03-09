@@ -160,7 +160,7 @@ class _CreateTableState extends State<CreateTable> {
             id: '',
             name: _nameController.text,
             seats: int.parse(_seat),
-            status: AppString.tableStatusAvailable);
+            isUse: false);
         createTable(table);
       }
     }

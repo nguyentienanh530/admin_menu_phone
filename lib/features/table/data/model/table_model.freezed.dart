@@ -23,7 +23,7 @@ mixin _$TableModel {
   String? get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   int get seats => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
+  bool get isUse => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -37,7 +37,7 @@ abstract class $TableModelCopyWith<$Res> {
           TableModel value, $Res Function(TableModel) then) =
       _$TableModelCopyWithImpl<$Res, TableModel>;
   @useResult
-  $Res call({String? id, String name, int seats, String status});
+  $Res call({String? id, String name, int seats, bool isUse});
 }
 
 /// @nodoc
@@ -56,7 +56,7 @@ class _$TableModelCopyWithImpl<$Res, $Val extends TableModel>
     Object? id = freezed,
     Object? name = null,
     Object? seats = null,
-    Object? status = null,
+    Object? isUse = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -71,10 +71,10 @@ class _$TableModelCopyWithImpl<$Res, $Val extends TableModel>
           ? _value.seats
           : seats // ignore: cast_nullable_to_non_nullable
               as int,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
+      isUse: null == isUse
+          ? _value.isUse
+          : isUse // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -87,7 +87,7 @@ abstract class _$$TableModelImplCopyWith<$Res>
       __$$TableModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? id, String name, int seats, String status});
+  $Res call({String? id, String name, int seats, bool isUse});
 }
 
 /// @nodoc
@@ -104,7 +104,7 @@ class __$$TableModelImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? name = null,
     Object? seats = null,
-    Object? status = null,
+    Object? isUse = null,
   }) {
     return _then(_$TableModelImpl(
       id: freezed == id
@@ -119,10 +119,10 @@ class __$$TableModelImplCopyWithImpl<$Res>
           ? _value.seats
           : seats // ignore: cast_nullable_to_non_nullable
               as int,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
+      isUse: null == isUse
+          ? _value.isUse
+          : isUse // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -131,7 +131,7 @@ class __$$TableModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$TableModelImpl with DiagnosticableTreeMixin implements _TableModel {
   _$TableModelImpl(
-      {this.id = '', this.name = '', this.seats = 0, this.status = ''});
+      {this.id = '', this.name = '', this.seats = 0, this.isUse = false});
 
   factory _$TableModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$TableModelImplFromJson(json);
@@ -147,11 +147,11 @@ class _$TableModelImpl with DiagnosticableTreeMixin implements _TableModel {
   final int seats;
   @override
   @JsonKey()
-  final String status;
+  final bool isUse;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TableModel(id: $id, name: $name, seats: $seats, status: $status)';
+    return 'TableModel(id: $id, name: $name, seats: $seats, isUse: $isUse)';
   }
 
   @override
@@ -162,7 +162,7 @@ class _$TableModelImpl with DiagnosticableTreeMixin implements _TableModel {
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('seats', seats))
-      ..add(DiagnosticsProperty('status', status));
+      ..add(DiagnosticsProperty('isUse', isUse));
   }
 
   @override
@@ -173,12 +173,12 @@ class _$TableModelImpl with DiagnosticableTreeMixin implements _TableModel {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.seats, seats) || other.seats == seats) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.isUse, isUse) || other.isUse == isUse));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, seats, status);
+  int get hashCode => Object.hash(runtimeType, id, name, seats, isUse);
 
   @JsonKey(ignore: true)
   @override
@@ -199,7 +199,7 @@ abstract class _TableModel implements TableModel {
       {final String? id,
       final String name,
       final int seats,
-      final String status}) = _$TableModelImpl;
+      final bool isUse}) = _$TableModelImpl;
 
   factory _TableModel.fromJson(Map<String, dynamic> json) =
       _$TableModelImpl.fromJson;
@@ -211,7 +211,7 @@ abstract class _TableModel implements TableModel {
   @override
   int get seats;
   @override
-  String get status;
+  bool get isUse;
   @override
   @JsonKey(ignore: true)
   _$$TableModelImplCopyWith<_$TableModelImpl> get copyWith =>

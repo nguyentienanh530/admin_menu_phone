@@ -6,9 +6,13 @@ class FoodRepository {
   FoodRepository({required FirebaseFirestore firebaseFirestore})
       : _firebaseFirestore = firebaseFirestore;
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getFoods() async {
+  Future<QuerySnapshot<Map<String, dynamic>>> getFoods(
+      {required bool isShowFood}) async {
     try {
-      return await _firebaseFirestore.collection('food').get();
+      return await _firebaseFirestore
+          .collection('food')
+          .where('isShowFood', isEqualTo: isShowFood)
+          .get();
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {

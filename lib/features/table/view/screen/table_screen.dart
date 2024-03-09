@@ -202,9 +202,7 @@ class TableView extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, TableModel table) {
     return Card(
-        color: table.status == AppString.tableStatusOccupied
-            ? context.colorScheme.primaryContainer
-            : null,
+        color: table.isUse ? context.colorScheme.primaryContainer : null,
         shape: const OutlineInputBorder(borderRadius: BorderRadius.zero),
         margin: const EdgeInsets.all(0),
         child: Container(
@@ -219,8 +217,8 @@ class TableView extends StatelessWidget {
                       title: 'Số ghế: ', value: table.seats.toString()),
                   CommonLineText(
                       title: 'Trạng thái: ',
-                      value: Ultils.tableStatus(table.status),
-                      valueStyle: table.status == AppString.tableStatusOccupied
+                      value: Ultils.tableStatus(table.isUse),
+                      valueStyle: table.isUse
                           ? context.textStyleSmall!
                               .copyWith(color: Colors.greenAccent)
                           : context.textStyleSmall!

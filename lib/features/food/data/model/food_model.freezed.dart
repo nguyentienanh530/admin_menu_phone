@@ -23,6 +23,7 @@ mixin _$Food {
   String get id => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
   bool get isDiscount => throw _privateConstructorUsedError;
+  bool get isShowFood => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
   String get categoryID => throw _privateConstructorUsedError;
   int get discount => throw _privateConstructorUsedError;
@@ -45,6 +46,7 @@ abstract class $FoodCopyWith<$Res> {
       {String id,
       String image,
       bool isDiscount,
+      bool isShowFood,
       String description,
       String categoryID,
       int discount,
@@ -70,6 +72,7 @@ class _$FoodCopyWithImpl<$Res, $Val extends Food>
     Object? id = null,
     Object? image = null,
     Object? isDiscount = null,
+    Object? isShowFood = null,
     Object? description = null,
     Object? categoryID = null,
     Object? discount = null,
@@ -90,6 +93,10 @@ class _$FoodCopyWithImpl<$Res, $Val extends Food>
       isDiscount: null == isDiscount
           ? _value.isDiscount
           : isDiscount // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isShowFood: null == isShowFood
+          ? _value.isShowFood
+          : isShowFood // ignore: cast_nullable_to_non_nullable
               as bool,
       description: null == description
           ? _value.description
@@ -134,6 +141,7 @@ abstract class _$$FoodImplCopyWith<$Res> implements $FoodCopyWith<$Res> {
       {String id,
       String image,
       bool isDiscount,
+      bool isShowFood,
       String description,
       String categoryID,
       int discount,
@@ -156,6 +164,7 @@ class __$$FoodImplCopyWithImpl<$Res>
     Object? id = null,
     Object? image = null,
     Object? isDiscount = null,
+    Object? isShowFood = null,
     Object? description = null,
     Object? categoryID = null,
     Object? discount = null,
@@ -176,6 +185,10 @@ class __$$FoodImplCopyWithImpl<$Res>
       isDiscount: null == isDiscount
           ? _value.isDiscount
           : isDiscount // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isShowFood: null == isShowFood
+          ? _value.isShowFood
+          : isShowFood // ignore: cast_nullable_to_non_nullable
               as bool,
       description: null == description
           ? _value.description
@@ -216,6 +229,7 @@ class _$FoodImpl implements _Food {
       {this.id = '',
       this.image = '',
       this.isDiscount = false,
+      this.isShowFood = false,
       this.description = '',
       this.categoryID = '',
       this.discount = 0,
@@ -237,6 +251,9 @@ class _$FoodImpl implements _Food {
   @override
   @JsonKey()
   final bool isDiscount;
+  @override
+  @JsonKey()
+  final bool isShowFood;
   @override
   @JsonKey()
   final String description;
@@ -266,7 +283,7 @@ class _$FoodImpl implements _Food {
 
   @override
   String toString() {
-    return 'Food(id: $id, image: $image, isDiscount: $isDiscount, description: $description, categoryID: $categoryID, discount: $discount, price: $price, name: $name, photoGallery: $photoGallery, createAt: $createAt)';
+    return 'Food(id: $id, image: $image, isDiscount: $isDiscount, isShowFood: $isShowFood, description: $description, categoryID: $categoryID, discount: $discount, price: $price, name: $name, photoGallery: $photoGallery, createAt: $createAt)';
   }
 
   @override
@@ -278,6 +295,8 @@ class _$FoodImpl implements _Food {
             (identical(other.image, image) || other.image == image) &&
             (identical(other.isDiscount, isDiscount) ||
                 other.isDiscount == isDiscount) &&
+            (identical(other.isShowFood, isShowFood) ||
+                other.isShowFood == isShowFood) &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.categoryID, categoryID) ||
@@ -299,6 +318,7 @@ class _$FoodImpl implements _Food {
       id,
       image,
       isDiscount,
+      isShowFood,
       description,
       categoryID,
       discount,
@@ -326,6 +346,7 @@ abstract class _Food implements Food {
       {final String id,
       final String image,
       final bool isDiscount,
+      final bool isShowFood,
       final String description,
       final String categoryID,
       final int discount,
@@ -342,6 +363,8 @@ abstract class _Food implements Food {
   String get image;
   @override
   bool get isDiscount;
+  @override
+  bool get isShowFood;
   @override
   String get description;
   @override

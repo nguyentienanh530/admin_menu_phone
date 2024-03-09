@@ -13,7 +13,7 @@ final class OrdersOnTableFecthed extends OrderEvent {
   const OrdersOnTableFecthed({required this.tableID});
 }
 
-final class OrdersWantingFecthed extends OrderEvent {}
+final class NewOrdersFecthed extends OrderEvent {}
 
 final class OrdersFecthed extends OrderEvent {
   final String tableID;
@@ -42,3 +42,9 @@ final class OrderDeleted extends OrderEvent {
 }
 
 final class AllOrderFetched extends OrderEvent {}
+
+final class OrderPaymented extends OrderEvent {
+  final String orderID;
+
+  const OrderPaymented({required this.orderID});
+}

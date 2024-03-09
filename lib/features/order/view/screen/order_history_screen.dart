@@ -26,14 +26,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
     super.build(context);
     return BlocProvider(
         create: (context) => OrderBloc()..add(OrdersHistoryFecthed()),
-        child:
-            Scaffold(appBar: _buildAppbar(), body: const OrderHistoryView()));
-  }
-
-  _buildAppbar() {
-    return AppBar(
-        centerTitle: true,
-        title: Text("Lịch sử đơn hàng", style: context.textStyleMedium));
+        child: const Scaffold(body: OrderHistoryView()));
   }
 
   @override
@@ -45,19 +38,25 @@ class OrderHistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
-        builder: (context, state) {
-      return (switch (state.status) {
-        Status.loading => const LoadingScreen(),
-        Status.empty => const EmptyScreen(),
-        Status.failure => ErrorScreen(errorMsg: state.error),
-        Status.success => _buildBody(context, state.datas as List<Orders>),
-      });
-    });
+    return RefreshIndicator.adaptive(
+        triggerMode: RefreshIndicatorTriggerMode.onEdge,
+        onRefresh: () async {
+          context.read<OrderBloc>().add(OrdersHistoryFecthed());
+        },
+        child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+            builder: (context, state) {
+          return (switch (state.status) {
+            Status.loading => const LoadingScreen(),
+            Status.empty => const EmptyScreen(),
+            Status.failure => ErrorScreen(errorMsg: state.error),
+            Status.success => _buildBody(context, state.datas as List<Orders>),
+          });
+        }));
   }
 
   Widget _buildBody(BuildContext context, List<Orders> orders) {
     return GroupedListView(
+        physics: const BouncingScrollPhysics(),
         elements: orders,
         groupBy: (element) => Ultils.formatToDate(element.payTime!),
         itemComparator: (element1, element2) =>
@@ -104,15 +103,15 @@ class OrderHistoryView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CommonLineText(title: 'ID: ', value: orderModel!.id!),
-                        const CommonLineText(
-                            title: 'Bàn: ', value: 'orderModel.table!'),
+                        CommonLineText(
+                            title: 'Bàn: ', value: orderModel.tableName),
                         CommonLineText(
                             title: 'Thời gian đặt: ',
                             value:
                                 Ultils.formatDateTime(orderModel.orderTime!)),
                         CommonLineText(
                             title: 'Thời thanh toán: ',
-                            value: Ultils.formatDateTime(orderModel.orderTime!))
+                            value: Ultils.formatDateTime(orderModel.payTime!))
                       ]),
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.end,

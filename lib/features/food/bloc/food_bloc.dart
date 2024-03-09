@@ -26,7 +26,8 @@ class FoodBloc extends Bloc<FoodEvent, GenericBlocState<Food>>
           FoodRepository(firebaseFirestore: FirebaseFirestore.instance));
 
   FutureOr<void> _fetchFoods(FoodsFetched event, Emit emit) async {
-    await getItems(_foodRepository.getFoods(), emit);
+    await getItems(
+        _foodRepository.getFoods(isShowFood: event.isShowFood), emit);
   }
 
   FutureOr<void> _createFood(FoodCreated event, Emit emit) async {

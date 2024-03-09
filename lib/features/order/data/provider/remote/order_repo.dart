@@ -14,9 +14,9 @@ class OrderRepo extends FirebaseBase<Orders> {
         (json) => Orders.fromJson(json));
   }
 
-  Stream<FirebaseResult<List<Orders>>> getOrdersWanting() {
+  Stream<FirebaseResult<List<Orders>>> getNewOrder() {
     return getItemsOnStream(
-        _orderRepository.getAllOrderWanting(), (json) => Orders.fromJson(json));
+        _orderRepository.getNewOrder(), (json) => Orders.fromJson(json));
   }
 
   Future<FirebaseResult<Orders>> getOrderByID({required String orderID}) async {
@@ -47,5 +47,9 @@ class OrderRepo extends FirebaseBase<Orders> {
   Future<FirebaseResult<List<Orders>>> getAllOrder() async {
     return await getItems(
         await _orderRepository.getAllOrder(), Orders.fromJson);
+  }
+
+  Future<FirebaseResult<bool>> paymentOrder({required String orderID}) async {
+    return await updateItem(_orderRepository.paymentOrder(orderID: orderID));
   }
 }

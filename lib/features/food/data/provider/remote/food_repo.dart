@@ -9,9 +9,12 @@ class FoodRepo extends FirebaseBase<Food> {
   FoodRepo({required FoodRepository foodRepository})
       : _foodRepository = foodRepository;
 
-  Future<FirebaseResult<List<Food>>> getFoods() async {
+  Future<FirebaseResult<List<Food>>> getFoods(
+      {required bool isShowFood}) async {
     try {
-      return await getItems(await _foodRepository.getFoods(), Food.fromJson);
+      return await getItems(
+          await _foodRepository.getFoods(isShowFood: isShowFood),
+          Food.fromJson);
     } catch (e) {
       throw '$e';
     }
@@ -36,6 +39,6 @@ class FoodRepo extends FirebaseBase<Food> {
 
   Future<FirebaseResult<bool>> updateFood({required Food food}) async {
     return await updateItem(
-        _foodRepository.updateFood(foodID: food.id ?? '', data: food.toJson()));
+        _foodRepository.updateFood(foodID: food.id, data: food.toJson()));
   }
 }

@@ -15,6 +15,7 @@ class Food with _$Food {
       {@Default('') String id,
       @Default('') String image,
       @Default(false) bool isDiscount,
+      @Default(false) bool isShowFood,
       @Default('') String description,
       @Default('') String categoryID,
       @Default(0) int discount,

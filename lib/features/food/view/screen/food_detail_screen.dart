@@ -60,8 +60,9 @@ class _FoodDetailViewState extends State<FoodDetailView> {
                     _ImageFood(food: food),
                     _buildTitle(context, food),
                     _buildPrice(context, food),
+                    _buildStatus(context, food),
                     _buildDescription(context, food),
-                    food.photoGallery != null && food.photoGallery!.isNotEmpty
+                    food.photoGallery.isNotEmpty
                         ? _Gallery(food: food)
                         : const SizedBox()
                   ]
@@ -114,7 +115,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
   }
 
   void _handleDeleteFood(Food food) {
-    context.read<FoodBloc>().add(DeleteFood(foodID: food.id!));
+    context.read<FoodBloc>().add(DeleteFood(foodID: food.id));
     showDialog(
         context: context,
         builder: (context) => BlocBuilder<FoodBloc, GenericBlocState<Food>>(
@@ -126,7 +127,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
                       title: state.error ?? "Lỗi",
                       onRetryPressed: () => context
                           .read<FoodBloc>()
-                          .add(DeleteFood(foodID: food.id!))),
+                          .add(DeleteFood(foodID: food.id))),
                   Status.success => ProgressDialog(
                       descriptrion: 'Xóa thành công',
                       onPressed: () {
@@ -168,7 +169,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
           Text('Description',
               style: context.titleStyleMedium!
                   .copyWith(fontWeight: FontWeight.bold)),
-          ReadMoreText(food.description ?? "",
+          ReadMoreText(food.description,
               trimLines: 8,
               trimMode: TrimMode.Line,
               trimCollapsedText: 'Xem thêm...',
@@ -185,7 +186,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
     return Padding(
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
-        child: Text(food.name!,
+        child: Text(food.name,
             style:
                 context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold)));
   }
@@ -199,6 +200,21 @@ class _FoodDetailViewState extends State<FoodDetailView> {
           Text(Ultils.currencyFormat(double.parse(food.price.toString())),
               style: context.textStyleLarge!.copyWith(
                   color: context.colorScheme.secondary,
+                  fontWeight: FontWeight.bold))
+        ]));
+  }
+
+  Widget _buildStatus(BuildContext context, Food food) {
+    return Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: defaultPadding, vertical: defaultPadding / 2),
+        child: Row(children: [
+          Text('Trạng thái: ', style: context.textStyleLarge),
+          Text(Ultils.foodStatus(food.isShowFood),
+              style: context.textStyleLarge!.copyWith(
+                  color: food.isShowFood
+                      ? context.colorScheme.secondary
+                      : context.colorScheme.error,
                   fontWeight: FontWeight.bold))
         ]));
   }
@@ -221,9 +237,7 @@ class _ImageFood extends StatelessWidget {
                     //     BorderRadius.vertical(bottom: Radius.circular(22 )),
                     image: DecorationImage(
                         image: NetworkImage(
-                            food.image == null || food.image == ""
-                                ? noImage
-                                : food.image ?? ""),
+                            food.image == "" ? noImage : food.image),
                         fit: BoxFit.cover)),
                 alignment: Alignment.topCenter)));
   }
@@ -248,28 +262,28 @@ class _Gallery extends StatelessWidget {
             Expanded(
                 child: _buildImage(
                     context,
-                    (food.photoGallery != null && food.photoGallery!.length > 1)
-                        ? (food.photoGallery![0].isEmpty
+                    (food.photoGallery.length > 1)
+                        ? (food.photoGallery[0].isEmpty
                             ? noImage
-                            : food.photoGallery![0])
+                            : food.photoGallery[0])
                         : noImage)),
             SizedBox(width: defaultPadding / 2),
             Expanded(
                 child: _buildImage(
                     context,
-                    (food.photoGallery != null && food.photoGallery!.length > 1)
-                        ? (food.photoGallery![1].isEmpty
+                    (food.photoGallery.length > 1)
+                        ? (food.photoGallery[1].isEmpty
                             ? noImage
-                            : food.photoGallery![1])
+                            : food.photoGallery[1])
                         : noImage)),
             SizedBox(width: defaultPadding / 2),
             Expanded(
                 child: _buildImage(
                     context,
-                    (food.photoGallery != null && food.photoGallery!.length > 2)
-                        ? (food.photoGallery![2].isEmpty
+                    (food.photoGallery.length > 2)
+                        ? (food.photoGallery[2].isEmpty
                             ? noImage
-                            : food.photoGallery![2])
+                            : food.photoGallery[2])
                         : noImage))
           ]))
     ]);

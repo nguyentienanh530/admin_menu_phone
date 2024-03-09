@@ -119,7 +119,8 @@ class AfterSearchUI extends StatelessWidget {
     var loadingOrInitState = Center(
         child: SpinKitCircle(color: context.colorScheme.primary, size: 30));
     return BlocProvider(
-        create: (context) => FoodBloc()..add(FoodsFetched()),
+        create: (context) =>
+            FoodBloc()..add(const FoodsFetched(isShowFood: true)),
         child: BlocBuilder<FoodBloc, GenericBlocState<Food>>(
             builder: (context, state) {
           return (switch (state.status) {
@@ -152,6 +153,11 @@ class AfterSearchUI extends StatelessWidget {
               foodID: food.id,
               quantity: 1,
               note: '',
+              discount: 0,
+              foodImage: food.image,
+              foodName: food.name,
+              foodPrice: food.price,
+              isDiscount: food.isDiscount,
               totalPrice: Ultils.foodPrice(
                   isDiscount: food.isDiscount,
                   foodPrice: food.price,

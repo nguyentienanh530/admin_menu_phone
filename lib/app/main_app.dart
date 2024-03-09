@@ -1,5 +1,4 @@
 import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
-import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
@@ -27,7 +26,7 @@ class MainApp extends StatelessWidget {
               create: (_) => AuthBloc(
                   authenticationRepository: _authenticationRepository)),
           BlocProvider(create: (_) => OrderBloc()),
-          BlocProvider(create: (_) => FoodBloc()),
+          // BlocProvider(create: (_) => FoodBloc()),
           BlocProvider(create: (_) => TableBloc()),
           BlocProvider(create: (_) => UserBloc()),
           BlocProvider(create: (_) => TextSearchCubit())

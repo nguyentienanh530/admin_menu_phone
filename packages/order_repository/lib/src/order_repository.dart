@@ -55,7 +55,7 @@ class OrderRepository {
     try {
       return _firebaseFirestore
           .collection("orders")
-          .where("isPay", isEqualTo: true)
+          .where("status", isEqualTo: 'success')
           .get();
     } on FirebaseException catch (e) {
       throw '$e';
@@ -77,11 +77,11 @@ class OrderRepository {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllOrderWanting() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getNewOrder() {
     try {
       return _firebaseFirestore
           .collection("orders")
-          .where('isPay', isEqualTo: false)
+          .where('status', isEqualTo: 'new')
           .snapshots();
     } on FirebaseException catch (e) {
       throw '$e';
@@ -125,12 +125,12 @@ class OrderRepository {
     }
   }
 
-  Future<void> paymentOrder({required String idOrder}) async {
+  Future<void> paymentOrder({required String orderID}) async {
     try {
       await _firebaseFirestore
           .collection('orders')
-          .doc(idOrder)
-          .update({'isPay': true, "datePay": DateTime.now().toString()});
+          .doc(orderID)
+          .update({'status': 'success', "payTime": DateTime.now().toString()});
     } on FirebaseException catch (e) {
       throw '$e';
     } catch (e) {

@@ -36,14 +36,25 @@ class Ultils {
     return outputFormat.format(dateTime);
   }
 
-  static String tableStatus(String tableStatus) {
-    switch (tableStatus) {
-      case 'available':
+  static String tableStatus(bool isUse) {
+    switch (isUse) {
+      case false:
         return 'Trống';
-      case 'occupied':
+      case true:
         return 'Sử dụng';
       default:
         return 'Trống';
+    }
+  }
+
+  static String foodStatus(bool isShow) {
+    switch (isShow) {
+      case false:
+        return 'Món ăn đang ẩn';
+      case true:
+        return 'Món ăn đang hiển thị';
+      default:
+        return 'Món ăn đang ẩn';
     }
   }
 
@@ -66,8 +77,9 @@ Future pop(BuildContext context, int returnedLevel) async {
 
 Future<String> uploadImage({required String path, required File file}) async {
   var image = '';
-  Reference storageReference =
-      FirebaseStorage.instance.ref().child('$path${file.path.split('/').last}');
+  Reference storageReference = FirebaseStorage.instance
+      .ref()
+      .child('$path/${file.path.split('/').last}');
   UploadTask uploadTask = storageReference.putFile(file);
   await uploadTask.whenComplete(() async {
     var url = await storageReference.getDownloadURL();

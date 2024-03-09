@@ -21,7 +21,12 @@ FoodDto _$FoodDtoFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$FoodDto {
   String get foodID => throw _privateConstructorUsedError;
+  String get foodName => throw _privateConstructorUsedError;
+  String get foodImage => throw _privateConstructorUsedError;
   int get quantity => throw _privateConstructorUsedError;
+  bool get isDiscount => throw _privateConstructorUsedError;
+  num get discount => throw _privateConstructorUsedError;
+  num get foodPrice => throw _privateConstructorUsedError;
   String get note => throw _privateConstructorUsedError;
   num get totalPrice => throw _privateConstructorUsedError;
 
@@ -35,7 +40,16 @@ abstract class $FoodDtoCopyWith<$Res> {
   factory $FoodDtoCopyWith(FoodDto value, $Res Function(FoodDto) then) =
       _$FoodDtoCopyWithImpl<$Res, FoodDto>;
   @useResult
-  $Res call({String foodID, int quantity, String note, num totalPrice});
+  $Res call(
+      {String foodID,
+      String foodName,
+      String foodImage,
+      int quantity,
+      bool isDiscount,
+      num discount,
+      num foodPrice,
+      String note,
+      num totalPrice});
 }
 
 /// @nodoc
@@ -52,7 +66,12 @@ class _$FoodDtoCopyWithImpl<$Res, $Val extends FoodDto>
   @override
   $Res call({
     Object? foodID = null,
+    Object? foodName = null,
+    Object? foodImage = null,
     Object? quantity = null,
+    Object? isDiscount = null,
+    Object? discount = null,
+    Object? foodPrice = null,
     Object? note = null,
     Object? totalPrice = null,
   }) {
@@ -61,10 +80,30 @@ class _$FoodDtoCopyWithImpl<$Res, $Val extends FoodDto>
           ? _value.foodID
           : foodID // ignore: cast_nullable_to_non_nullable
               as String,
+      foodName: null == foodName
+          ? _value.foodName
+          : foodName // ignore: cast_nullable_to_non_nullable
+              as String,
+      foodImage: null == foodImage
+          ? _value.foodImage
+          : foodImage // ignore: cast_nullable_to_non_nullable
+              as String,
       quantity: null == quantity
           ? _value.quantity
           : quantity // ignore: cast_nullable_to_non_nullable
               as int,
+      isDiscount: null == isDiscount
+          ? _value.isDiscount
+          : isDiscount // ignore: cast_nullable_to_non_nullable
+              as bool,
+      discount: null == discount
+          ? _value.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as num,
+      foodPrice: null == foodPrice
+          ? _value.foodPrice
+          : foodPrice // ignore: cast_nullable_to_non_nullable
+              as num,
       note: null == note
           ? _value.note
           : note // ignore: cast_nullable_to_non_nullable
@@ -84,7 +123,16 @@ abstract class _$$FoodDtoImplCopyWith<$Res> implements $FoodDtoCopyWith<$Res> {
       __$$FoodDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String foodID, int quantity, String note, num totalPrice});
+  $Res call(
+      {String foodID,
+      String foodName,
+      String foodImage,
+      int quantity,
+      bool isDiscount,
+      num discount,
+      num foodPrice,
+      String note,
+      num totalPrice});
 }
 
 /// @nodoc
@@ -99,7 +147,12 @@ class __$$FoodDtoImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? foodID = null,
+    Object? foodName = null,
+    Object? foodImage = null,
     Object? quantity = null,
+    Object? isDiscount = null,
+    Object? discount = null,
+    Object? foodPrice = null,
     Object? note = null,
     Object? totalPrice = null,
   }) {
@@ -108,10 +161,30 @@ class __$$FoodDtoImplCopyWithImpl<$Res>
           ? _value.foodID
           : foodID // ignore: cast_nullable_to_non_nullable
               as String,
+      foodName: null == foodName
+          ? _value.foodName
+          : foodName // ignore: cast_nullable_to_non_nullable
+              as String,
+      foodImage: null == foodImage
+          ? _value.foodImage
+          : foodImage // ignore: cast_nullable_to_non_nullable
+              as String,
       quantity: null == quantity
           ? _value.quantity
           : quantity // ignore: cast_nullable_to_non_nullable
               as int,
+      isDiscount: null == isDiscount
+          ? _value.isDiscount
+          : isDiscount // ignore: cast_nullable_to_non_nullable
+              as bool,
+      discount: null == discount
+          ? _value.discount
+          : discount // ignore: cast_nullable_to_non_nullable
+              as num,
+      foodPrice: null == foodPrice
+          ? _value.foodPrice
+          : foodPrice // ignore: cast_nullable_to_non_nullable
+              as num,
       note: null == note
           ? _value.note
           : note // ignore: cast_nullable_to_non_nullable
@@ -129,7 +202,12 @@ class __$$FoodDtoImplCopyWithImpl<$Res>
 class _$FoodDtoImpl implements _FoodDto {
   _$FoodDtoImpl(
       {this.foodID = '',
+      this.foodName = '',
+      this.foodImage = '',
       this.quantity = 1,
+      this.isDiscount = false,
+      this.discount = 0,
+      this.foodPrice = 0,
       this.note = '',
       this.totalPrice = 0});
 
@@ -141,7 +219,22 @@ class _$FoodDtoImpl implements _FoodDto {
   final String foodID;
   @override
   @JsonKey()
+  final String foodName;
+  @override
+  @JsonKey()
+  final String foodImage;
+  @override
+  @JsonKey()
   final int quantity;
+  @override
+  @JsonKey()
+  final bool isDiscount;
+  @override
+  @JsonKey()
+  final num discount;
+  @override
+  @JsonKey()
+  final num foodPrice;
   @override
   @JsonKey()
   final String note;
@@ -151,7 +244,7 @@ class _$FoodDtoImpl implements _FoodDto {
 
   @override
   String toString() {
-    return 'FoodDto(foodID: $foodID, quantity: $quantity, note: $note, totalPrice: $totalPrice)';
+    return 'FoodDto(foodID: $foodID, foodName: $foodName, foodImage: $foodImage, quantity: $quantity, isDiscount: $isDiscount, discount: $discount, foodPrice: $foodPrice, note: $note, totalPrice: $totalPrice)';
   }
 
   @override
@@ -160,8 +253,18 @@ class _$FoodDtoImpl implements _FoodDto {
         (other.runtimeType == runtimeType &&
             other is _$FoodDtoImpl &&
             (identical(other.foodID, foodID) || other.foodID == foodID) &&
+            (identical(other.foodName, foodName) ||
+                other.foodName == foodName) &&
+            (identical(other.foodImage, foodImage) ||
+                other.foodImage == foodImage) &&
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
+            (identical(other.isDiscount, isDiscount) ||
+                other.isDiscount == isDiscount) &&
+            (identical(other.discount, discount) ||
+                other.discount == discount) &&
+            (identical(other.foodPrice, foodPrice) ||
+                other.foodPrice == foodPrice) &&
             (identical(other.note, note) || other.note == note) &&
             (identical(other.totalPrice, totalPrice) ||
                 other.totalPrice == totalPrice));
@@ -169,8 +272,8 @@ class _$FoodDtoImpl implements _FoodDto {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, foodID, quantity, note, totalPrice);
+  int get hashCode => Object.hash(runtimeType, foodID, foodName, foodImage,
+      quantity, isDiscount, discount, foodPrice, note, totalPrice);
 
   @JsonKey(ignore: true)
   @override
@@ -189,7 +292,12 @@ class _$FoodDtoImpl implements _FoodDto {
 abstract class _FoodDto implements FoodDto {
   factory _FoodDto(
       {final String foodID,
+      final String foodName,
+      final String foodImage,
       final int quantity,
+      final bool isDiscount,
+      final num discount,
+      final num foodPrice,
       final String note,
       final num totalPrice}) = _$FoodDtoImpl;
 
@@ -198,7 +306,17 @@ abstract class _FoodDto implements FoodDto {
   @override
   String get foodID;
   @override
+  String get foodName;
+  @override
+  String get foodImage;
+  @override
   int get quantity;
+  @override
+  bool get isDiscount;
+  @override
+  num get discount;
+  @override
+  num get foodPrice;
   @override
   String get note;
   @override

@@ -16,13 +16,14 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
     with BlocHelper<Orders> {
   OrderBloc() : super(GenericBlocState.loading()) {
     on<OrdersOnTableFecthed>(_getOrderOnTable);
-    on<OrdersWantingFecthed>(_getOdersWanting);
+    on<NewOrdersFecthed>(_getNewOrders);
     on<OrdersFecthed>(_getOrders);
     on<OrdersHistoryFecthed>(_getIOrderHistory);
     on<GetOrdersByID>(_getOrderByID);
     on<OrderUpdated>(_updateOrder);
     on<OrderDeleted>(_deleteOrder);
     on<AllOrderFetched>(_getAllOrder);
+    on<OrderPaymented>(_payOrder);
   }
   final _orderRepository = OrderRepo(
       orderRepository:
@@ -33,8 +34,8 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
         _orderRepository.getOrderOnTable(tableID: event.tableID), emit);
   }
 
-  FutureOr<void> _getOdersWanting(OrdersWantingFecthed event, Emit emit) {
-    // return getItemsOnStream(_orderRepository.getOrdersWanting(), emit);
+  FutureOr<void> _getNewOrders(NewOrdersFecthed event, Emit emit) async {
+    await getItemsOnStream(_orderRepository.getNewOrder(), emit);
   }
 
   FutureOr<void> _getOrders(OrdersFecthed event, Emit emit) async {
@@ -65,5 +66,10 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
   FutureOr<void> _getAllOrder(
       AllOrderFetched event, Emitter<GenericBlocState<Orders>> emit) async {
     await getItems(_orderRepository.getAllOrder(), emit);
+  }
+
+  FutureOr<void> _payOrder(OrderPaymented event, Emit emit) async {
+    await updateItem(
+        _orderRepository.paymentOrder(orderID: event.orderID), emit);
   }
 }

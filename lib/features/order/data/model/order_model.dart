@@ -1,5 +1,6 @@
+import 'package:admin_menu_mobile/features/order/data/model/food_dto.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'food_dto.dart';
+
 part 'order_model.freezed.dart';
 part 'order_model.g.dart';
 

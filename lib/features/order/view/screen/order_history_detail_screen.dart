@@ -29,21 +29,21 @@ class OrderHistoryDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildBody(context, orders);
+    return _buildBody(context);
   }
 
-  Widget _buildBody(BuildContext context, Orders orderModel) {
+  Widget _buildBody(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView(children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text("Thời gian đặt:", style: context.textStyleSmall),
-            Text(Ultils.formatDateTime(orderModel.orderTime!),
+            Text(Ultils.formatDateTime(orders.orderTime!),
                 style: context.textStyleSmall)
           ]),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text("Thời gian thanh toán:", style: context.textStyleSmall),
-            Text(Ultils.formatDateTime(orderModel.orderTime!),
+            Text(Ultils.formatDateTime(orders.orderTime!),
                 style: context.textStyleSmall)
           ]),
           SizedBox(height: defaultPadding),
@@ -82,15 +82,14 @@ class OrderHistoryDetailView extends StatelessWidget {
                 1: FlexColumnWidth(context.sizeDevice.width * 0.0015),
                 2: const FlexColumnWidth()
               },
-              children: orderModel.foods
-                  .map((e) => _buildTable(context, FoodDto()))
-                  .toList()),
+              children:
+                  orders.foods.map((e) => _buildTable(context, e)).toList()),
           const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text("Tổng tiền:", style: context.textStyleSmall),
             Text(
                 Ultils.currencyFormat(
-                    double.parse(orderModel.totalPrice.toString())),
+                    double.parse(orders.totalPrice.toString())),
                 style: context.textStyleSmall)
           ])
         ]));
@@ -101,7 +100,7 @@ class OrderHistoryDetailView extends StatelessWidget {
       Container(
           padding: const EdgeInsets.all(5),
           height: 40,
-          child: Text('food.name!', style: context.textStyleSmall)),
+          child: Text(food.foodName, style: context.textStyleSmall)),
       Container(
           padding: const EdgeInsets.all(5),
           alignment: Alignment.center,
@@ -111,8 +110,8 @@ class OrderHistoryDetailView extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           alignment: Alignment.center,
           height: 40,
-          // food.totalPrice.toString()
-          child: Text(Ultils.currencyFormat(double.parse("0")),
+          child: Text(
+              Ultils.currencyFormat(double.parse(food.totalPrice.toString())),
               style: context.textStyleSmall))
     ]);
   }

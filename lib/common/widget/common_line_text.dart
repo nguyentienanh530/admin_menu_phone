@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../core/utils/utils.dart';
-
 // import 'widgets.dart';
 
 class CommonLineText extends StatelessWidget {
   final String? title, value;
-  final Color? color;
+  // final Color? color;
   final TextStyle? titleStyle;
   final TextStyle? valueStyle;
 
@@ -15,7 +13,7 @@ class CommonLineText extends StatelessWidget {
       {super.key,
       this.title,
       this.value,
-      this.color,
+      // this.color,
       this.titleStyle,
       this.isDarkText = false,
       this.valueStyle});
@@ -28,13 +26,9 @@ class CommonLineText extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             text: TextSpan(
                 text: title ?? "",
-                style: titleStyle ?? context.textStyleSmall!,
+                style: titleStyle,
                 children: <TextSpan>[
-                  TextSpan(
-                      text: value ?? '',
-                      style: valueStyle ??
-                          context.textStyleSmall!
-                              .copyWith(color: color ?? kTextColor))
+                  TextSpan(text: value ?? '', style: valueStyle)
                 ])));
   }
 }

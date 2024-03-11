@@ -1,8 +1,9 @@
+import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
 import 'package:admin_menu_mobile/config/config.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
@@ -56,16 +57,14 @@ class _TableScreenState extends State<TableScreen>
               .push<bool>(RouteName.createTable, extra: {'mode': Mode.create});
           if (result != null && result) {
             getData();
-          } else {}
+          }
         },
         child: const Icon(Icons.add));
   }
 
   _buildAppbar(BuildContext context) => AppBar(
       centerTitle: true,
-      title: Text("Bàn ăn",
-          style:
-              context.textStyleMedium!.copyWith(fontWeight: FontWeight.bold)));
+      title: Text("Bàn ăn", style: context.titleStyleMedium));
 
   @override
   bool get wantKeepAlive => true;
@@ -76,77 +75,69 @@ class TableView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
+    return CommonRefreshIndicator(
         onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (!context.mounted) return;
           context.read<TableBloc>().add(TablesFetched());
         },
         child: BlocBuilder<TableBloc, GenericBlocState<TableModel>>(
             buildWhen: (previous, current) =>
                 context.read<TableBloc>().operation == ApiOperation.select,
             builder: (context, state) {
-              return (switch (state.status) {
-                Status.loading => const LoadingScreen(),
-                Status.failure => ErrorScreen(errorMsg: state.error),
-                Status.empty => const EmptyScreen(),
-                Status.success =>
-                  _buildBody(context, state.datas as List<TableModel>)
-              });
+              switch (state.status) {
+                case Status.loading:
+                  return const LoadingScreen();
+                case Status.failure:
+                  return ErrorScreen(errorMsg: state.error);
+                case Status.empty:
+                  return const EmptyScreen();
+                case Status.success:
+                  var newTables = [...state.datas ?? <TableModel>[]];
+                  newTables.sort((a, b) => a.name.compareTo(b.name));
+                  return _buildBody(context, newTables);
+              }
             }));
   }
 
   Widget _buildBody(BuildContext context, List<TableModel> tables) {
-    return Column(children: [
-      Expanded(
-          child: SingleChildScrollView(
-              child: Column(
-                  children: [
-        Column(
-            children: tables
-                .map((table) => Slidable(
-                    endActionPane: ActionPane(
-                        extentRatio: 0.6,
-                        motion: const ScrollMotion(),
-                        children: [
-                          _buildActionSlidable(context,
-                              color: context.colorScheme.primaryContainer,
-                              icon: Icons.update, onTap: () {
-                            context.push(RouteName.createTable, extra: {
-                              'mode': Mode.update,
-                              'table': table
-                            }).then((result) {
-                              if (result is bool && result) {
-                                context.read<TableBloc>().add(TablesFetched());
-                              }
-                            });
-                          }, title: 'Cập nhật'),
-                          _buildActionSlidable(context,
-                              color: context.colorScheme.errorContainer,
-                              icon: Icons.delete,
-                              onTap: () => _dialogDeleted(context, table),
-                              title: 'Xóa'),
-                        ]),
-                    child: _buildItem(context, table)))
-                .toList())
-      ]
-                      .animate(interval: 50.ms)
-                      .slideX(
-                          begin: -0.1,
-                          end: 0,
-                          curve: Curves.easeInOutCubic,
-                          duration: 500.ms)
-                      .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))))
-    ]);
+    return ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: tables.length,
+        itemBuilder: (context, index) => Slidable(
+            endActionPane: ActionPane(
+                extentRatio: 0.65,
+                motion: const ScrollMotion(),
+                children: [
+                  _buildActionSlidable(context,
+                      color: context.colorScheme.primaryContainer,
+                      icon: Icons.update, onTap: () {
+                    context.push(RouteName.createTable, extra: {
+                      'mode': Mode.update,
+                      'table': tables[index]
+                    }).then((result) {
+                      if (result is bool && result) {
+                        context.read<TableBloc>().add(TablesFetched());
+                      }
+                    });
+                  }, title: 'Cập nhật'),
+                  _buildActionSlidable(context,
+                      color: context.colorScheme.errorContainer,
+                      icon: Icons.delete,
+                      onTap: () => _dialogDeleted(context, tables[index]),
+                      title: 'Xóa')
+                ]),
+            child: _buildItem(context, tables[index])));
   }
 
   void _dialogDeleted(BuildContext context, TableModel table) {
-    showModalBottomSheet(
+    showCupertinoModalPopup(
         context: context,
         builder: (context) => CommonBottomSheet(
               title: 'Chắc chắn muốn xóa bàn: ${table.name}?',
               textCancel: 'Hủy',
               textConfirm: 'Xóa',
               textConfirmColor: context.colorScheme.errorContainer,
-              onCancel: () => context.pop(),
               onConfirm: () => onDeleteTable(context, table),
             ));
   }
@@ -155,16 +146,15 @@ class TableView extends StatelessWidget {
       {Function()? onTap, String? title, IconData? icon, Color? color}) {
     return GestureDetector(
         onTap: onTap,
-        child: Container(
-            width: context.sizeDevice.width * 0.3,
-            height: context.sizeDevice.width * 0.2,
-            decoration: BoxDecoration(color: color),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon!, size: 18),
-                  Text(title!, style: context.textStyleSmall)
-                ])));
+        child: Card(
+          child: Container(
+              width: context.sizeDevice.width * 0.3,
+              height: context.sizeDevice.width * 0.3,
+              decoration: BoxDecoration(color: color),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Icon(icon!, size: 18), Text(title!)])),
+        ));
   }
 
   void onDeleteTable(BuildContext context, TableModel table) {
@@ -203,8 +193,8 @@ class TableView extends StatelessWidget {
   Widget _buildItem(BuildContext context, TableModel table) {
     return Card(
         color: table.isUse ? context.colorScheme.primaryContainer : null,
-        shape: const OutlineInputBorder(borderRadius: BorderRadius.zero),
-        margin: const EdgeInsets.all(0),
+        // shape: const OutlineInputBorder(borderRadius: BorderRadius.zero),
+        // margin: const EdgeInsets.all(0),
         child: Container(
             width: context.sizeDevice.width,
             padding: const EdgeInsets.all(15),
@@ -212,17 +202,23 @@ class TableView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  CommonLineText(title: 'Tên bàn: ', value: table.name),
+                  CommonLineText(
+                      title: 'Tên bàn: ',
+                      value: table.name,
+                      valueStyle: TextStyle(
+                          color: context.colorScheme.secondary,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
                   CommonLineText(
                       title: 'Số ghế: ', value: table.seats.toString()),
+                  const SizedBox(height: 8),
                   CommonLineText(
                       title: 'Trạng thái: ',
                       value: Ultils.tableStatus(table.isUse),
-                      valueStyle: table.isUse
-                          ? context.textStyleSmall!
-                              .copyWith(color: Colors.greenAccent)
-                          : context.textStyleSmall!
-                              .copyWith(color: Colors.redAccent))
+                      valueStyle: TextStyle(
+                          color: table.isUse
+                              ? Colors.greenAccent
+                              : Colors.redAccent))
                 ])));
   }
 }

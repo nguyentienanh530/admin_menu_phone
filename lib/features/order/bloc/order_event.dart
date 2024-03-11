@@ -23,6 +23,8 @@ final class OrdersFecthed extends OrderEvent {
 
 final class OrdersHistoryFecthed extends OrderEvent {}
 
+final class OrdersOnDayFecthed extends OrderEvent {}
+
 final class GetOrdersByID extends OrderEvent {
   final String orderID;
 
@@ -41,7 +43,7 @@ final class OrderDeleted extends OrderEvent {
   const OrderDeleted({required this.orderID});
 }
 
-final class AllOrderFetched extends OrderEvent {}
+// final class AllOrderFetched extends OrderEvent {}
 
 final class OrderPaymented extends OrderEvent {
   final String orderID;

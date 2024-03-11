@@ -8,7 +8,6 @@ import 'package:admin_menu_mobile/features/order/view/screen/order_detail_screen
 import 'package:admin_menu_mobile/features/order/view/screen/order_history_detail_screen.dart';
 import 'package:admin_menu_mobile/features/order/view/screen/order_screen.dart';
 import 'package:admin_menu_mobile/features/user/view/screen/change_password.dart';
-import 'package:admin_menu_mobile/features/print/view/screen/print_setting.dart';
 import 'package:admin_menu_mobile/features/user/view/screen/update_user.dart';
 import 'package:admin_menu_mobile/features/food/view/screen/food_screen.dart';
 import 'package:admin_menu_mobile/features/register/view/screen/signup_screen.dart';
@@ -16,12 +15,12 @@ import 'package:admin_menu_mobile/features/table/view/screen/create_or_update_ta
 import 'package:admin_menu_mobile/features/food/view/screen/create_or_update_food_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import '../features/auth/bloc/auth_bloc.dart';
 import '../features/food/data/model/food_model.dart';
 import '../features/home/view/screen/home_screen.dart';
 import '../features/login/view/screen/login_screen.dart';
 import '../core/utils/utils.dart';
+import '../features/print/view/screen/print_screen.dart';
 
 class RouteName {
   static const String home = '/';
@@ -84,7 +83,7 @@ final router = GoRouter(
           builder: (context, state) => ChangePassword()),
       GoRoute(
           path: RouteName.printSeting,
-          builder: (context, state) => const PrintSetting()),
+          builder: (context, state) => const PrintScreen()),
       GoRoute(
           path: RouteName.foodDetail,
           builder: (context, state) {

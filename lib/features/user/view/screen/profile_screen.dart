@@ -1,9 +1,11 @@
 import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
 import 'package:admin_menu_mobile/features/user/data/model/user_model.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:admin_menu_mobile/common/widget/common_bottomsheet.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,15 +17,29 @@ import '../../../auth/bloc/auth_bloc.dart';
 import '../../../../common/widget/empty_screen.dart';
 import '../../../../common/widget/error_screen.dart';
 import '../../../../common/widget/loading_screen.dart';
+import '../../../print/cubit/is_use_print_cubit.dart';
+import '../../../print/data/print_data_source/print_data_source.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => UserBloc(),
+      child: const ProfileView(),
+    );
+  }
 }
 
-class _ProfileState extends State<ProfileScreen>
+class ProfileView extends StatefulWidget {
+  const ProfileView({super.key});
+
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView>
     with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
@@ -38,73 +54,106 @@ class _ProfileState extends State<ProfileScreen>
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    return const Scaffold(body: ProfileView());
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
-
-  @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  @override
-  Widget build(BuildContext context) {
     return SafeArea(
         child: Padding(
             padding: EdgeInsets.all(defaultPadding),
-            child: BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
-                buildWhen: (previous, current) =>
-                    context.read<UserBloc>().operation == ApiOperation.select,
-                builder: (context, state) {
-                  return (switch (state.status) {
-                    Status.loading => const LoadingScreen(),
-                    Status.failure => ErrorScreen(errorMsg: state.error),
-                    Status.empty => const EmptyScreen(),
-                    Status.success => _buildBody(state.data ?? UserModel())
-                  });
-                })));
+            child: CommonRefreshIndicator(
+              onRefresh: () async {
+                await Future.delayed(const Duration(milliseconds: 500));
+                getUser();
+              },
+              child: BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
+                  buildWhen: (previous, current) =>
+                      context.read<UserBloc>().operation == ApiOperation.select,
+                  builder: (context, state) {
+                    return (switch (state.status) {
+                      Status.loading => const LoadingScreen(),
+                      Status.failure => ErrorScreen(errorMsg: state.error),
+                      Status.empty => const EmptyScreen(),
+                      Status.success => _buildBody(state.data ?? UserModel())
+                    });
+                  }),
+            )));
   }
 
   Widget _buildBody(UserModel user) {
-    return Column(
-        children: [
-      _CardProfife(user: user),
-      Expanded(
-          child: SingleChildScrollView(
-              child: Column(children: [
-        _ItemProfile(
-            svgPath: 'assets/icon/user_config.svg',
-            title: 'Cập nhật thông tin',
-            onTap: () => _handleUserUpdated(user)),
-        _ItemProfile(
-            svgPath: 'assets/icon/lock.svg',
-            title: 'Đổi mật khẩu',
-            onTap: () => context.push(RouteName.changePassword)),
-        _ItemProfile(
-            svgPath: 'assets/icon/print.svg',
-            title: 'Cài đặt máy in',
-            onTap: () => context.push(RouteName.printSeting)),
-        _ItemProfile(
-            svgPath: 'assets/icon/logout.svg',
-            title: 'Đăng xuất',
-            onTap: () => _handleLogout())
-      ])))
-    ]
-            .animate(interval: 50.ms)
-            .slideX(
-                begin: -0.1,
-                end: 0,
-                curve: Curves.easeInOutCubic,
-                duration: 500.ms)
-            .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms));
+    return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+            height: context.sizeDevice.height,
+            child: Column(
+                children: [
+              _CardProfife(user: user),
+              Expanded(
+                  child: SingleChildScrollView(
+                      child: Column(children: [
+                _ItemProfile(
+                    svgPath: 'assets/icon/user_config.svg',
+                    title: 'Cập nhật thông tin',
+                    onTap: () => _handleUserUpdated(user)),
+                _ItemProfile(
+                    svgPath: 'assets/icon/lock.svg',
+                    title: 'Đổi mật khẩu',
+                    onTap: () => context.push(RouteName.changePassword)),
+                _buildItemPrint(context),
+                _ItemProfile(
+                    svgPath: 'assets/icon/logout.svg',
+                    title: 'Đăng xuất',
+                    onTap: () => _handleLogout())
+              ])))
+            ]
+                    .animate(interval: 50.ms)
+                    .slideX(
+                        begin: -0.1,
+                        end: 0,
+                        curve: Curves.easeInOutCubic,
+                        duration: 500.ms)
+                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
+  }
+
+  Widget _buildItemPrint(BuildContext context) {
+    var isUsePrint = context.watch<IsUsePrintCubit>().state;
+
+    return Column(children: [
+      GestureDetector(
+          onTap: () {},
+          child: Card(
+              child: SizedBox(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                Row(children: [
+                  Padding(
+                      padding: EdgeInsets.all(defaultPadding),
+                      child: SvgPicture.asset('assets/icon/print.svg',
+                          colorFilter: ColorFilter.mode(
+                              context.colorScheme.primary, BlendMode.srcIn))),
+                  const Text('Sử dụng máy in')
+                ]),
+                Transform.scale(
+                    scale: 0.8,
+                    child: Switch(
+                        activeTrackColor: context.colorScheme.secondary,
+                        value: isUsePrint,
+                        onChanged: (value) {
+                          context
+                              .read<IsUsePrintCubit>()
+                              .onUsePrintChanged(value);
+                          PrintDataSource.setIsUsePrint(value);
+                        }))
+              ])))),
+      isUsePrint
+          ? _ItemProfile(
+              svgPath: 'assets/icon/file_setting.svg',
+              title: 'Cấu hình máy in',
+              onTap: () => context.push(RouteName.printSeting))
+          : const SizedBox()
+    ]);
   }
 
   _handleUserUpdated(UserModel user) async {
@@ -127,14 +176,13 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   _handleLogout() {
-    showModalBottomSheet<void>(
+    showCupertinoModalPopup<void>(
         context: context,
         builder: (context) => CommonBottomSheet(
             title: 'Chắc chắn muốn đăng xuất?',
             textCancel: 'Hủy',
             textConfirm: 'Đăng xuất',
             textConfirmColor: context.colorScheme.errorContainer,
-            onCancel: () => context.pop(),
             onConfirm: () {
               context.read<AuthBloc>().add(const AuthLogoutRequested());
               context.go(RouteName.login);
@@ -164,7 +212,7 @@ class _ItemProfile extends StatelessWidget {
                     child: SvgPicture.asset(svgPath,
                         colorFilter: ColorFilter.mode(
                             context.colorScheme.primary, BlendMode.srcIn))),
-                Text(title, style: context.textStyleSmall)
+                Text(title)
               ]),
               Padding(
                   padding: EdgeInsets.all(defaultPadding),
@@ -187,7 +235,7 @@ class _CardProfife extends StatelessWidget {
                   ? _buildImageAsset(context)
                   : _buildImageNetwork(context),
               SizedBox(height: defaultPadding),
-              Text(user.name, style: context.textStyleMedium),
+              Text(user.name),
               SizedBox(height: defaultPadding / 4),
               _buildItem(context, Icons.email_rounded, user.email),
               SizedBox(height: defaultPadding / 4),
@@ -225,9 +273,7 @@ class _CardProfife extends StatelessWidget {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       Icon(icon, size: 15),
       const SizedBox(width: 3),
-      Text(title,
-          style: context.textStyleSmall!
-              .copyWith(color: Colors.white.withOpacity(0.5)))
+      Text(title, style: TextStyle(color: Colors.white.withOpacity(0.5)))
     ]);
   }
 }

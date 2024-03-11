@@ -15,6 +15,7 @@ class TableBloc extends Bloc<TableEvent, GenericBlocState<Table>>
     with BlocHelper<Table> {
   TableBloc() : super(GenericBlocState.loading()) {
     on<TablesFetched>(_getAllTable);
+    on<TablesOnStreamFetched>(_getTablesOnStream);
     on<TableDeleted>(_deleteTable);
     on<TableCreated>(_createTable);
     on<TableUpdated>(_updateTable);
@@ -40,5 +41,10 @@ class TableBloc extends Bloc<TableEvent, GenericBlocState<Table>>
   FutureOr<void> _updateTable(
       TableUpdated event, Emitter<GenericBlocState<Table>> emit) async {
     await updateItem(_tableRepository.updateTable(table: event.table), emit);
+  }
+
+  FutureOr<void> _getTablesOnStream(
+      TablesOnStreamFetched event, Emit emit) async {
+    await getItemsOnStream(_tableRepository.getTablesOnStream(), emit);
   }
 }

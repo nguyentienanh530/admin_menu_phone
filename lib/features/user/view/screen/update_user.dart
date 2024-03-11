@@ -108,7 +108,8 @@ class _UpdateUserDialogState extends State<UpdateUser> {
                           child: ElevatedButton(
                               onPressed: () => _handleUpdateUser(),
                               child: Text("Cập nhật",
-                                  style: context.textStyleSmall)))
+                                  style: context.titleStyleMedium!
+                                      .copyWith(fontWeight: FontWeight.bold))))
                     ]
                             .animate(interval: 50.ms)
                             .slideX(
@@ -209,9 +210,7 @@ class _UpdateUserDialogState extends State<UpdateUser> {
   }
 
   _buildAppbar() => AppBar(
-      title: Text('Cập nhật thông tin',
-          style:
-              context.textStyleMedium!.copyWith(fontWeight: FontWeight.bold)),
+      title: Text('Cập nhật thông tin', style: context.titleStyleMedium),
       centerTitle: true);
 }
 

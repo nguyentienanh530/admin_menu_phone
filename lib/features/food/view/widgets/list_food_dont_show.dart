@@ -1,3 +1,4 @@
+import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,13 +46,13 @@ class ListFoodIsShowView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var foodIsShow = context.watch<FoodBloc>().state;
-    return RefreshIndicator.adaptive(
+    return CommonRefreshIndicator(
         child: (switch (foodIsShow.status) {
           Status.loading => const LoadingScreen(),
           Status.empty => const EmptyScreen(),
           Status.failure => ErrorScreen(errorMsg: foodIsShow.error),
           Status.success => ListView.builder(
-              physics: const BouncingScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               itemCount: foodIsShow.datas!.length,
               itemBuilder: (context, i) {
                 if (foodIsShow.datas![i].name
@@ -79,8 +80,10 @@ class ListFoodIsShowView extends StatelessWidget {
                 return const SizedBox();
               })
         }),
-        onRefresh: () async => context
-            .read<FoodBloc>()
-            .add(const FoodsFetched(isShowFood: false)));
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (!context.mounted) return;
+          context.read<FoodBloc>().add(const FoodsFetched(isShowFood: false));
+        });
   }
 }

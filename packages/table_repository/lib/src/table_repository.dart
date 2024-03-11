@@ -18,6 +18,16 @@ class TableRepository {
     }
   }
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> getTablesOnStream() {
+    try {
+      return _firebaseFirestore.collection('table').snapshots();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
   Future<void> deleteTable({required String idTable}) async {
     try {
       await _firebaseFirestore.collection('table').doc(idTable).delete();

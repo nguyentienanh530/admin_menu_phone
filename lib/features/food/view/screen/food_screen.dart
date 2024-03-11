@@ -43,6 +43,9 @@ class _MyWidgetState extends State<FoodScreen>
                 DefaultTabController(
                     length: 2,
                     child: TabBar(
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white.withOpacity(0.3),
+                        indicatorColor: context.colorScheme.secondary,
                         onTap: (value) => _pageController.jumpToPage(value),
                         tabs: const [
                           Tab(text: 'Đang hiển thị'),
@@ -91,9 +94,7 @@ class _MyWidgetState extends State<FoodScreen>
                 .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms)
             : AnimatedContainer(
                 duration: const Duration(milliseconds: 400),
-                child: Text('Danh sách món',
-                    style: context.titleStyleMedium!
-                        .copyWith(fontWeight: FontWeight.bold))),
+                child: Text('Danh sách món', style: context.titleStyleMedium)),
         actions: [
           IconButton(
               onPressed: () {

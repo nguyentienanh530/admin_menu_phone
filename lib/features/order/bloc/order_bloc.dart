@@ -19,10 +19,11 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
     on<NewOrdersFecthed>(_getNewOrders);
     on<OrdersFecthed>(_getOrders);
     on<OrdersHistoryFecthed>(_getIOrderHistory);
+    on<OrdersOnDayFecthed>(_getOrdersOnday);
     on<GetOrdersByID>(_getOrderByID);
     on<OrderUpdated>(_updateOrder);
     on<OrderDeleted>(_deleteOrder);
-    on<AllOrderFetched>(_getAllOrder);
+    // on<AllOrderFetched>(_getAllOrder);
     on<OrderPaymented>(_payOrder);
   }
   final _orderRepository = OrderRepo(
@@ -63,13 +64,17 @@ class OrderBloc extends Bloc<OrderEvent, GenericBlocState<Orders>>
         _orderRepository.deleteOrder(orderID: event.orderID), emit);
   }
 
-  FutureOr<void> _getAllOrder(
-      AllOrderFetched event, Emitter<GenericBlocState<Orders>> emit) async {
-    await getItems(_orderRepository.getAllOrder(), emit);
-  }
+  // FutureOr<void> _getAllOrder(
+  //     AllOrderFetched event, Emitter<GenericBlocState<Orders>> emit) async {
+  //   await getItems(_orderRepository.getAllOrder(), emit);
+  // }
 
   FutureOr<void> _payOrder(OrderPaymented event, Emit emit) async {
     await updateItem(
         _orderRepository.paymentOrder(orderID: event.orderID), emit);
+  }
+
+  FutureOr<void> _getOrdersOnday(OrdersOnDayFecthed event, Emit emit) async {
+    await getItemsOnStream(_orderRepository.getOrdersOnDay(), emit);
   }
 }

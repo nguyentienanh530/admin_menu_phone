@@ -41,8 +41,8 @@ class ChangePassword extends StatelessWidget {
         onPressed: () => handleChangePass(context),
         icon: const Icon(Icons.update_rounded),
         label: Text('Cập nhật',
-            style:
-                context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold)));
+            style: context.titleStyleMedium!
+                .copyWith(fontWeight: FontWeight.bold)));
   }
 
   void handleChangePass(BuildContext context) {
@@ -82,9 +82,7 @@ class ChangePassword extends StatelessWidget {
 
   _buildAppbar(BuildContext context) => AppBar(
       centerTitle: true,
-      title: Text('Đổi mật khẩu',
-          style:
-              context.textStyleMedium!.copyWith(fontWeight: FontWeight.bold)));
+      title: Text('Đổi mật khẩu', style: context.titleStyleMedium));
 }
 
 class _CurrentPassword extends StatelessWidget {

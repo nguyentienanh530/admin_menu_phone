@@ -170,8 +170,7 @@ class _ButtonSignUp extends StatelessWidget {
         child: CommonLineText(
             title: AppString.noAccount,
             value: AppString.signup,
-            valueStyle: context.textStyleSmall!.copyWith(
-                color: context.colorScheme.tertiaryContainer,
-                fontWeight: FontWeight.bold)));
+            valueStyle:
+                TextStyle(color: context.colorScheme.tertiaryContainer)));
   }
 }

@@ -16,9 +16,7 @@ class OrderHistoryDetailScreen extends StatelessWidget {
 
   _buildAppbar(BuildContext context) {
     return AppBar(
-        title: Text('Chi tiết đơn hàng',
-            style: context.titleStyleMedium!
-                .copyWith(fontWeight: FontWeight.bold)),
+        title: Text('Chi tiết đơn hàng', style: context.titleStyleMedium),
         centerTitle: true);
   }
 }
@@ -37,14 +35,12 @@ class OrderHistoryDetailView extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: ListView(children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("Thời gian đặt:", style: context.textStyleSmall),
-            Text(Ultils.formatDateTime(orders.orderTime!),
-                style: context.textStyleSmall)
+            const Text("Thời gian đặt:"),
+            Text(Ultils.formatDateTime(orders.orderTime!))
           ]),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("Thời gian thanh toán:", style: context.textStyleSmall),
-            Text(Ultils.formatDateTime(orders.orderTime!),
-                style: context.textStyleSmall)
+            const Text("Thời gian thanh toán:"),
+            Text(Ultils.formatDateTime(orders.orderTime!))
           ]),
           SizedBox(height: defaultPadding),
           Table(
@@ -61,17 +57,17 @@ class OrderHistoryDetailView extends StatelessWidget {
                       height: 40,
                       alignment: Alignment.center,
                       color: context.colorScheme.primary,
-                      child: Text("Món", style: context.textStyleSmall)),
+                      child: const Text("Món")),
                   Container(
                       alignment: Alignment.center,
                       height: 40,
                       color: context.colorScheme.primary,
-                      child: Text("Số lượng", style: context.textStyleSmall)),
+                      child: const Text("Số lượng")),
                   Container(
                       alignment: Alignment.center,
                       height: 40,
                       color: context.colorScheme.primary,
-                      child: Text("Giá", style: context.textStyleSmall))
+                      child: const Text("Giá"))
                 ])
               ]),
           Table(
@@ -86,11 +82,9 @@ class OrderHistoryDetailView extends StatelessWidget {
                   orders.foods.map((e) => _buildTable(context, e)).toList()),
           const SizedBox(height: 20),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("Tổng tiền:", style: context.textStyleSmall),
-            Text(
-                Ultils.currencyFormat(
-                    double.parse(orders.totalPrice.toString())),
-                style: context.textStyleSmall)
+            const Text("Tổng tiền:"),
+            Text(Ultils.currencyFormat(
+                double.parse(orders.totalPrice.toString())))
           ])
         ]));
   }
@@ -100,19 +94,18 @@ class OrderHistoryDetailView extends StatelessWidget {
       Container(
           padding: const EdgeInsets.all(5),
           height: 40,
-          child: Text(food.foodName, style: context.textStyleSmall)),
+          child: Text(food.foodName)),
       Container(
           padding: const EdgeInsets.all(5),
           alignment: Alignment.center,
           height: 40,
-          child: Text(food.quantity.toString(), style: context.textStyleSmall)),
+          child: Text(food.quantity.toString())),
       Container(
           padding: const EdgeInsets.all(5),
           alignment: Alignment.center,
           height: 40,
           child: Text(
-              Ultils.currencyFormat(double.parse(food.totalPrice.toString())),
-              style: context.textStyleSmall))
+              Ultils.currencyFormat(double.parse(food.totalPrice.toString()))))
     ]);
   }
 }

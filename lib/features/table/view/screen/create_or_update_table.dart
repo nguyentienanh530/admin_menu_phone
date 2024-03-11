@@ -28,8 +28,8 @@ class _CreateTableState extends State<CreateTable> {
   final _seats = ['2', '4', '6', '8', '10', '12', '14', '16', '18', '20'];
   var _seat = '';
   final _formKey = GlobalKey<FormState>();
-
   var _loading = false;
+  final _tableStatus = ValueNotifier(true);
   //  = BlocProvider.of<IsLoadingCubit>(context);
 
   @override
@@ -41,7 +41,7 @@ class _CreateTableState extends State<CreateTable> {
   void initValue() {
     if (widget.tableModel != null && widget.mode == Mode.update) {
       _seat = widget.tableModel!.seats.toString();
-      // _image = widget.tableModel!.image;
+      _tableStatus.value = widget.tableModel?.isUse ?? false;
       _nameController.text = widget.tableModel!.name;
     }
   }
@@ -63,7 +63,7 @@ class _CreateTableState extends State<CreateTable> {
                         _seat = e;
                       });
                     },
-                    child: Text(e, style: context.textStyleSmall))))
+                    child: Text(e))))
             .toList());
   }
 
@@ -73,28 +73,6 @@ class _CreateTableState extends State<CreateTable> {
   }
 
   Widget _buildBody() {
-    var bodyWidget = Expanded(
-        child: SingleChildScrollView(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: defaultPadding / 2),
-                  SizedBox(height: defaultPadding / 2),
-                  _buildTitle('Tên bàn:'),
-                  SizedBox(height: defaultPadding / 2),
-                  _NameTable(nameController: _nameController),
-                  SizedBox(height: defaultPadding / 2),
-                  _buildTitle('Số ghế:'),
-                  SizedBox(height: defaultPadding / 2),
-                  _buildSeats()
-                ]
-                    .animate(interval: 50.ms)
-                    .slideX(
-                        begin: -0.1,
-                        end: 0,
-                        curve: Curves.easeInOutCubic,
-                        duration: 500.ms)
-                    .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms))));
     return SafeArea(
         child: Form(
             key: _formKey,
@@ -103,10 +81,62 @@ class _CreateTableState extends State<CreateTable> {
                 child: SizedBox(
                     height: context.sizeDevice.height,
                     child: Column(children: [
-                      bodyWidget,
+                      Expanded(
+                          child: SingleChildScrollView(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: defaultPadding / 2),
+                                    SizedBox(height: defaultPadding / 2),
+                                    _buildTitle('Tên bàn:'),
+                                    SizedBox(height: defaultPadding / 2),
+                                    _NameTable(nameController: _nameController),
+                                    SizedBox(height: defaultPadding / 2),
+                                    _buildTitle('Số ghế:'),
+                                    SizedBox(height: defaultPadding / 2),
+                                    _buildSeats(),
+                                    SizedBox(height: defaultPadding / 2),
+                                    SizedBox(height: defaultPadding / 2),
+                                    _buildTableStatus()
+                                  ]
+                                      .animate(interval: 50.ms)
+                                      .slideX(
+                                          begin: -0.1,
+                                          end: 0,
+                                          curve: Curves.easeInOutCubic,
+                                          duration: 500.ms)
+                                      .fadeIn(
+                                          curve: Curves.easeInOutCubic,
+                                          duration: 500.ms)))),
                       SizedBox(height: defaultPadding / 2),
                       _buildButtonSubmited(),
                     ])))));
+  }
+
+  Widget _buildTableStatus() {
+    return ValueListenableBuilder(
+        valueListenable: _tableStatus,
+        builder: (context, value, child) => Row(children: [
+              Text('Trạng thái: ', style: context.titleStyleMedium),
+              Row(children: [
+                Radio<bool>(
+                    value: true,
+                    groupValue: _tableStatus.value,
+                    activeColor: context.colorScheme.secondary,
+                    onChanged: (value) {
+                      _tableStatus.value = value ?? false;
+                    }),
+                const Text('Sử dụng'),
+                Radio<bool>(
+                    value: false,
+                    activeColor: context.colorScheme.secondary,
+                    groupValue: _tableStatus.value,
+                    onChanged: (value) {
+                      _tableStatus.value = value ?? false;
+                    }),
+                const Text('trống')
+              ])
+            ]));
   }
 
   Widget _buildButtonSubmited() {
@@ -138,7 +168,7 @@ class _CreateTableState extends State<CreateTable> {
 
         var table = TableModel(
             id: idTable,
-            // image: _image,
+            isUse: _tableStatus.value,
             name: _nameController.text,
             seats: int.parse(_seat));
         updateTable(table);
@@ -225,16 +255,14 @@ class _CreateTableState extends State<CreateTable> {
   }
 
   Widget _buildTitle(String title) {
-    return Text(title,
-        style: context.textStyleMedium!.copyWith(fontWeight: FontWeight.bold));
+    return Text(title, style: context.titleStyleMedium);
   }
 
   _buildAppbar(BuildContext context) {
     return AppBar(
         centerTitle: true,
         title: Text(widget.mode == Mode.create ? 'Tạo bàn ăn' : 'Cập nhật',
-            style:
-                context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold)));
+            style: context.titleStyleMedium));
   }
 }
 

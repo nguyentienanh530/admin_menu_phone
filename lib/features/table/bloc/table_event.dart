@@ -6,6 +6,8 @@ sealed class TableEvent {
 
 final class TablesFetched extends TableEvent {}
 
+final class TablesOnStreamFetched extends TableEvent {}
+
 final class TableDeleted extends TableEvent {
   final String idTable;
 

@@ -29,9 +29,7 @@ class AddFoodToOrderScreen extends StatelessWidget {
 
 _buildAppbar(BuildContext context) {
   return AppBar(
-      title: Text(AppString.searchFood,
-          style:
-              context.titleStyleMedium!.copyWith(fontWeight: FontWeight.bold)),
+      title: Text(AppString.searchFood, style: context.titleStyleMedium),
       centerTitle: true);
 }
 
@@ -216,10 +214,7 @@ class AfterSearchUI extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context, Food food) {
-    return FittedBox(
-        child: Text(food.name,
-            style:
-                context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold)));
+    return FittedBox(child: Text(food.name));
   }
 
   Widget _buildPrice(BuildContext context, Food food) {
@@ -227,7 +222,7 @@ class AfterSearchUI extends StatelessWidget {
     double discountedPrice = food.price - discountAmount;
     return food.isDiscount == false
         ? Text(Ultils.currencyFormat(double.parse(food.price.toString())),
-            style: context.textStyleSmall!.copyWith(
+            style: TextStyle(
                 color: context.colorScheme.secondary,
                 fontWeight: FontWeight.bold))
         : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -245,8 +240,9 @@ class AfterSearchUI extends StatelessWidget {
               Text(
                   Ultils.currencyFormat(
                       double.parse(discountedPrice.toString())),
-                  style: context.textStyleSmall!
-                      .copyWith(color: context.colorScheme.tertiaryContainer))
+                  style: TextStyle(
+                      color: context.colorScheme.secondary,
+                      fontWeight: FontWeight.bold))
             ])
           ]);
   }

@@ -1,3 +1,4 @@
+import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/common/dialog/progress_dialog.dart';
 import 'package:admin_menu_mobile/common/dialog/retry_dialog.dart';
@@ -5,6 +6,7 @@ import 'package:admin_menu_mobile/features/order/data/model/order_model.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:admin_menu_mobile/features/order/data/provider/remote/order_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -25,17 +27,15 @@ class OrderDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => OrderBloc(),
-      child: Scaffold(
-          appBar: _buildAppbar(context), body: OrderDetailView(orders: orders)),
-    );
+        create: (context) => OrderBloc(),
+        child: Scaffold(
+            appBar: _buildAppbar(context),
+            body: OrderDetailView(orders: orders)));
   }
 
   _buildAppbar(BuildContext context) {
     return AppBar(
-        title: Text(orders.id!,
-            style: context.titleStyleMedium!
-                .copyWith(fontWeight: FontWeight.bold)),
+        title: Text(orders.id!, style: context.titleStyleMedium),
         centerTitle: true,
         actions: [_DeleteOrder(idOrder: orders.id!)]);
   }
@@ -57,33 +57,25 @@ class _DeleteOrder extends StatelessWidget {
                 backgroundColor: MaterialStatePropertyAll(
                     context.colorScheme.errorContainer)),
             icon: const Icon(Icons.delete_outlined),
-            label: FittedBox(
-                child: Text('Xóa đơn', style: context.textStyleSmall)),
+            label: const FittedBox(child: Text('Xóa đơn')),
             onPressed: () => _handleDeleteOrder(context, idOrder)));
   }
 
   void _handleDeleteOrder(BuildContext context, String idOrder) {
-    showModalBottomSheet<void>(
+    showCupertinoModalPopup<void>(
         context: context,
         builder: (BuildContext context) {
-          return SizedBox(
-              height: 200,
-              child: CommonBottomSheet(
-                  title: "Bạn có muốn xóa đơn này không?",
-                  textConfirm: 'Xóa',
-                  textCancel: "Hủy",
-                  textConfirmColor: context.colorScheme.errorContainer,
-                  onCancel: () {
-                    context.pop();
-                  },
-                  onConfirm: () {
-                    context
-                        .read<OrderBloc>()
-                        .add(OrderDeleted(orderID: idOrder));
-                    showDialog(
-                        context: context,
-                        builder: (context) => BlocBuilder<OrderBloc,
-                                GenericBlocState<Orders>>(
+          return CommonBottomSheet(
+              title: "Bạn có muốn xóa đơn này không?",
+              textConfirm: 'Xóa',
+              textCancel: "Hủy",
+              textConfirmColor: context.colorScheme.errorContainer,
+              onConfirm: () {
+                context.read<OrderBloc>().add(OrderDeleted(orderID: idOrder));
+                showDialog(
+                    context: context,
+                    builder: (context) =>
+                        BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
                             builder: (context, state) => switch (state.status) {
                                   Status.loading => const ProgressDialog(
                                       descriptrion: "Đang xóa...",
@@ -99,7 +91,7 @@ class _DeleteOrder extends StatelessWidget {
                                       isProgressed: false,
                                       onPressed: () => pop(context, 3))
                                 }));
-                  }));
+              });
         });
   }
 }
@@ -131,7 +123,9 @@ class _OrderDetailViewState extends State<OrderDetailView> {
 
   Widget _buildBody(BuildContext context, Orders order) {
     return BlocListener<OrderBloc, GenericBlocState<Orders>>(
-        listenWhen: (previous, current) => previous.status != current.status,
+        listenWhen: (previous, current) =>
+            previous.status != current.status &&
+            context.read<OrderBloc>().operation == ApiOperation.update,
         listener: (context, state) => (switch (state.status) {
               Status.loading => AppAlerts.loadingDialog(context),
               Status.empty => const SizedBox(),
@@ -198,22 +192,21 @@ class _OrderDetailViewState extends State<OrderDetailView> {
     final quantity = ValueNotifier(foodDto.quantity);
     final totalPriceFood = ValueNotifier(foodDto.totalPrice);
     return ItemFood(
-      totalPriceFood: totalPriceFood,
-      quantity: quantity,
-      foodDto: foodDto,
-      onTapIncrement: () {
-        quantity.value++;
-        totalPriceFood.value = quantity.value * foodDto.foodPrice;
-        _handleUpdate(foodDto, quantity.value);
-      },
-      onTapDecrement: () {
-        if (quantity.value > 1) {
-          quantity.value--;
+        totalPriceFood: totalPriceFood,
+        quantity: quantity,
+        foodDto: foodDto,
+        onTapIncrement: () {
+          quantity.value++;
           totalPriceFood.value = quantity.value * foodDto.foodPrice;
           _handleUpdate(foodDto, quantity.value);
-        }
-      },
-    );
+        },
+        onTapDecrement: () {
+          if (quantity.value > 1) {
+            quantity.value--;
+            totalPriceFood.value = quantity.value * foodDto.foodPrice;
+            _handleUpdate(foodDto, quantity.value);
+          }
+        });
   }
 
   void _handleUpdate(FoodDto foodDto, int quantity) {
@@ -232,11 +225,15 @@ class _OrderDetailViewState extends State<OrderDetailView> {
       _totalPrice.value += foo.totalPrice;
     }
     orders = orders.copyWith(totalPrice: _totalPrice.value);
-    context.read<OrderBloc>().add(OrderUpdated(orders: orders));
+    OrderRepo(
+            orderRepository:
+                OrderRepository(firebaseFirestore: FirebaseFirestore.instance))
+        .updateOrder(orders: orders);
+    // context.read<OrderBloc>().add(OrderUpdated(orders: orders));
   }
 
   void _handleDeleteItem(FoodDto foodDto) {
-    showModalBottomSheet<void>(
+    showCupertinoModalPopup<void>(
         context: context,
         builder: (BuildContext context) {
           return SizedBox(
@@ -246,9 +243,6 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                   textConfirm: 'Xóa',
                   textCancel: "Hủy",
                   textConfirmColor: context.colorScheme.errorContainer,
-                  onCancel: () {
-                    context.pop();
-                  },
                   onConfirm: () {
                     var foods = <FoodDto>[];
                     foods.addAll(orders.foods);
@@ -270,41 +264,18 @@ class _OrderDetailViewState extends State<OrderDetailView> {
         }).then((value) => _totalPrice.value = orders.totalPrice!);
   }
 
-  // void _handleIncrement(Food food, FoodDto foodDto, int quantity) {
-  //   setState(() {
-  //     quantity++;
-  //   });
-  //   foodDto =
-  //       foodDto.copyWith(quantity: quantity, totalPrice: quantity * food.price);
-
-  //   orders = orders.copyWith(
-  //       foods: orders.foods.map((element) {
-  //     if (element.foodID == foodDto.foodID) {
-  //       return element.copyWith(
-  //           quantity: foodDto.quantity, totalPrice: foodDto.totalPrice);
-  //     }
-  //     return element;
-  //   }).toList());
-  //   _totalPrice.value = 0;
-  //   for (FoodDto foo in orders.foods) {
-  //     _totalPrice.value += foo.totalPrice;
-  //   }
-  //   orders = orders.copyWith(totalPrice: _totalPrice.value);
-  //   context.read<OrderBloc>().add(OrderUpdated(orders: orders));
-  // }
-
   Widget _buildBottomAction() {
     return Card(
         child: Padding(
             padding: EdgeInsets.all(defaultPadding),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text("Tổng tiền:", style: context.textStyleMedium),
+                const Text("Tổng tiền:"),
                 ValueListenableBuilder(
                     valueListenable: _totalPrice,
                     builder: (context, value, child) => Text(
                         Ultils.currencyFormat(double.parse(value.toString())),
-                        style: context.textStyleMedium!.copyWith(
+                        style: TextStyle(
                             color: context.colorScheme.secondary,
                             fontWeight: FontWeight.bold)))
               ]),
@@ -328,35 +299,37 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 MaterialStatePropertyAll(context.colorScheme.primary)),
         icon: const Icon(Icons.payment_outlined, size: 15),
         label: FittedBox(
-          child: Text("Thanh toán",
-              style: context.textStyleLarge!
-                  .copyWith(fontWeight: FontWeight.bold)),
+          child: Text("Thanh toán", style: context.titleStyleMedium),
         ),
         onPressed: () => _handleButtonAccepted(context));
   }
 
-  Future _handleButtonAccepted(BuildContext context) {
-    final FToast fToast = FToast()..init(context);
-    return showModalBottomSheet<void>(
+  Future<void> _handleButtonAccepted(BuildContext context) async {
+    showCupertinoModalPopup<void>(
         context: context,
         builder: (BuildContext context) {
-          return SizedBox(
-              height: 200,
-              child: CommonBottomSheet(
-                  title: "Xác nhận thanh toán?",
-                  textConfirm: 'Thanh toán',
-                  textCancel: "Hủy",
-                  onCancel: () {
-                    context.pop();
-                  },
-                  onConfirm: () {
-                    context.pop();
-                    handlePaymentSubmited();
-                    // fToast.showToast(
-                    //     child:
-                    //         AppAlerts.successToast(msg: 'Thanh toán thành công'));
-                    // pop(context, 2);
-                  }));
+          return BlocProvider(
+              create: (context) => OrderBloc()..add(NewOrdersFecthed()),
+              child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+                  builder: (context, state) {
+                if (state.status == Status.success) {
+                  return CommonBottomSheet(
+                      title: "Xác nhận thanh toán?",
+                      textConfirm: 'Thanh toán',
+                      textCancel: "Hủy",
+                      onConfirm: () {
+                        context.pop();
+                        handlePaymentSubmited();
+                        if (state.datas!.length <= 1) {
+                          FirebaseFirestore.instance
+                              .collection('table')
+                              .doc(orders.tableID)
+                              .update({'isUse': false});
+                        }
+                      });
+                }
+                return const Center(child: Text('Có lỗi xảy ra!'));
+              }));
         });
   }
 
@@ -371,10 +344,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
             backgroundColor: MaterialStatePropertyAll(
                 context.colorScheme.secondaryContainer)),
         icon: const Icon(Icons.add_box_rounded, size: 15),
-        label: FittedBox(
-            child: Text('Thêm món',
-                style: context.textStyleLarge!
-                    .copyWith(fontWeight: FontWeight.bold))),
+        label:
+            FittedBox(child: Text('Thêm món', style: context.titleStyleMedium)),
         onPressed: () async {
           await context.push(RouteName.addFood).then((result) {
             if (result is FoodDto) {
@@ -430,7 +401,7 @@ class _PriceFoodItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(Ultils.currencyFormat(double.parse(totalPrice)),
-        style: context.textStyleMedium!.copyWith(
+        style: TextStyle(
             color: context.colorScheme.secondary, fontWeight: FontWeight.bold));
   }
 }
@@ -460,9 +431,7 @@ class ItemFood extends StatelessWidget {
               _buildImage(foodDto),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const SizedBox(),
-                Text(foodDto.foodName,
-                    style: context.textStyleMedium!
-                        .copyWith(fontWeight: FontWeight.bold)),
+                Text(foodDto.foodName),
                 SizedBox(height: defaultPadding / 2),
                 _buildQuality(context, foodDto)
               ])
@@ -481,10 +450,10 @@ class ItemFood extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Divider(),
-                        Text("Ghi chú: ",
-                            style: context.textStyleMedium!
-                                .copyWith(fontWeight: FontWeight.bold)),
-                        Text(foodDto.note, style: context.textStyleSmall)
+                        const Text("Ghi chú: "),
+                        Text(foodDto.note,
+                            style:
+                                TextStyle(color: Colors.white.withOpacity(0.3)))
                       ]))
               : const SizedBox()
         ]));
@@ -505,9 +474,7 @@ class ItemFood extends StatelessWidget {
           valueListenable: quantity,
           builder: (context, value, child) => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Text('$value',
-                  style: context.textStyleSmall!
-                      .copyWith(fontWeight: FontWeight.bold)))),
+              child: Text('$value'))),
       InkWell(
           onTap: onTapIncrement,
           child: Container(

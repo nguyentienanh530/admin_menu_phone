@@ -35,8 +35,7 @@ class CreateOrUpdateFoodScreen extends StatelessWidget {
   _buildAppbar(BuildContext context) {
     return AppBar(
         title: Text(mode == Mode.update ? 'Cập nhật món ăn' : "Thêm món ăn",
-            style: context.titleStyleMedium!
-                .copyWith(fontWeight: FontWeight.bold)),
+            style: context.titleStyleMedium),
         centerTitle: true);
   }
 }
@@ -119,9 +118,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Hình ảnh: (*)",
-                          style: context.textStyleMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                      Text("Hình ảnh: (*)", style: context.titleStyleMedium),
                       SizedBox(height: defaultPadding / 2),
                       _ImageFood(
                           image: _image,
@@ -131,35 +128,26 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                                     _imageFile = file;
                                   }))),
                       SizedBox(height: defaultPadding / 2),
-                      Text("Tên món ăn: (*)",
-                          style: context.textStyleMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                      Text("Tên món ăn: (*)", style: context.titleStyleMedium),
                       SizedBox(height: defaultPadding / 2),
                       _NameFood(nameController: _nameController),
                       SizedBox(height: defaultPadding / 2),
-                      Text("Gía bán: (*)",
-                          style: context.textStyleMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                      Text("Gía bán: (*)", style: context.titleStyleMedium),
                       SizedBox(height: defaultPadding / 2),
                       _PriceFood(priceCtrl: _priceCtrl),
                       SizedBox(height: defaultPadding / 2),
                       _buildStatusFood(),
                       SizedBox(height: defaultPadding / 2),
-                      Text("Danh mục: (*)",
-                          style: context.textStyleMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                      Text("Danh mục: (*)", style: context.titleStyleMedium),
                       SizedBox(height: defaultPadding / 2),
                       _categories(),
                       SizedBox(height: defaultPadding / 2),
-                      Text("Mô tả chi tiết:",
-                          style: context.textStyleMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                      Text("Mô tả chi tiết:", style: context.titleStyleMedium),
                       SizedBox(height: defaultPadding / 2),
                       _Description(_disController),
                       SizedBox(height: defaultPadding / 2),
                       Text("Album hình ảnh: (*)",
-                          style: context.textStyleMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                          style: context.titleStyleMedium),
                       SizedBox(height: defaultPadding / 2),
                       _PhotoGallery(
                           image1: _imageGallery1,
@@ -182,8 +170,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                                   }))),
                       SizedBox(height: defaultPadding / 2),
                       Text("Áp dụng khuyến mãi ? (*)",
-                          style: context.textStyleMedium!
-                              .copyWith(fontWeight: FontWeight.bold)),
+                          style: context.titleStyleMedium),
                       SizedBox(height: defaultPadding / 2),
                       _Discount(
                           discountController: _discountController,
@@ -200,7 +187,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text("(*): thông tin không được để trống.",
-                                style: context.textStyleMedium!.copyWith(
+                                style: context.textStyleSmall!.copyWith(
                                     fontStyle: FontStyle.italic,
                                     color: context.colorScheme.error))
                           ]),
@@ -220,9 +207,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
     return ValueListenableBuilder(
         valueListenable: _isShowFood,
         builder: (context, value, child) => Row(children: [
-              Text('Trạng thái: ',
-                  style: context.textStyleMedium!
-                      .copyWith(fontWeight: FontWeight.bold)),
+              Text('Trạng thái: ', style: context.titleStyleMedium),
               Row(children: [
                 Radio<bool>(
                     value: true,
@@ -231,7 +216,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                     onChanged: (value) {
                       _isShowFood.value = value ?? false;
                     }),
-                Text('Hiển thị', style: context.textStyleSmall),
+                const Text('Hiển thị'),
                 Radio<bool>(
                     value: false,
                     activeColor: context.colorScheme.secondary,
@@ -239,7 +224,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                     onChanged: (value) {
                       _isShowFood.value = value ?? false;
                     }),
-                Text('Không hiển thị', style: context.textStyleSmall)
+                const Text('Không hiển thị')
               ])
             ]));
   }
@@ -264,7 +249,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                         _categoryID = e.id ?? '';
                       });
                     },
-                    child: Text(e.name!, style: context.textStyleSmall))))
+                    child: Text(e.name!))))
             .toList());
   }
 
@@ -285,7 +270,8 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                         child: SpinKitCircle(color: Colors.white, size: 30))
                     : Text(
                         widget.mode == Mode.create ? 'Tạo món' : 'Cập nhật món',
-                        style: context.textStyleMedium))));
+                        style: context.titleStyleMedium!
+                            .copyWith(fontWeight: FontWeight.bold)))));
   }
 
   void _handleUpdateFood(Food food) async {
@@ -447,13 +433,13 @@ class _Discount extends StatelessWidget {
           groupValue: isDiscount,
           activeColor: context.colorScheme.secondary,
           onChanged: onChanged),
-      Text('Áp dụng', style: context.textStyleSmall),
+      const Text('Áp dụng'),
       Radio<bool>(
           value: false,
           activeColor: context.colorScheme.secondary,
           groupValue: isDiscount,
           onChanged: onChanged),
-      Text('Không áp dụng', style: context.textStyleSmall)
+      const Text('Không áp dụng')
     ]);
   }
 

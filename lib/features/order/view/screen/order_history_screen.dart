@@ -1,4 +1,5 @@
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:admin_menu_mobile/common/widget/empty_screen.dart';
@@ -38,20 +39,19 @@ class OrderHistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator.adaptive(
-        triggerMode: RefreshIndicatorTriggerMode.onEdge,
-        onRefresh: () async {
-          context.read<OrderBloc>().add(OrdersHistoryFecthed());
-        },
-        child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
-            builder: (context, state) {
-          return (switch (state.status) {
-            Status.loading => const LoadingScreen(),
-            Status.empty => const EmptyScreen(),
-            Status.failure => ErrorScreen(errorMsg: state.error),
-            Status.success => _buildBody(context, state.datas as List<Orders>),
-          });
-        }));
+    return CommonRefreshIndicator(onRefresh: () async {
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!context.mounted) return;
+      context.read<OrderBloc>().add(OrdersHistoryFecthed());
+    }, child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+        builder: (context, state) {
+      return (switch (state.status) {
+        Status.loading => const LoadingScreen(),
+        Status.empty => const EmptyScreen(),
+        Status.failure => ErrorScreen(errorMsg: state.error),
+        Status.success => _buildBody(context, state.datas as List<Orders>)
+      });
+    }));
   }
 
   Widget _buildBody(BuildContext context, List<Orders> orders) {
@@ -118,7 +118,6 @@ class OrderHistoryView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CommonLineText(
-                            color: context.colorScheme.secondaryContainer,
                             title: 'Tổng tiền: ',
                             valueStyle: context.textStyleMedium!.copyWith(
                                 color: context.colorScheme.secondary,

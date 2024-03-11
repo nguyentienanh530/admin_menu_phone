@@ -1,11 +1,13 @@
 import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
+import 'package:admin_menu_mobile/features/print/cubit/is_use_print_cubit.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../features/print/cubit/print_cubit.dart';
 import '../features/search_food/cubit/text_search_cubit.dart';
 import 'app_view.dart';
 
@@ -29,7 +31,9 @@ class MainApp extends StatelessWidget {
           // BlocProvider(create: (_) => FoodBloc()),
           BlocProvider(create: (_) => TableBloc()),
           BlocProvider(create: (_) => UserBloc()),
-          BlocProvider(create: (_) => TextSearchCubit())
+          BlocProvider(create: (_) => TextSearchCubit()),
+          BlocProvider(create: (_) => IsUsePrintCubit()),
+          BlocProvider(create: (_) => PrintCubit()),
         ], child: const AppView()));
   }
 }

@@ -1,5 +1,8 @@
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
+import 'package:admin_menu_mobile/common/widget/error_widget.dart';
 import 'package:admin_menu_mobile/config/router.dart';
+import 'package:admin_menu_mobile/features/dashboard/cubit/daily_revenue_cubit.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/model/food_model.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
@@ -8,8 +11,6 @@ import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:admin_menu_mobile/features/table/data/model/table_model.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
 import 'package:admin_menu_mobile/features/user/data/model/user_model.dart';
-import 'package:admin_menu_mobile/common/widget/empty_screen.dart';
-import 'package:admin_menu_mobile/common/widget/error_screen.dart';
 import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -17,7 +18,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../common/widget/display_white_text.dart';
+import '../../../../common/widget/empty_widget.dart';
 import '../../../../core/utils/utils.dart';
+import '../widgets/chart_revenua.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -30,28 +33,39 @@ class _MyWidgetState extends State<DashboardView>
     with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
-    // context.read<OrderBloc>().add(OrdersWantingFecthed());
+    getData();
     super.initState();
+  }
+
+  void getData() {
+    if (!mounted) return;
+    context.read<OrderBloc>().add(NewOrdersFecthed());
+    context.read<TableBloc>().add(TablesOnStreamFetched());
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return SingleChildScrollView(
-        child: Column(children: [
-      Padding(
-          padding: EdgeInsets.only(
-              left: defaultPadding, right: defaultPadding, top: defaultPadding),
-          child: const DailyRevenue()),
-      // Padding(
-      //     padding: EdgeInsets.only(
-      //         left: defaultPadding, right: defaultPadding, top: defaultPadding),
-      //     child: ChartRevenue()),
-      _buildHeader(context),
-      _buildTitle(context),
-      Padding(
-          padding: EdgeInsets.all(defaultPadding), child: const _ListTable())
-    ]));
+    return CommonRefreshIndicator(
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 500));
+          getData();
+        },
+        child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(children: [
+              Padding(
+                  padding: EdgeInsets.only(
+                      left: defaultPadding,
+                      right: defaultPadding,
+                      top: defaultPadding),
+                  child: const DailyRevenue()),
+              _buildHeader(context),
+              _buildTitle(context),
+              Padding(
+                  padding: EdgeInsets.all(defaultPadding),
+                  child: const _ListTable())
+            ])));
   }
 
   Widget _buildTitle(BuildContext context) {
@@ -70,7 +84,7 @@ class _MyWidgetState extends State<DashboardView>
 
   Widget _buildHeader(BuildContext context) {
     return SizedBox(
-        height: context.sizeDevice.height * 0.25,
+        height: context.sizeDevice.height * 0.2,
         child: Padding(
             padding: EdgeInsets.all(defaultPadding),
             child: Row(
@@ -80,7 +94,7 @@ class _MyWidgetState extends State<DashboardView>
                   SizedBox(width: defaultPadding),
                   Expanded(child: _buildFoods()),
                   SizedBox(width: defaultPadding),
-                  Expanded(child: _buildTableNumber()),
+                  Expanded(child: _buildTableNumber())
                 ])));
   }
 
@@ -116,7 +130,7 @@ class _MyWidgetState extends State<DashboardView>
             Status.empty => loadingOrInitState,
             Status.failure => Center(child: Text(state.error!)),
             Status.success => _buidItemDashBoard(context,
-                  title: "Số lượng",
+                  title: "Số lượng món",
                   title2: "Món",
                   value: state.datas!.length, onTap: () {
                 // context.push(RouteName.searchFood);
@@ -126,20 +140,18 @@ class _MyWidgetState extends State<DashboardView>
   }
 
   Widget _buildTableNumber() {
-    return BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
-        builder: (context, state) {
-      return (switch (state.status) {
-        Status.loading => Center(
-            child: SpinKitCircle(color: context.colorScheme.primary, size: 30)),
-        Status.failure => Center(child: Text(state.error ?? '')),
-        Status.success => _buidItemDashBoard(context,
-            title: "Tổng bàn",
-            title2: "Tất cả",
-            value: state.datas == null ? 0 : state.datas!.length,
-            onTap: () {}),
-        Status.empty => _buidItemDashBoard(context,
-            title: "Tổng đơn", title2: "Đang chờ", value: 0, onTap: () {})
-      });
+    var tableState = context.watch<TableBloc>().state;
+    return (switch (tableState.status) {
+      Status.loading => Center(
+          child: SpinKitCircle(color: context.colorScheme.primary, size: 30)),
+      Status.failure => Center(child: Text(tableState.error ?? '')),
+      Status.success => _buidItemDashBoard(context,
+          title: "Tổng bàn",
+          title2: "Tất cả",
+          value: tableState.datas == null ? 0 : tableState.datas!.length,
+          onTap: () {}),
+      Status.empty => _buidItemDashBoard(context,
+          title: "Tổng đơn", title2: "Đang chờ", value: 0, onTap: () {})
     });
   }
 
@@ -154,8 +166,7 @@ class _MyWidgetState extends State<DashboardView>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      FittedBox(
-                          child: Text(title!, style: context.textStyleSmall)),
+                      FittedBox(child: Text(title!)),
                       FittedBox(
                           child: Text(
                               value == null || value == 0
@@ -165,8 +176,7 @@ class _MyWidgetState extends State<DashboardView>
                                   color: context.colorScheme.secondary,
                                   fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center)),
-                      FittedBox(
-                          child: Text(title2!, style: context.textStyleSmall))
+                      FittedBox(child: Text(title2!))
                     ]
                         .animate(interval: 50.ms)
                         .slideX(
@@ -182,128 +192,107 @@ class _MyWidgetState extends State<DashboardView>
   bool get wantKeepAlive => true;
 }
 
-// class ChartRevenue extends StatelessWidget {
-//   ChartRevenue({super.key});
-//   var showingTooltip = -1;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     title() =>
-//         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-//           Text('Doanh thu ngày'.toUpperCase(), style: context.textStyleSmall),
-//           Row(children: [
-//             Text('Xem chi tiết', style: context.textStyleSmall),
-//             const Icon(Icons.navigate_next_rounded)
-//           ])
-//         ]);
-
-//     price() => Text(Ultils.currencyFormat(134534534),
-//         style: context.titleStyleMedium!.copyWith(
-//             fontWeight: FontWeight.bold, color: context.colorScheme.secondary));
-//     childStatus(String title, String value) => Column(
-//           children: [
-//             Text(title,
-//                 style: context.textStyleSmall!
-//                     .copyWith(color: Colors.white.withOpacity(0.5))),
-//             // const SizedBox(height: 16),
-//             Text(value,
-//                 style: context.textStyleLarge!
-//                     .copyWith(fontWeight: FontWeight.bold)),
-//           ],
-//         );
-//     status() => Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             childStatus('Đơn hàng mới', '10'),
-//             childStatus('Tổng đơn/Ngày', '100'),
-//             childStatus('Đơn đang lên', '1'),
-//           ],
-//         );
-
-//     return Card(
-//         child: Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: BarChart(BarChartData(
-//               barGroups: [
-//                 generateGroupData(1, 10),
-//                 generateGroupData(2, 18),
-//                 generateGroupData(3, 4),
-//                 generateGroupData(4, 11),
-//               ],
-//             ))));
-//   }
-
-//   BarChartGroupData generateGroupData(int x, int y) {
-//     return BarChartGroupData(
-//       x: x,
-//       showingTooltipIndicators: showingTooltip == x ? [0] : [],
-//       barRods: [
-//         BarChartRodData(toY: y.toDouble()),
-//       ],
-//     );
-//   }
-// }
-
 class DailyRevenue extends StatelessWidget {
   const DailyRevenue({super.key});
 
   @override
   Widget build(BuildContext context) {
     var newOrder = context.watch<OrderBloc>().state;
+    var tableState = context.watch<TableBloc>().state.datas;
+    var dailyRevenue = context.watch<DailyRevenueCubit>().state;
+    var tableIsUseNumber = 0;
+
+    for (var element in tableState ?? <TableModel>[]) {
+      if (element.isUse) {
+        tableIsUseNumber++;
+      }
+    }
     title() =>
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Doanh thu ngày'.toUpperCase(), style: context.textStyleSmall),
+          Text('Doanh thu ngày'.toUpperCase()),
           Row(children: [
             Text('Xem chi tiết', style: context.textStyleSmall),
             const Icon(Icons.navigate_next_rounded)
           ])
         ]);
 
-    price() => Text(Ultils.currencyFormat(134534534),
+    price() => Text(Ultils.currencyFormat(dailyRevenue),
         style: context.titleStyleMedium!.copyWith(
             fontWeight: FontWeight.bold, color: context.colorScheme.secondary));
-    childStatus(String title, String value) => Column(
-          children: [
-            Text(title,
-                style: context.textStyleSmall!
-                    .copyWith(color: Colors.white.withOpacity(0.5))),
-            const SizedBox(height: 8),
-            Text(value,
-                style: context.textStyleLarge!
-                    .copyWith(fontWeight: FontWeight.bold)),
-          ],
-        );
-    status() => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            switch (newOrder.status) {
-              Status.loading => const SizedBox(),
-              Status.empty => childStatus('Đơn hàng mới', '0'),
-              Status.failure =>
-                Text(newOrder.error ?? '', style: context.textStyleSmall),
-              Status.success =>
-                childStatus('Đơn hàng mới', newOrder.datas!.length.toString())
-            },
-            childStatus('Tổng đơn/Ngày', '100'),
-            childStatus('Bàn sử dụng', '5'),
-          ],
-        );
+
+    status() =>
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          switch (newOrder.status) {
+            Status.loading => const SizedBox(),
+            Status.empty => childStatus(context, 'Đơn hàng mới', '0'),
+            Status.failure =>
+              Text(newOrder.error ?? '', style: context.textStyleSmall),
+            Status.success => childStatus(
+                context, 'Đơn hàng mới', newOrder.datas!.length.toString())
+          },
+          _buildOrderOnDay(context),
+          childStatus(context, 'Bàn sử dụng', tableIsUseNumber.toString())
+        ]);
 
     return Card(
         child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-                // height: context.sizeDevice.height * 0.2,
                 width: context.sizeDevice.width,
                 child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       title(),
+                      const SizedBox(height: 8),
                       price(),
+                      SizedBox(
+                          height: context.sizeDevice.height * 0.2,
+                          child: const ChartRevenue()),
                       Divider(color: context.colorScheme.primary),
                       status()
                     ]))));
+  }
+
+  Widget childStatus(BuildContext context, String title, String value) =>
+      Column(children: [
+        Text(title, style: TextStyle(color: Colors.white.withOpacity(0.5))),
+        const SizedBox(height: 8),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold))
+      ]);
+
+  Widget _buildOrderOnDay(BuildContext context) {
+    return BlocProvider(
+        create: (context) => OrderBloc()..add(OrdersOnDayFecthed()),
+        child: BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+            builder: (context, state) {
+          switch (state.status) {
+            case Status.loading:
+              return const LoadingScreen();
+            case Status.empty:
+              return const EmptyWidget();
+            case Status.failure:
+              return ErrorWidgetCustom(errorMessage: state.error ?? '');
+            case Status.success:
+              var ordersNumber = 0;
+              var totalPrice = 0.0;
+              for (var element in state.datas ?? <Orders>[]) {
+                if (Ultils.formatToDate(
+                        element.payTime ?? DateTime.now().day.toString()) ==
+                    Ultils.formatToDate(DateTime.now().toString())) {
+                  ordersNumber++;
+                  totalPrice += double.parse(element.totalPrice.toString());
+                }
+              }
+              context
+                  .read<DailyRevenueCubit>()
+                  .onDailyRevenueChanged(totalPrice);
+              return childStatus(
+                  context, 'Tổng đơn/Ngày', ordersNumber.toString());
+            default:
+              return const LoadingScreen();
+          }
+        }));
   }
 }
 
@@ -321,24 +310,26 @@ class _ListTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (context) => TableBloc()..add(TablesFetched()),
-        child: BlocBuilder<TableBloc, GenericBlocState<TableModel>>(
-            builder: (context, state) {
-          return switch (state.status) {
-            Status.empty => const EmptyScreen(),
-            Status.loading => const LoadingScreen(),
-            Status.failure => ErrorScreen(errorMsg: state.error),
-            Status.success => GridView.count(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                crossAxisCount: 4,
-                // crossAxisSpacing: defaultPadding,
-                // mainAxisSpacing: defaultPadding,
-                children:
-                    state.datas!.map((e) => _ItemTable(table: e)).toList())
-          };
-        }));
+    var tableState = context.watch<TableBloc>().state;
+    switch (tableState.status) {
+      case Status.empty:
+        return const EmptyWidget();
+      case Status.loading:
+        return const LoadingScreen();
+      case Status.failure:
+        return ErrorWidgetCustom(errorMessage: tableState.error ?? '');
+      case Status.success:
+        var newTables = [...tableState.datas ?? <TableModel>[]];
+        newTables.sort((a, b) => a.name.compareTo(b.name));
+        return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4),
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: newTables.length,
+            itemBuilder: (context, index) =>
+                _ItemTable(table: newTables[index]));
+    }
   }
 }
 
@@ -351,18 +342,17 @@ class _ItemTable extends StatelessWidget {
     return GestureDetector(
         onTap: () => context.push(RouteName.orderOnTable, extra: table),
         child: Card(
-            color: table.isUse ? Colors.green.shade900 : null,
+            color: table.isUse ? Colors.green.shade900.withOpacity(0.3) : null,
             child: Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(3),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      FittedBox(
-                          child: Text('Bàn', style: context.textStyleSmall)),
+                      const FittedBox(child: Text('Bàn')),
                       FittedBox(
                           child: Text(table.name,
-                              style: context.textStyleLarge!.copyWith(
+                              style: context.titleStyleMedium!.copyWith(
                                   color: context.colorScheme.secondary,
                                   fontWeight: FontWeight.bold))),
                       FittedBox(

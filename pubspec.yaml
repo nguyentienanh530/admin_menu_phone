@@ -23,6 +23,10 @@ dependencies:
     path: packages/category_repository
   user_repository:
     path: packages/user_repository
+  print_repository:
+    path: packages/print_repository
+
+    
   awesome_dialog: ^3.2.0
   equatable: ^2.0.5
   firebase_auth: ^4.16.0

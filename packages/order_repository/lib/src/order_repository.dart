@@ -64,11 +64,24 @@ class OrderRepository {
     }
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getAllOrder() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getOrdersOnDay() {
     try {
       return _firebaseFirestore
           .collection("orders")
-          .where('status', isEqualTo: 'new')
+          .where("status", isEqualTo: 'success')
+          .snapshots();
+    } on FirebaseException catch (e) {
+      throw '$e';
+    } catch (e) {
+      throw '$e';
+    }
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getAllOrderOnDay() {
+    try {
+      return _firebaseFirestore
+          .collection("orders")
+          .where('status', isEqualTo: 'success')
           .get();
     } on FirebaseException catch (e) {
       throw '$e';

@@ -44,12 +44,17 @@ class OrderRepo extends FirebaseBase<Orders> {
     return await deleteItem(_orderRepository.deleteOrder(orderID: orderID));
   }
 
-  Future<FirebaseResult<List<Orders>>> getAllOrder() async {
-    return await getItems(
-        await _orderRepository.getAllOrder(), Orders.fromJson);
-  }
+  // Future<FirebaseResult<List<Orders>>> getAllOrder() async {
+  //   return await getItems(
+  //       await _orderRepository.getAllOrder(), Orders.fromJson);
+  // }
 
   Future<FirebaseResult<bool>> paymentOrder({required String orderID}) async {
     return await updateItem(_orderRepository.paymentOrder(orderID: orderID));
+  }
+
+  Stream<FirebaseResult<List<Orders>>> getOrdersOnDay() {
+    return getItemsOnStream(
+        _orderRepository.getOrdersOnDay(), (json) => Orders.fromJson(json));
   }
 }

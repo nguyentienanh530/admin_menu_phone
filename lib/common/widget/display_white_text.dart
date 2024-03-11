@@ -16,7 +16,7 @@ class DisplayWhiteText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(text,
         textAlign: TextAlign.center,
-        style: context.textStyleSmall?.copyWith(
+        style: context.titleStyleMedium?.copyWith(
             color: context.colorScheme.surface,
             fontSize: size,
             fontWeight: fontWeight ?? FontWeight.w300));

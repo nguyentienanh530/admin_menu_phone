@@ -16,6 +16,11 @@ class TableRepo extends FirebaseBase<TableModel> {
     return result;
   }
 
+  Stream<FirebaseResult<List<TableModel>>> getTablesOnStream() {
+    return getItemsOnStream(
+        _tableRepository.getTablesOnStream(), TableModel.fromJson);
+  }
+
   Future<FirebaseResult> deleteTable({required String idTable}) async {
     return await deleteItem(_tableRepository.deleteTable(idTable: idTable));
   }

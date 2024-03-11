@@ -30,8 +30,7 @@ class OrderOnTable extends StatelessWidget {
   _buildAppbar(BuildContext context) {
     return AppBar(
         title: Text(' ${AppString.titleOrder} - ${tableModel!.name}',
-            style: context.titleStyleMedium!
-                .copyWith(fontWeight: FontWeight.bold)),
+            style: context.titleStyleMedium),
         centerTitle: true);
   }
 }
@@ -103,7 +102,7 @@ class ExpandableListView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CommonLineText(
-              valueStyle: context.textStyleMedium!.copyWith(
+              valueStyle: TextStyle(
                   color: context.colorScheme.secondary,
                   fontWeight: FontWeight.bold),
               value: Ultils.currencyFormat(

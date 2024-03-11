@@ -1,6 +1,7 @@
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/common/widget/common_bottomsheet.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../common/dialog/progress_dialog.dart';
@@ -28,9 +29,7 @@ class FoodDetailScreen extends StatelessWidget {
 
   _buildAppbar(BuildContext context) {
     return AppBar(
-        title: Text(AppString.titleFoodDetail,
-            style: context.titleStyleMedium!
-                .copyWith(fontWeight: FontWeight.bold)),
+        title: Text(AppString.titleFoodDetail, style: context.titleStyleMedium),
         centerTitle: true);
   }
 }
@@ -89,7 +88,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
   Widget _buildDeleteFood(BuildContext context, Food food) {
     return InkWell(
         onTap: () {
-          showModalBottomSheet<void>(
+          showCupertinoModalPopup<void>(
               context: context,
               builder: (BuildContext context) {
                 return SizedBox(
@@ -99,9 +98,6 @@ class _FoodDetailViewState extends State<FoodDetailView> {
                         textConfirm: 'Xóa',
                         textCancel: "Hủy",
                         textConfirmColor: context.colorScheme.errorContainer,
-                        onCancel: () {
-                          context.pop();
-                        },
                         onConfirm: () => _handleDeleteFood(food)));
               });
         },
@@ -111,7 +107,9 @@ class _FoodDetailViewState extends State<FoodDetailView> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(defaultBorderRadius),
                 color: context.colorScheme.errorContainer),
-            child: Center(child: Text("Xoá", style: context.textStyleMedium))));
+            child: const Center(
+                child: Text("Xoá",
+                    style: TextStyle(fontWeight: FontWeight.bold)))));
   }
 
   void _handleDeleteFood(Food food) {
@@ -157,8 +155,9 @@ class _FoodDetailViewState extends State<FoodDetailView> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(defaultBorderRadius),
                 color: context.colorScheme.primary),
-            child: Center(
-                child: Text("Cập nhật", style: context.textStyleMedium))));
+            child: const Center(
+                child: Text("Cập nhật",
+                    style: TextStyle(fontWeight: FontWeight.bold)))));
   }
 
   Widget _buildDescription(BuildContext context, Food food) {
@@ -166,15 +165,13 @@ class _FoodDetailViewState extends State<FoodDetailView> {
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Description',
-              style: context.titleStyleMedium!
-                  .copyWith(fontWeight: FontWeight.bold)),
+          Text('Mô tả', style: context.titleStyleMedium),
           ReadMoreText(food.description,
               trimLines: 8,
               trimMode: TrimMode.Line,
               trimCollapsedText: 'Xem thêm...',
               trimExpandedText: 'ẩn bớt',
-              style: context.textStyleSmall,
+              style: TextStyle(color: Colors.white.withOpacity(0.5)),
               lessStyle: context.textStyleSmall!
                   .copyWith(color: context.colorScheme.secondary),
               moreStyle: context.textStyleSmall!
@@ -186,9 +183,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
     return Padding(
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
-        child: Text(food.name,
-            style:
-                context.textStyleLarge!.copyWith(fontWeight: FontWeight.bold)));
+        child: Text(food.name, style: context.titleStyleMedium));
   }
 
   Widget _buildPrice(BuildContext context, Food food) {
@@ -198,7 +193,7 @@ class _FoodDetailViewState extends State<FoodDetailView> {
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text(Ultils.currencyFormat(double.parse(food.price.toString())),
-              style: context.textStyleLarge!.copyWith(
+              style: TextStyle(
                   color: context.colorScheme.secondary,
                   fontWeight: FontWeight.bold))
         ]));
@@ -209,13 +204,12 @@ class _FoodDetailViewState extends State<FoodDetailView> {
         padding: EdgeInsets.symmetric(
             horizontal: defaultPadding, vertical: defaultPadding / 2),
         child: Row(children: [
-          Text('Trạng thái: ', style: context.textStyleLarge),
+          Text('Trạng thái: ', style: context.titleStyleMedium),
           Text(Ultils.foodStatus(food.isShowFood),
-              style: context.textStyleLarge!.copyWith(
+              style: TextStyle(
                   color: food.isShowFood
                       ? context.colorScheme.secondary
-                      : context.colorScheme.error,
-                  fontWeight: FontWeight.bold))
+                      : context.colorScheme.error))
         ]));
   }
 }
@@ -253,7 +247,7 @@ class _Gallery extends StatelessWidget {
       Padding(
           padding: EdgeInsets.symmetric(
               horizontal: defaultPadding, vertical: defaultPadding / 2),
-          child: Text('Gallery', style: context.titleStyleLarge)),
+          child: Text('Thư viện ảnh', style: context.titleStyleMedium)),
       Padding(
           padding: EdgeInsets.symmetric(
               horizontal: defaultPadding, vertical: defaultPadding / 2),

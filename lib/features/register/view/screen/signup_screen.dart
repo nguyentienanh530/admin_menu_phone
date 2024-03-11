@@ -209,7 +209,7 @@ class _ButtonSignIn extends StatelessWidget {
         child: CommonLineText(
             title: AppString.haveAnAccount,
             value: AppString.signin,
-            valueStyle: context.textStyleSmall!.copyWith(
+            valueStyle: TextStyle(
                 color: context.colorScheme.secondaryContainer,
                 fontWeight: FontWeight.bold)));
   }

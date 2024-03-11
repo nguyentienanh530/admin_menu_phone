@@ -67,10 +67,7 @@ class ItemFood extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context, Food food) {
-    return FittedBox(
-        child: Text(food.name,
-            style:
-                context.textStyleSmall!.copyWith(fontWeight: FontWeight.bold)));
+    return FittedBox(child: Text(food.name));
   }
 
   Widget _buildPrice(BuildContext context, Food food) {
@@ -78,7 +75,7 @@ class ItemFood extends StatelessWidget {
     double discountedPrice = food.price - discountAmount;
     return food.isDiscount == false
         ? Text(Ultils.currencyFormat(double.parse(food.price.toString())),
-            style: context.textStyleSmall!.copyWith(
+            style: TextStyle(
                 color: context.colorScheme.secondary,
                 fontWeight: FontWeight.bold))
         : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -96,7 +93,7 @@ class ItemFood extends StatelessWidget {
               Text(
                   Ultils.currencyFormat(
                       double.parse(discountedPrice.toString())),
-                  style: context.textStyleSmall!.copyWith(
+                  style: TextStyle(
                       color: context.colorScheme.secondary,
                       fontWeight: FontWeight.bold))
             ])

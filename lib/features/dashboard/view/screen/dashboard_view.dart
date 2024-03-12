@@ -3,6 +3,7 @@ import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
 import 'package:admin_menu_mobile/common/widget/error_widget.dart';
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/dashboard/cubit/daily_revenue_cubit.dart';
+import 'package:admin_menu_mobile/features/dashboard/cubit/data_chart_revenua.dart';
 import 'package:admin_menu_mobile/features/food/bloc/food_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/model/food_model.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
@@ -12,6 +13,7 @@ import 'package:admin_menu_mobile/features/table/data/model/table_model.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
 import 'package:admin_menu_mobile/features/user/data/model/user_model.dart';
 import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,7 +61,7 @@ class _MyWidgetState extends State<DashboardView>
                       left: defaultPadding,
                       right: defaultPadding,
                       top: defaultPadding),
-                  child: const DailyRevenue()),
+                  child: DailyRevenue()),
               _buildHeader(context),
               _buildTitle(context),
               Padding(
@@ -200,6 +202,7 @@ class DailyRevenue extends StatelessWidget {
     var newOrder = context.watch<OrderBloc>().state;
     var tableState = context.watch<TableBloc>().state.datas;
     var dailyRevenue = context.watch<DailyRevenueCubit>().state;
+    // final dataChartRevenue = context.watch<DataChartRevenueCubit>().state;
     var tableIsUseNumber = 0;
 
     for (var element in tableState ?? <TableModel>[]) {
@@ -207,18 +210,14 @@ class DailyRevenue extends StatelessWidget {
         tableIsUseNumber++;
       }
     }
-    title() =>
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Doanh thu ngày'.toUpperCase()),
-          Row(children: [
-            Text('Xem chi tiết', style: context.textStyleSmall),
-            const Icon(Icons.navigate_next_rounded)
-          ])
-        ]);
 
     price() => Text(Ultils.currencyFormat(dailyRevenue),
         style: context.titleStyleMedium!.copyWith(
             fontWeight: FontWeight.bold, color: context.colorScheme.secondary));
+    title() =>
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text('Doanh thu ngày'.toUpperCase()),
+        ]);
 
     status() =>
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -276,17 +275,27 @@ class DailyRevenue extends StatelessWidget {
             case Status.success:
               var ordersNumber = 0;
               var totalPrice = 0.0;
+              final listDataChart = <FlSpot>[];
+              // var index =0;
               for (var element in state.datas ?? <Orders>[]) {
                 if (Ultils.formatToDate(
                         element.payTime ?? DateTime.now().day.toString()) ==
                     Ultils.formatToDate(DateTime.now().toString())) {
                   ordersNumber++;
                   totalPrice += double.parse(element.totalPrice.toString());
+                  listDataChart.add(FlSpot(
+                      double.parse(ordersNumber.toString()),
+                      double.parse(element.totalPrice.toString())));
                 }
               }
               context
+                  .read<DataChartRevenueCubit>()
+                  .onDataChartRevenueChanged(listDataChart);
+
+              context
                   .read<DailyRevenueCubit>()
                   .onDailyRevenueChanged(totalPrice);
+
               return childStatus(
                   context, 'Tổng đơn/Ngày', ordersNumber.toString());
             default:

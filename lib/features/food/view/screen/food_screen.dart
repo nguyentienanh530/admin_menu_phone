@@ -68,7 +68,7 @@ class _MyWidgetState extends State<FoodScreen>
   bool get wantKeepAlive => true;
 
   Widget _buildFloatingActionButton() {
-    return FloatingActionButton.small(
+    return FloatingActionButton(
         heroTag: 'addFood',
         backgroundColor: context.colorScheme.secondary,
         onPressed: () async {

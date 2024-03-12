@@ -59,26 +59,32 @@ class _ProfileViewState extends State<ProfileView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return SafeArea(
-        child: Padding(
-            padding: EdgeInsets.all(defaultPadding),
-            child: CommonRefreshIndicator(
-              onRefresh: () async {
-                await Future.delayed(const Duration(milliseconds: 500));
-                getUser();
-              },
-              child: BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
-                  buildWhen: (previous, current) =>
-                      context.read<UserBloc>().operation == ApiOperation.select,
-                  builder: (context, state) {
-                    return (switch (state.status) {
-                      Status.loading => const LoadingScreen(),
-                      Status.failure => ErrorScreen(errorMsg: state.error),
-                      Status.empty => const EmptyScreen(),
-                      Status.success => _buildBody(state.data ?? UserModel())
-                    });
-                  }),
-            )));
+    return Scaffold(
+      appBar: AppBar(
+          centerTitle: true,
+          title: Text('Cá nhân', style: context.titleStyleMedium)),
+      body: SafeArea(
+          child: Padding(
+              padding: EdgeInsets.all(defaultPadding),
+              child: CommonRefreshIndicator(
+                onRefresh: () async {
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  getUser();
+                },
+                child: BlocBuilder<UserBloc, GenericBlocState<UserModel>>(
+                    buildWhen: (previous, current) =>
+                        context.read<UserBloc>().operation ==
+                        ApiOperation.select,
+                    builder: (context, state) {
+                      return (switch (state.status) {
+                        Status.loading => const LoadingScreen(),
+                        Status.failure => ErrorScreen(errorMsg: state.error),
+                        Status.empty => const EmptyScreen(),
+                        Status.success => _buildBody(state.data ?? UserModel())
+                      });
+                    }),
+              ))),
+    );
   }
 
   Widget _buildBody(UserModel user) {

@@ -1,6 +1,8 @@
 import 'package:admin_menu_mobile/core/utils/utils.dart';
+import 'package:admin_menu_mobile/features/dashboard/cubit/data_chart_revenua.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChartRevenue extends StatefulWidget {
   const ChartRevenue({super.key});
@@ -12,85 +14,45 @@ class ChartRevenue extends StatefulWidget {
 class _ChartRevenueState extends State<ChartRevenue> {
   @override
   Widget build(BuildContext context) {
+    var data = context.watch<DataChartRevenueCubit>().state;
     return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: LineChart(sampleData1,
+        padding:
+            const EdgeInsets.only(right: 18, left: 12, top: 24, bottom: 12),
+        child: LineChart(dataChart(data),
             duration: const Duration(milliseconds: 250)));
   }
 
-  LineChartData get sampleData1 => LineChartData(
-      // lineTouchData: lineTouchData1,
+  LineChartData dataChart(List<FlSpot> listData) => LineChartData(
+      lineTouchData: lineTouchData,
       gridData: gridData,
-      titlesData: titlesData1,
+      titlesData: titlesData,
       borderData: borderData,
-      lineBarsData: lineBarsData1,
-      // minX: 0.5,
-      // maxX: 14,
-      // maxY: 4,
-      minY: 0);
+      lineBarsData: lineBarsData(listData));
 
-  LineTouchData get lineTouchData1 => LineTouchData(
+  LineTouchData get lineTouchData => LineTouchData(
+      // enabled: false,
       handleBuiltInTouches: true,
       touchTooltipData: LineTouchTooltipData(
+          getTooltipItems: (touchedSpots) =>
+              touchedSpots.map((LineBarSpot touchedSpot) {
+                final textStyle = TextStyle(
+                    color: touchedSpot.bar.gradient?.colors.first ??
+                        touchedSpot.bar.color ??
+                        Colors.blueGrey,
+                    fontWeight: FontWeight.bold);
+                return LineTooltipItem(
+                    Ultils.currencyFormat(touchedSpot.y), textStyle);
+              }).toList(),
           tooltipBgColor: Colors.blueGrey.withOpacity(0.8)));
 
-  FlTitlesData get titlesData1 => FlTitlesData(
+  FlTitlesData get titlesData => FlTitlesData(
       bottomTitles: AxisTitles(sideTitles: bottomTitles),
       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       leftTitles: AxisTitles(sideTitles: leftTitles()));
 
-  List<LineChartBarData> get lineBarsData1 => [
-        lineChartBarData1_1,
-      ];
-
-  LineTouchData get lineTouchData2 => const LineTouchData(
-        enabled: false,
-      );
-
-  FlTitlesData get titlesData2 => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles(),
-        ),
-      );
-
-  Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 14,
-    );
-    String text;
-    switch (value.toInt()) {
-      case 1:
-        text = '1m';
-        break;
-      case 2:
-        text = '2m';
-        break;
-      case 3:
-        text = '3m';
-        break;
-      case 4:
-        text = '5m';
-        break;
-      case 5:
-        text = '6m';
-        break;
-      default:
-        return Container();
-    }
-
-    return Text(text, style: style, textAlign: TextAlign.center);
-  }
+  List<LineChartBarData> lineBarsData(List<FlSpot> listData) =>
+      [lineChartBarData(listData)];
 
   SideTitles leftTitles() => const SideTitles(
         // getTitlesWidget: leftTitleWidgets,
@@ -98,34 +60,6 @@ class _ChartRevenueState extends State<ChartRevenue> {
         interval: 1,
         reservedSize: 40,
       );
-
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
-    Widget text;
-    switch (value.toInt()) {
-      case 2:
-        text = const Text('SEPT', style: style);
-        break;
-      case 7:
-        text = const Text('OCT', style: style);
-        break;
-      case 12:
-        text = const Text('DEC', style: style);
-        break;
-      default:
-        text = const Text('');
-        break;
-    }
-
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 10,
-      child: text,
-    );
-  }
 
   SideTitles get bottomTitles => const SideTitles(
         showTitles: false,
@@ -145,34 +79,25 @@ class _ChartRevenueState extends State<ChartRevenue> {
           // top: const BorderSide(color: Colors.transparent),
           ));
 
-  LineChartBarData get lineChartBarData1_1 => LineChartBarData(
-          isCurved: true,
-          color: context.colorScheme.secondary,
-          barWidth: 2,
-          isStrokeCapRound: true,
-          curveSmoothness: 0.4,
-          dotData: const FlDotData(show: false),
-          belowBarData: BarAreaData(
-              show: true,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
+  LineChartBarData lineChartBarData(List<FlSpot> listData) {
+    return LineChartBarData(
+        isCurved: true,
+        color: context.colorScheme.secondary,
+        barWidth: 3,
+        isStrokeCapRound: true,
+        curveSmoothness: 0.4,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(
+            show: false,
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
                 // end: const Alignment(0.8, 1),
                 colors: <Color>[
+                  context.colorScheme.secondary.withOpacity(0.05),
                   context.colorScheme.secondary.withOpacity(0.1),
-                  context.colorScheme.secondary.withOpacity(0.3),
-                  context.colorScheme.secondary.withOpacity(0.6)
+                  context.colorScheme.secondary.withOpacity(0.2)
                 ],
-                tileMode: TileMode.mirror,
-              )),
-          spots: const [
-            FlSpot(0, 0),
-            FlSpot(1, 1.5),
-            FlSpot(2, 1.4),
-            FlSpot(3, 3.4),
-            FlSpot(4, 4.5),
-            FlSpot(5, 2),
-            FlSpot(6, 2.2),
-            FlSpot(7, 1.8),
-            FlSpot(8, 4)
-          ]);
+                tileMode: TileMode.mirror)),
+        spots: listData);
+  }
 }

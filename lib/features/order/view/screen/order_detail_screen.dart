@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -47,18 +48,10 @@ class _DeleteOrder extends StatelessWidget {
   const _DeleteOrder({required this.idOrder});
   @override
   Widget build(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.only(right: defaultPadding / 2),
-        width: 90,
-        height: 25,
-        child: FilledButton.icon(
-            style: ButtonStyle(
-                iconSize: const MaterialStatePropertyAll(15),
-                backgroundColor: MaterialStatePropertyAll(
-                    context.colorScheme.errorContainer)),
-            icon: const Icon(Icons.delete_outlined),
-            label: const FittedBox(child: Text('Xóa đơn')),
-            onPressed: () => _handleDeleteOrder(context, idOrder)));
+    return IconButton(
+        icon: SvgPicture.asset('assets/icon/trash.svg',
+            colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn)),
+        onPressed: () => _handleDeleteOrder(context, idOrder));
   }
 
   void _handleDeleteOrder(BuildContext context, String idOrder) {
@@ -166,25 +159,20 @@ class _OrderDetailViewState extends State<OrderDetailView> {
   Widget _buildItemFood(FoodDto foodDto) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-        child: Slidable(
-            endActionPane: ActionPane(
-                extentRatio: 0.3,
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                      borderRadius: BorderRadius.circular(defaultBorderRadius),
-                      flex: 1,
-                      // spacing: 8,
-                      padding: EdgeInsets.all(defaultPadding),
-                      onPressed: (ct) {
-                        _handleDeleteItem(foodDto);
-                      },
-                      backgroundColor: context.colorScheme.error,
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete_forever)
-                ]),
-            child: _buildItem(foodDto)));
+        child: _buildItem(foodDto));
   }
+
+  // SlidableAction(
+  //                     borderRadius: BorderRadius.circular(defaultBorderRadius),
+  //                     flex: 1,
+  //                     // spacing: 8,
+  //                     padding: EdgeInsets.all(defaultPadding),
+  //                     onPressed: (ct) {
+  //                       _handleDeleteItem(foodDto);
+  //                     },
+  //                     backgroundColor: context.colorScheme.error,
+  //                     foregroundColor: Colors.white,
+  //                     icon: Icons.delete_forever)
 
   Widget _buildItem(FoodDto foodDto) {
     // final foodDtoo = ValueNotifier(foodDto);
@@ -192,6 +180,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
     final quantity = ValueNotifier(foodDto.quantity);
     final totalPriceFood = ValueNotifier(foodDto.totalPrice);
     return ItemFood(
+        onPressed: () => _handleDeleteItem(foodDto),
         totalPriceFood: totalPriceFood,
         quantity: quantity,
         foodDto: foodDto,
@@ -413,12 +402,14 @@ class ItemFood extends StatelessWidget {
       required this.totalPriceFood,
       required this.foodDto,
       required this.onTapIncrement,
-      required this.onTapDecrement});
+      required this.onTapDecrement,
+      required this.onPressed});
   final FoodDto foodDto;
   final ValueNotifier<int> quantity;
   final ValueNotifier<num> totalPriceFood;
   final void Function()? onTapIncrement;
   final void Function()? onTapDecrement;
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -436,12 +427,20 @@ class ItemFood extends StatelessWidget {
                 _buildQuality(context, foodDto)
               ])
             ]),
-            Padding(
-                padding: EdgeInsets.only(right: defaultPadding / 2),
-                child: ValueListenableBuilder(
-                    valueListenable: totalPriceFood,
-                    builder: (context, value, child) =>
-                        _PriceFoodItem(totalPrice: value.toString())))
+            Column(children: [
+              IconButton(
+                  onPressed: onPressed,
+                  icon: SvgPicture.asset('assets/icon/trash.svg',
+                      colorFilter: ColorFilter.mode(
+                          context.colorScheme.error, BlendMode.srcIn))),
+              Padding(
+                  padding: EdgeInsets.only(right: defaultPadding / 2),
+                  child: ValueListenableBuilder(
+                      valueListenable: totalPriceFood,
+                      builder: (context, value, child) =>
+                          _PriceFoodItem(totalPrice: value.toString()))),
+              const SizedBox(height: 8)
+            ])
           ]),
           foodDto.note.isNotEmpty
               ? Padding(

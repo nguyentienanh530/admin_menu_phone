@@ -1,16 +1,21 @@
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/widget/common_icon_button.dart';
 import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:admin_menu_mobile/common/widget/empty_screen.dart';
 import 'package:admin_menu_mobile/common/widget/error_screen.dart';
 import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:admin_menu_mobile/config/config.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grouped_list/grouped_list.dart';
+import '../../../../common/dialog/progress_dialog.dart';
+import '../../../../common/dialog/retry_dialog.dart';
+import '../../../../common/widget/common_bottomsheet.dart';
 import '../../../../common/widget/common_line_text.dart';
 import '../../data/model/order_model.dart';
 
@@ -79,8 +84,8 @@ class OrderHistoryView extends StatelessWidget {
                       color: context.colorScheme.tertiary,
                       fontWeight: FontWeight.bold)));
         },
-        itemBuilder: (context, element) {
-          return _buildItemListView(context, element)
+        indexedItemBuilder: (context, element, index) {
+          return _buildItemListView(context, element, index)
               .animate()
               .slideX(
                   begin: -0.1,
@@ -91,54 +96,107 @@ class OrderHistoryView extends StatelessWidget {
         });
   }
 
-  Widget _buildItemListView(BuildContext context, Orders? orderModel) {
-    return GestureDetector(
-        onTap: () async {
-          await context
-              .push(RouteName.orderDetail, extra: orderModel)
-              .then((value) {
-            if (!context.mounted) return;
-            context.read<OrderBloc>().add(NewOrdersFecthed());
-          });
-        },
-        child: Card(
-            child: Container(
-                padding: EdgeInsets.all(defaultPadding / 2),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CommonLineText(
-                                title: 'ID: ', value: orderModel?.id ?? ''),
-                            Row(children: [
-                              Text('Xem chi tiết',
-                                  style: context.textStyleSmall),
-                              const Icon(Icons.navigate_next)
-                            ])
-                          ]),
-                      const SizedBox(height: 8.0),
-                      CommonLineText(
-                          title: 'Bàn: ', value: orderModel?.tableName ?? ''),
-                      const SizedBox(height: 8.0),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CommonLineText(
-                                title: 'Đặt lúc: ',
-                                value: Ultils.formatDateTime(
-                                    orderModel?.orderTime ??
-                                        DateTime.now().toString())),
-                            CommonLineText(
-                                title: 'Tổng tiền: ',
-                                value: Ultils.currencyFormat(double.parse(
-                                    orderModel?.totalPrice?.toString() ?? '0')),
-                                valueStyle: TextStyle(
-                                    color: context.colorScheme.secondary,
-                                    fontWeight: FontWeight.bold))
-                          ])
-                    ]))));
+  Widget _buildItemListView(
+      BuildContext context, Orders orderModel, int index) {
+    return Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        elevation: 10,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeaderItem(context, index, orderModel),
+              _buildBodyItem(orderModel)
+            ]));
   }
+
+  Widget _buildHeaderItem(BuildContext context, int index, Orders orders) =>
+      Container(
+          height: 40,
+          color: context.colorScheme.primary.withOpacity(0.3),
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(children: [
+                      Text('#${index + 1} - ',
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                          Ultils.currencyFormat(double.parse(
+                              orders.totalPrice?.toString() ?? '0')),
+                          style: TextStyle(
+                              color: context.colorScheme.secondary,
+                              fontWeight: FontWeight.bold))
+                    ]),
+                    Row(children: [
+                      const SizedBox(width: 8),
+                      CommonIconButton(
+                          icon: Icons.edit,
+                          onTap: () async =>
+                              await _goToEditOrder(context, orders)),
+                      const SizedBox(width: 8),
+                      CommonIconButton(
+                          icon: Icons.delete,
+                          color: context.colorScheme.errorContainer,
+                          onTap: () =>
+                              _handleDeleteOrder(context, orders.id ?? ''))
+                    ])
+                  ])));
+
+  Future<void> _goToEditOrder(BuildContext context, Orders orders) async =>
+      await context.push(RouteName.orderDetail, extra: orders).then((value) {
+        if (!context.mounted) return;
+        context.read<OrderBloc>().add(NewOrdersFecthed());
+      });
+
+  void _handleDeleteOrder(BuildContext context, String idOrder) {
+    showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return CommonBottomSheet(
+              title: "Bạn có muốn xóa đơn này không?",
+              textConfirm: 'Xóa',
+              textCancel: "Hủy",
+              textConfirmColor: context.colorScheme.errorContainer,
+              onConfirm: () {
+                context.read<OrderBloc>().add(OrderDeleted(orderID: idOrder));
+                showDialog(
+                    context: context,
+                    builder: (context) =>
+                        BlocBuilder<OrderBloc, GenericBlocState<Orders>>(
+                            builder: (context, state) => switch (state.status) {
+                                  Status.loading => const ProgressDialog(
+                                      descriptrion: "Đang xóa...",
+                                      isProgressed: true),
+                                  Status.empty => const SizedBox(),
+                                  Status.failure => RetryDialog(
+                                      title: 'Lỗi',
+                                      onRetryPressed: () => context
+                                          .read<OrderBloc>()
+                                          .add(OrderDeleted(orderID: idOrder))),
+                                  Status.success => ProgressDialog(
+                                      descriptrion: "Xóa thành công!",
+                                      isProgressed: false,
+                                      onPressed: () => pop(context, 2))
+                                }));
+              });
+        });
+  }
+
+  _buildBodyItem(Orders orderModel) => Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CommonLineText(title: 'ID: ', value: orderModel.id ?? ''),
+            const SizedBox(height: 8.0),
+            CommonLineText(title: 'Bàn: ', value: orderModel.tableName),
+            const SizedBox(height: 8.0),
+            CommonLineText(
+                title: 'Đặt lúc: ',
+                value: Ultils.formatDateTime(
+                    orderModel.orderTime ?? DateTime.now().toString()))
+          ]));
 }

@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../common/widget/common_icon_button.dart';
+import '../../../../config/config.dart';
 import '../../../../core/utils/utils.dart';
-import '../../../../common/widget/common_line_text.dart';
 import '../../data/model/food_model.dart';
 
 class ItemFood extends StatelessWidget {
-  const ItemFood({super.key, required this.food, required this.onTap});
+  const ItemFood(
+      {super.key,
+      required this.food,
+      required this.onTap,
+      required this.index,
+      required this.onTapDeleteFood});
 
   final Food food;
   final void Function()? onTap;
+  final void Function()? onTapDeleteFood;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -16,38 +25,66 @@ class ItemFood extends StatelessWidget {
   }
 
   Widget _buildItemSearch(BuildContext context, Food food) {
-    return InkWell(
-        onTap: onTap,
-        child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: defaultPadding, vertical: defaultPadding / 5),
-            child: Card(
-                borderOnForeground: false,
-                child: SizedBox(
-                    height: 80,
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildImage(food),
-                          Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildTitle(context, food),
-                                // _buildCategory(context, food),
-                                _buildPrice(context, food)
-                              ])
-                        ]
-                            .animate(interval: 50.ms)
-                            .slideX(
-                                begin: -0.1,
-                                end: 0,
-                                curve: Curves.easeInOutCubic,
-                                duration: 500.ms)
-                            .fadeIn(
-                                curve: Curves.easeInOutCubic,
-                                duration: 500.ms))))));
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
+        child: Card(
+            elevation: 10,
+            child: AutofillGroup(
+                child: Column(children: [
+              _buildHeader(context, food),
+              SizedBox(
+                  height: 80,
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildImage(food),
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildTitle(context, food),
+                              // _buildCategory(context, food),
+                              _buildPrice(context, food)
+                            ])
+                      ]
+                          .animate(interval: 50.ms)
+                          .slideX(
+                              begin: -0.1,
+                              end: 0,
+                              curve: Curves.easeInOutCubic,
+                              duration: 500.ms)
+                          .fadeIn(
+                              curve: Curves.easeInOutCubic, duration: 500.ms)))
+            ]))));
   }
+
+  Widget _buildHeader(BuildContext context, Food food) => Container(
+      height: 40,
+      color: context.colorScheme.primary.withOpacity(0.3),
+      child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text('#${index + 1}',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Row(children: [
+              food.isShowFood
+                  ? CommonIconButton(onTap: onTap, color: Colors.green)
+                  : CommonIconButton(
+                      icon: Icons.visibility_off,
+                      onTap: onTap,
+                      color: Colors.red),
+              const SizedBox(width: 8),
+              CommonIconButton(
+                  icon: Icons.edit,
+                  onTap: () async => await _goToEditFood(context, food)),
+              const SizedBox(width: 8),
+              CommonIconButton(
+                  icon: Icons.delete,
+                  color: context.colorScheme.errorContainer,
+                  onTap: onTapDeleteFood)
+            ])
+          ])));
 
   Widget _buildImage(Food food) {
     return Container(
@@ -100,19 +137,23 @@ class ItemFood extends StatelessWidget {
           ]);
   }
 
-  Widget _buildPercentDiscount(Food food) {
-    return Container(
-        height: 80,
-        width: 80,
-        // decoration: BoxDecoration(color: redColor),
-        child: Center(child: CommonLineText(value: "${food.discount}%")
+  // Widget _buildPercentDiscount(Food food) {
+  //   return SizedBox(
+  //       height: 80,
+  //       width: 80,
+  //       // decoration: BoxDecoration(color: redColor),
+  //       child: Center(child: CommonLineText(value: "${food.discount}%")
 
-            // Text("${food.discount}%",
-            //     style: TextStyle(
-            //         fontSize: 16,
-            //         color: textColor,
-            //         fontFamily: Constant.font,
-            //         fontWeight: FontWeight.w600)))
-            ));
-  }
+  //           // Text("${food.discount}%",
+  //           //     style: TextStyle(
+  //           //         fontSize: 16,
+  //           //         color: textColor,
+  //           //         fontFamily: Constant.font,
+  //           //         fontWeight: FontWeight.w600)))
+  //           ));
+  // }
+
+  _goToEditFood(BuildContext context, Food food) =>
+      context.push(RouteName.createOrUpdateFood,
+          extra: {'food': food, 'mode': Mode.update});
 }

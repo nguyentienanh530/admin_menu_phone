@@ -1,7 +1,6 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:form_inputs/form_inputs.dart';
 import 'package:formz/formz.dart';
 part 'login_state.dart';
 
@@ -10,40 +9,16 @@ class LoginCubit extends Cubit<LoginState> {
 
   final AuthenticationRepository _authenticationRepository;
 
-  void emailChanged(String value) {
-    final email = Email.dirty(value);
-    emit(
-      state.copyWith(
-        email: email,
-        isValid: Formz.validate([email, state.password]),
-      ),
-    );
-  }
-
-  void isShowPasswordChanged() {
-    emit(state.copyWith(isShowPassword: !state.isShowPassword!));
-  }
-
   void resetStatus() {
     emit(state.copyWith(status: FormzSubmissionStatus.initial));
   }
 
-  void passwordChanged(String value) {
-    final password = Password.dirty(value);
-    emit(
-      state.copyWith(
-        password: password,
-        isValid: Formz.validate([state.email, password]),
-      ),
-    );
-  }
-
-  Future<void> logInWithCredentials() async {
-    if (!state.isValid) return;
+  Future<void> logInWithCredentials(
+      {required String email, required String password}) async {
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
       await _authenticationRepository.logInWithEmailAndPassword(
-          email: state.email.value, password: state.password.value);
+          email: email, password: password);
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on LogInWithEmailAndPasswordFailure catch (e) {
       emit(

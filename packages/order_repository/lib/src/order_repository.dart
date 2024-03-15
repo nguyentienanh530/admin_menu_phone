@@ -68,6 +68,7 @@ class OrderRepository {
     try {
       return _firebaseFirestore
           .collection("orders")
+          .orderBy('payTime', descending: false)
           .where("status", isEqualTo: 'success')
           .snapshots();
     } on FirebaseException catch (e) {

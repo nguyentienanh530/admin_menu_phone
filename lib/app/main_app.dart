@@ -7,6 +7,7 @@ import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../features/food/bloc/food_bloc.dart';
 import '../features/print/cubit/print_cubit.dart';
 import '../features/search_food/cubit/text_search_cubit.dart';
 import 'app_view.dart';
@@ -28,7 +29,7 @@ class MainApp extends StatelessWidget {
               create: (_) => AuthBloc(
                   authenticationRepository: _authenticationRepository)),
           BlocProvider(create: (_) => OrderBloc()),
-          // BlocProvider(create: (_) => FoodBloc()),
+          BlocProvider(create: (_) => FoodBloc()),
           BlocProvider(create: (_) => TableBloc()),
           BlocProvider(create: (_) => UserBloc()),
           BlocProvider(create: (_) => TextSearchCubit()),

@@ -314,7 +314,8 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
         photoGallery: [_imageGallery1, _imageGallery2, _imageGallery3],
       );
 
-      _updateFood(food);
+      if (!mounted) return;
+      context.read<FoodBloc>().add(FoodUpdated(food: food));
     } else {
       toast.showToast(
           child: AppAlerts.errorToast(msg: 'Chưa nhập đầy đủ thông tin'));
@@ -347,21 +348,13 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
           isDiscount: _isDiscount,
           createAt: DateTime.now().toString(),
           discount: _isDiscount ? int.tryParse(_discountController.text)! : 0);
-      createFood(newFood);
-
+      if (!mounted) return;
+      context.read<FoodBloc>().add(FoodCreated(food: newFood));
       _isLoading.value = false;
     } else {
       toast.showToast(
           child: AppAlerts.errorToast(msg: 'Chưa nhập đầy đủ thông tin'));
     }
-  }
-
-  void _updateFood(Food food) {
-    context.read<FoodBloc>().add(FoodUpdated(food: food));
-  }
-
-  void createFood(Food food) {
-    context.read<FoodBloc>().add(FoodCreated(food: food));
   }
 
   @override
@@ -380,7 +373,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                   Status.success =>
                     AppAlerts.successDialog(context, btnOkOnPress: () {
                       _isLoading.value = false;
-                      pop(context, 3);
+                      pop(context, 2);
                     })
                 }),
             child: onSuccess(widget.food)));

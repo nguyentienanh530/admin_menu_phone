@@ -61,7 +61,7 @@ class _MyWidgetState extends State<DashboardView>
                       left: defaultPadding,
                       right: defaultPadding,
                       top: defaultPadding),
-                  child: DailyRevenue()),
+                  child: const DailyRevenue()),
               _buildHeader(context),
               _buildTitle(context),
               Padding(
@@ -162,6 +162,7 @@ class _MyWidgetState extends State<DashboardView>
     return GestureDetector(
         onTap: onTap,
         child: Card(
+            elevation: 10,
             child: Container(
                 padding: EdgeInsets.all(defaultPadding / 2),
                 child: Column(
@@ -178,7 +179,10 @@ class _MyWidgetState extends State<DashboardView>
                                   color: context.colorScheme.secondary,
                                   fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center)),
-                      FittedBox(child: Text(title2!))
+                      FittedBox(
+                          child: Text(title2!,
+                              style: context.textStyleSmall!.copyWith(
+                                  color: Colors.white.withOpacity(0.5))))
                     ]
                         .animate(interval: 50.ms)
                         .slideX(
@@ -234,6 +238,7 @@ class DailyRevenue extends StatelessWidget {
         ]);
 
     return Card(
+        elevation: 10,
         child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
@@ -271,7 +276,9 @@ class DailyRevenue extends StatelessWidget {
             case Status.empty:
               return const EmptyWidget();
             case Status.failure:
-              return ErrorWidgetCustom(errorMessage: state.error ?? '');
+              print(state.error);
+              // ErrorWidgetCustom(errorMessage: state.error ?? '')
+              return const Text('error');
             case Status.success:
               var ordersNumber = 0;
               var totalPrice = 0.0;
@@ -351,6 +358,7 @@ class _ItemTable extends StatelessWidget {
     return GestureDetector(
         onTap: () => context.push(RouteName.orderOnTable, extra: table),
         child: Card(
+            elevation: 10,
             color: table.isUse ? Colors.green.shade900.withOpacity(0.3) : null,
             child: Container(
                 alignment: Alignment.center,

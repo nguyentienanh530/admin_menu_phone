@@ -26,29 +26,29 @@ class PrintRepository {
   //   }
   // }
 
-  // Future<void> createTable({required Map<String, dynamic> dataJson}) async {
-  //   try {
-  //     var documentReference =
-  //         await _firebaseFirestore.collection('table').add(dataJson);
-  //     await updateTable(
-  //         tableID: documentReference.id,
-  //         dataJson: {'id': documentReference.id});
-  //   } catch (e) {
-  //     throw '$e';
-  //   }
-  // }
+  Future<void> createPrint({required Map<String, dynamic> dataJson}) async {
+    try {
+      var documentReference =
+          await _firebaseFirestore.collection('prints').add(dataJson);
+      await updatePrint(
+          printID: documentReference.id,
+          dataJson: {'id': documentReference.id});
+    } catch (e) {
+      throw '$e';
+    }
+  }
 
-  // Future<void> updateTable(
-  //     {required String tableID, required Map<String, dynamic> dataJson}) async {
-  //   try {
-  //     await _firebaseFirestore
-  //         .collection('table')
-  //         .doc(tableID)
-  //         .update(dataJson);
-  //   } catch (e) {
-  //     throw '$e';
-  //   }
-  // }
+  Future<void> updatePrint(
+      {required String printID, required Map<String, dynamic> dataJson}) async {
+    try {
+      await _firebaseFirestore
+          .collection('prints')
+          .doc(printID)
+          .update(dataJson);
+    } catch (e) {
+      throw '$e';
+    }
+  }
 
   // Future<void> updateStatusTable(
   //     {required Map<String, dynamic> dataJson}) async {

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -87,6 +88,39 @@ class Ultils {
     num discountedPrice = foodPrice - discountAmount;
 
     return isDiscount ? discountedPrice : foodPrice;
+  }
+
+  static Future<void> sendPrintToServer(
+      {String? ip, String? port, List? lst}) async {
+    logger.d(lst);
+    final socket = await Socket.connect(ip, int.parse(port!));
+    logger.d(
+        'Connected to: ${socket.remoteAddress.address}:${socket.remotePort}');
+    // logger.d(lst);
+    // Gửi lệnh đến server
+    socket.writeln(lst);
+
+    // Đọc phản hồi từ server
+    socket.listen(
+      (List<int> data) {
+        final serverResponse = utf8.decode(data);
+        logger.d('Server response: $serverResponse');
+
+        // Cập nhật UI khi nhận được phản hồi từ server
+
+        // Đặt lại trạng thái của nút sau 5 giây
+        Future.delayed(const Duration(seconds: 5), () {});
+
+        socket.close(); // Đóng kết nối sau khi nhận phản hồi
+      },
+      onDone: () {
+        logger.d('Server disconnected.');
+      },
+      onError: (error) {
+        logger.e('Error: $error');
+      },
+      cancelOnError: true,
+    );
   }
 }
 

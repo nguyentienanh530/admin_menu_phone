@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../common/widget/common_icon_button.dart';
-import '../../../../config/config.dart';
 import '../../../../core/utils/utils.dart';
 import '../../data/model/food_model.dart';
 
@@ -10,13 +8,15 @@ class ItemFood extends StatelessWidget {
   const ItemFood(
       {super.key,
       required this.food,
-      required this.onTap,
+      required this.onTapView,
       required this.index,
-      required this.onTapDeleteFood});
+      required this.onTapDeleteFood,
+      required this.onTapEditFood});
 
   final Food food;
-  final void Function()? onTap;
+  final void Function()? onTapView;
   final void Function()? onTapDeleteFood;
+  final void Function()? onTapEditFood;
   final int index;
 
   @override
@@ -69,15 +69,13 @@ class ItemFood extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             Row(children: [
               food.isShowFood
-                  ? CommonIconButton(onTap: onTap, color: Colors.green)
+                  ? CommonIconButton(onTap: onTapView, color: Colors.green)
                   : CommonIconButton(
                       icon: Icons.visibility_off,
-                      onTap: onTap,
+                      onTap: onTapView,
                       color: Colors.red),
               const SizedBox(width: 8),
-              CommonIconButton(
-                  icon: Icons.edit,
-                  onTap: () async => await _goToEditFood(context, food)),
+              CommonIconButton(icon: Icons.edit, onTap: onTapEditFood),
               const SizedBox(width: 8),
               CommonIconButton(
                   icon: Icons.delete,
@@ -152,8 +150,4 @@ class ItemFood extends StatelessWidget {
   //           //         fontWeight: FontWeight.w600)))
   //           ));
   // }
-
-  _goToEditFood(BuildContext context, Food food) =>
-      context.push(RouteName.createOrUpdateFood,
-          extra: {'food': food, 'mode': Mode.update});
 }

@@ -93,9 +93,9 @@ class _MyWidgetState extends State<DashboardView>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(child: _buildUserAccount()),
-                  SizedBox(width: defaultPadding),
+                  SizedBox(width: defaultPadding / 2),
                   Expanded(child: _buildFoods()),
-                  SizedBox(width: defaultPadding),
+                  SizedBox(width: defaultPadding / 2),
                   Expanded(child: _buildTableNumber())
                 ])));
   }
@@ -276,8 +276,6 @@ class DailyRevenue extends StatelessWidget {
             case Status.empty:
               return const EmptyWidget();
             case Status.failure:
-              print(state.error);
-              // ErrorWidgetCustom(errorMessage: state.error ?? '')
               return const Text('error');
             case Status.success:
               var ordersNumber = 0;
@@ -366,7 +364,8 @@ class _ItemTable extends StatelessWidget {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      const FittedBox(child: Text('Bàn')),
+                      FittedBox(
+                          child: Text('Bàn', style: context.textStyleSmall)),
                       FittedBox(
                           child: Text(table.name,
                               style: context.titleStyleMedium!.copyWith(

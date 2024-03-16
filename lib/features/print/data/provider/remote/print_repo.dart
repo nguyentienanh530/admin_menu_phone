@@ -13,4 +13,16 @@ class PrintRepo extends FirebaseBase<PrintModel> {
     return await getItems(
         await _printRepository.getPrints(), PrintModel.fromJson);
   }
+
+  Future<FirebaseResult<bool>> createPrint(
+      {required PrintModel printModel}) async {
+    return await createItem(
+        _printRepository.createPrint(dataJson: printModel.toJson()));
+  }
+
+  Future<FirebaseResult<bool>> updatePrint(
+      {required PrintModel printModel}) async {
+    return await updateItem(_printRepository.updatePrint(
+        printID: printModel.id, dataJson: printModel.toJson()));
+  }
 }

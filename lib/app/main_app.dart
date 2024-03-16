@@ -1,5 +1,6 @@
 import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
+import 'package:admin_menu_mobile/features/print/bloc/print_bloc.dart';
 import 'package:admin_menu_mobile/features/print/cubit/is_use_print_cubit.dart';
 import 'package:admin_menu_mobile/features/table/bloc/table_bloc.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
@@ -35,6 +36,7 @@ class MainApp extends StatelessWidget {
           BlocProvider(create: (_) => TextSearchCubit()),
           BlocProvider(create: (_) => IsUsePrintCubit()),
           BlocProvider(create: (_) => PrintCubit()),
+          BlocProvider(create: (_) => PrintBloc()),
         ], child: const AppView()));
   }
 }

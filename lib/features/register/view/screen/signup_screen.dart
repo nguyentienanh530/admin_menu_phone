@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../../common/dialog/app_alerts.dart';
 import '../../../../common/widget/common_button.dart';
 import '../../../../common/widget/common_line_text.dart';
@@ -113,7 +112,7 @@ class _SignUpViewState extends State<SignUpView> {
         id: userID,
         name: _nameCtrl.text.trim(),
         email: _emailCtrl.text.trim(),
-        role: 'user',
+        role: 'admin',
         createAt: DateTime.now().toString());
     context.read<UserBloc>().add(UserCreated(user: user));
   }

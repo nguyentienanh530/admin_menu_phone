@@ -1,5 +1,7 @@
 import 'package:admin_menu_mobile/features/order/data/model/order_model.dart';
 import 'package:admin_menu_mobile/features/order/view/screen/order_on_table.dart';
+import 'package:admin_menu_mobile/features/print/data/model/print_model.dart';
+import 'package:admin_menu_mobile/features/print/view/screen/create_or_update_print.dart';
 import 'package:admin_menu_mobile/features/table/data/model/table_model.dart';
 import 'package:admin_menu_mobile/features/user/data/model/user_model.dart';
 import 'package:admin_menu_mobile/features/order/view/screen/add_food_to_order_screen.dart';
@@ -40,6 +42,7 @@ class RouteName {
   static const String printSeting = '/printSeting';
   static const String createOrUpdateFood = '/createOrUpdateFood';
   static const String orderOnTable = '/orderOnTable';
+  static const String createOrUpdatePrint = '/createOrUpdatePrint';
 
   static const publicRoutes = [login, register];
 }
@@ -119,6 +122,15 @@ final router = GoRouter(
             final food = data['food'] as Food;
             final mode = data['mode'] as Mode;
             return CreateOrUpdateFoodScreen(food: food, mode: mode);
+          }),
+      GoRoute(
+          path: RouteName.createOrUpdatePrint,
+          builder: (context, state) {
+            final data =
+                GoRouterState.of(context).extra as Map<String, dynamic>;
+            final print = data['print'] as PrintModel;
+            final mode = data['mode'] as Mode;
+            return CreateOrUpdatePrint(printModel: print, mode: mode);
           }),
       GoRoute(
           path: RouteName.updateUser,

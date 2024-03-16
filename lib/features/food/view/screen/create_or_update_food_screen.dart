@@ -181,7 +181,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                             });
                           }),
                       SizedBox(height: defaultPadding / 2),
-                      _buttonCreateOUpdateFood(),
+                      _buttonCreateOrUpdateFood(),
                       SizedBox(height: defaultPadding / 2),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -253,7 +253,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
             .toList());
   }
 
-  Widget _buttonCreateOUpdateFood() {
+  Widget _buttonCreateOrUpdateFood() {
     return ValueListenableBuilder(
         valueListenable: _isLoading,
         builder: (context, value, child) => Center(

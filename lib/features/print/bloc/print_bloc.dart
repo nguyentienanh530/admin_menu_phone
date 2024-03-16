@@ -17,6 +17,8 @@ class PrintBloc extends Bloc<PrintEvent, GenericBlocState<PrintModel>>
     with BlocHelper<PrintModel> {
   PrintBloc() : super(GenericBlocState.loading()) {
     on<PrintsFetched>(_getPrints);
+    on<PrintCreated>(_createPrint);
+    on<PrintUpdated>(_updatePrint);
   }
   final _printRepository = PrintRepo(
       printRepository:
@@ -24,5 +26,15 @@ class PrintBloc extends Bloc<PrintEvent, GenericBlocState<PrintModel>>
 
   FutureOr<void> _getPrints(PrintsFetched event, Emit emit) async {
     await getItems(_printRepository.getPrints(), emit);
+  }
+
+  FutureOr<void> _createPrint(PrintCreated event, Emit emit) async {
+    await createItem(
+        _printRepository.createPrint(printModel: event.printModel), emit);
+  }
+
+  FutureOr<void> _updatePrint(PrintUpdated event, Emit emit) async {
+    await updateItem(
+        _printRepository.updatePrint(printModel: event.printModel), emit);
   }
 }

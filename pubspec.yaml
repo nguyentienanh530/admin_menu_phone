@@ -57,6 +57,8 @@ dependencies:
   flutter_svg: ^2.0.10+1
   easy_search_bar: ^2.5.0
   fl_chart: ^0.66.2
+  flutter_native_splash: ^2.3.10
+  flutter_launcher_icons: ^0.13.1
  
   
 
@@ -81,3 +83,26 @@ flutter:
     - assets/image/image_recipe/
     - assets/icon/
     - assets/.env
+
+
+
+
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+  background_image: assets/image/splash.png
+  image: assets/image/icon_splash.png
+  android_12:
+    image: assets/image/icon_splash.png
+    icon_background_color: "#ffffff"
+    image_dark: assets/image/icon_splash.png
+    icon_background_color_dark: "#121212"
+
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon_launcher.png"
+  min_sdk_android: 21 

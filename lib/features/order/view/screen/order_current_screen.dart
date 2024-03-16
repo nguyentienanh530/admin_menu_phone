@@ -33,15 +33,16 @@ class _CurrentOrderState extends State<CurrentOrder>
     super.build(context);
     return BlocProvider(
         create: (context) => OrderBloc()..add(NewOrdersFecthed()),
-        child: const Scaffold(body: OrderHistoryView()));
+        child: Scaffold(body: OrderHistoryView()));
   }
 
   @override
   bool get wantKeepAlive => true;
 }
 
+// ignore: must_be_immutable
 class OrderHistoryView extends StatelessWidget {
-  const OrderHistoryView({super.key});
+  OrderHistoryView({super.key});
 
   @override
   Widget build(BuildContext context) {

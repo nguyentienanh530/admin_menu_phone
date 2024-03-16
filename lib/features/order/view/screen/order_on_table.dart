@@ -1,5 +1,11 @@
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/dialog/app_alerts.dart';
+import 'package:admin_menu_mobile/common/widget/_print_bottom_sheet.dart';
 import 'package:admin_menu_mobile/features/order/bloc/order_bloc.dart';
+import 'package:admin_menu_mobile/features/order/data/model/food_dto.dart';
+import 'package:admin_menu_mobile/features/print/cubit/is_use_print_cubit.dart';
+import 'package:admin_menu_mobile/features/print/cubit/print_cubit.dart';
+import 'package:admin_menu_mobile/features/print/data/model/print_model.dart';
 import 'package:admin_menu_mobile/features/table/data/model/table_model.dart';
 import 'package:admin_menu_mobile/common/widget/error_screen.dart';
 import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
@@ -9,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/common/widget/empty_screen.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../common/dialog/progress_dialog.dart';
 import '../../../../common/dialog/retry_dialog.dart';
@@ -23,18 +30,9 @@ class OrderOnTable extends StatelessWidget {
   final TableModel? tableModel;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: _buildAppbar(context),
-        body: BlocProvider(
-            create: (context) => OrderBloc(),
-            child: OrderView(tableModel: tableModel ?? TableModel())));
-  }
-
-  _buildAppbar(BuildContext context) {
-    return AppBar(
-        title: Text(' ${AppString.titleOrder} - ${tableModel!.name}',
-            style: context.titleStyleMedium),
-        centerTitle: true);
+    return BlocProvider(
+        create: (context) => OrderBloc(),
+        child: OrderView(tableModel: tableModel ?? TableModel()));
   }
 }
 
@@ -47,36 +45,141 @@ class OrderView extends StatefulWidget {
 }
 
 class _OrderViewState extends State<OrderView> {
-  var orderState = GenericBlocState<Orders>();
+  var _orderState = GenericBlocState<Orders>();
+  var _tableModel = TableModel();
+  var _isUsePrint = false;
+  var _print = PrintModel();
+  final _loading = ValueNotifier(false);
+
   @override
   void initState() {
+    _tableModel = widget.tableModel ?? TableModel();
+
     _getData();
+
     super.initState();
   }
 
   void _getData() {
     if (!mounted) return;
-    context
-        .read<OrderBloc>()
-        .add(OrdersFecthed(tableID: widget.tableModel!.id!));
+    context.read<OrderBloc>().add(OrdersFecthed(tableID: _tableModel.id ?? ''));
+  }
+
+  void _updateTable() {
+    if (_orderState.datas == null || _orderState.datas!.isEmpty) {
+      FirebaseFirestore.instance
+          .collection('table')
+          .doc(_tableModel.id)
+          .update({'isUse': false});
+    }
+  }
+
+  void _handlePrint(List<FoodDto> lst) async {
+    var newList = [];
+    for (var element in lst) {
+      newList.add(
+          '${_tableModel.id} - ${_tableModel.name} - ${element.foodName} - ${element.quantity} - ${element.totalPrice}');
+    }
+
+    _loading.value = true;
+    final toast = FToast()..init(context);
+    if (_print.id.isNotEmpty) {
+      await Ultils.sendPrintToServer(
+              ip: _print.ip, port: _print.port, lst: newList)
+          .then((value) {
+        _loading.value = false;
+        toast
+          ..removeQueuedCustomToasts()
+          ..showToast(child: AppAlerts.successToast(msg: 'in thành công!'));
+      }).onError((error, stackTrace) {
+        _loading.value = false;
+        toast
+          ..removeQueuedCustomToasts()
+          ..showToast(child: AppAlerts.errorToast(msg: error.toString()));
+      });
+    } else {
+      _loading.value = false;
+      toast
+        ..removeQueuedCustomToasts()
+        ..showToast(child: AppAlerts.errorToast(msg: 'Chưa chọn máy in!'));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildBody(context);
+    _isUsePrint = context.watch<IsUsePrintCubit>().state;
+    _print = context.watch<PrintCubit>().state;
+    return Scaffold(appBar: _buildAppbar(context), body: _buildBody(context));
+  }
+
+  _buildAppbar(BuildContext context) {
+    return AppBar(
+        title: Text(' ${AppString.titleOrder} - ${_tableModel.name}',
+            style: context.titleStyleMedium),
+        centerTitle: true,
+        actions: [
+          _isUsePrint
+              ? CommonIconButton(
+                  onTap: () {
+                    showModalBottomSheet(
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => SizedBox(
+                            height: context.sizeDevice.height * 0.9,
+                            child: PrintBottomSheet(
+                                listFoodDto: _handlePrintFood(),
+                                onPressedPrint: () {
+                                  _handlePrint(_handlePrintFood());
+                                })));
+                  },
+                  icon: Icons.print)
+              : const SizedBox(),
+          const SizedBox(width: 8)
+        ]);
+  }
+
+  List<FoodDto> _handlePrintFood() {
+    var newListFoodDto = <FoodDto>[];
+    Map<String, FoodDto> uniqueFoods = {};
+    _orderState.datas?.forEach((e) => newListFoodDto.addAll(e.foods));
+
+    for (var food in newListFoodDto) {
+      if (uniqueFoods.containsKey(food.foodID)) {
+        uniqueFoods[food.foodID] = uniqueFoods[food.foodID]!.copyWith(
+          quantity: uniqueFoods[food.foodID]!.quantity + 1,
+          totalPrice: uniqueFoods[food.foodID]!.totalPrice + food.foodPrice,
+        );
+      } else {
+        // Nếu mặt hàng chưa tồn tại, thêm vào uniqueFoods
+        uniqueFoods[food.foodID] =
+            food.copyWith(quantity: 1, totalPrice: food.foodPrice);
+      }
+    }
+
+    // Chuyển đổi map thành danh sách và trả về
+    return uniqueFoods.values.toList();
   }
 
   Widget _buildBody(BuildContext context) {
-    orderState = context.watch<OrderBloc>().state;
-    return switch (orderState.status) {
-      Status.loading => const LoadingScreen(),
-      Status.empty => const EmptyScreen(),
-      Status.failure => ErrorScreen(errorMsg: orderState.error),
-      Status.success => ListView.builder(
-          itemCount: orderState.datas!.length,
-          itemBuilder: (context, index) =>
-              _buildItemListView(context, orderState.datas![index], index))
-    };
+    _orderState = context.watch<OrderBloc>().state;
+    switch (_orderState.status) {
+      case Status.loading:
+        return const LoadingScreen();
+      case Status.empty:
+        _updateTable();
+        return const EmptyScreen();
+      case Status.failure:
+        return ErrorScreen(errorMsg: _orderState.error);
+      case Status.success:
+        return ValueListenableBuilder(
+            valueListenable: _loading,
+            builder: (context, value, child) => value
+                ? const LoadingScreen()
+                : ListView.builder(
+                    itemCount: _orderState.datas!.length,
+                    itemBuilder: (context, index) => _buildItemListView(
+                        context, _orderState.datas![index], index)));
+    }
   }
 
   Widget _buildItemListView(
@@ -113,6 +216,24 @@ class _OrderViewState extends State<OrderView> {
                               fontWeight: FontWeight.bold))
                     ]),
                     Row(children: [
+                      _isUsePrint
+                          ? CommonIconButton(
+                              onTap: () {
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (context) => SizedBox(
+                                        height: context.sizeDevice.height * 0.9,
+                                        child: PrintBottomSheet(
+                                            listFoodDto: orders.foods,
+                                            onPressedPrint: () {
+                                              context.pop();
+                                              _handlePrint(orders.foods);
+                                            })));
+                              },
+                              icon: Icons.print,
+                              color: Colors.blueAccent)
+                          : const SizedBox(),
                       const SizedBox(width: 8),
                       CommonIconButton(
                           icon: Icons.edit,
@@ -161,13 +282,8 @@ class _OrderViewState extends State<OrderView> {
                                       descriptrion: "Xóa thành công!",
                                       isProgressed: false,
                                       onPressed: () {
-                                        if (orderState.datas!.length <= 1) {
-                                          FirebaseFirestore.instance
-                                              .collection('table')
-                                              .doc(order.tableID)
-                                              .update({'isUse': false});
-                                        }
                                         _getData();
+                                        _updateTable();
                                         pop(context, 2);
                                       })
                                 }));
@@ -192,7 +308,10 @@ class _OrderViewState extends State<OrderView> {
           ]));
 
   _goToEditOrder(BuildContext context, Orders orders) async {
-    await context.push(RouteName.orderDetail, extra: orders).then((value) =>
-        context.read<OrderBloc>().add(OrdersFecthed(tableID: orders.tableID!)));
+    await context.push(RouteName.orderDetail, extra: orders).then((value) {
+      // context.read<OrderBloc>().add(OrdersFecthed(tableID: orders.tableID!));
+      _getData();
+      _updateTable();
+    });
   }
 }

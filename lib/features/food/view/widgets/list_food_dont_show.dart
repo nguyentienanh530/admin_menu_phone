@@ -71,22 +71,14 @@ class ListFoodIsShowView extends StatelessWidget {
                             foodIsShow.datas![i].name.toString().toLowerCase())
                         .contains(textSearch.toLowerCase())) {
                   return ItemFood(
+                      onTapEditFood: () async =>
+                          await _goToEditFood(context, foodIsShow.datas![i]),
                       onTapDeleteFood: () =>
                           _buildDeleteFood(context, foodIsShow.datas![i]),
                       index: i,
                       food: foodIsShow.datas![i],
-                      onTap: () {
-                        context
-                            .push(RouteName.foodDetail,
-                                extra: foodIsShow.datas![i])
-                            .then((value) {
-                          if (value is bool || value == true) {
-                            context
-                                .read<FoodBloc>()
-                                .add(const FoodsFetched(isShowFood: false));
-                          }
-                        });
-                      });
+                      onTapView: () => context.push(RouteName.foodDetail,
+                          extra: foodIsShow.datas![i]));
                 }
                 return const SizedBox();
               })
@@ -97,6 +89,14 @@ class ListFoodIsShowView extends StatelessWidget {
           context.read<FoodBloc>().add(const FoodsFetched(isShowFood: false));
         });
   }
+
+  _goToEditFood(BuildContext context, Food food) async =>
+      await context.push(RouteName.createOrUpdateFood,
+          extra: {'food': food, 'mode': Mode.update}).then((value) {
+        if (value is bool && value == true) {
+          context.read<FoodBloc>().add(const FoodsFetched(isShowFood: true));
+        }
+      });
 
   _buildDeleteFood(BuildContext context, Food food) {
     showCupertinoModalPopup<void>(

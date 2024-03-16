@@ -1,10 +1,7 @@
-import 'package:admin_menu_mobile/common/bloc/bloc_helper.dart';
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/common/dialog/progress_dialog.dart';
 import 'package:admin_menu_mobile/common/dialog/retry_dialog.dart';
 import 'package:admin_menu_mobile/common/widget/empty_screen.dart';
-import 'package:admin_menu_mobile/common/widget/error_screen.dart';
-import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
 import 'package:admin_menu_mobile/features/order/data/model/order_model.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:admin_menu_mobile/features/order/data/provider/remote/order_repo.dart';
@@ -29,14 +26,10 @@ class OrderDetailScreen extends StatelessWidget {
   @override
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context) => OrderBloc()),
-          BlocProvider(create: (context) => OrderBloc())
-        ],
-        child: Scaffold(
-            appBar: _buildAppbar(context),
-            body: OrderDetailView(orders: orders)));
+    //  // ..add(NewOrdersFecthed())
+    //       BlocProvider(create: (context) => OrderBloc())
+    return Scaffold(
+        appBar: _buildAppbar(context), body: OrderDetailView(orders: orders));
   }
 
   _buildAppbar(BuildContext context) {
@@ -57,26 +50,19 @@ class OrderDetailView extends StatefulWidget {
 class _OrderDetailViewState extends State<OrderDetailView> {
   var orders = Orders();
   final _totalPrice = ValueNotifier<num>(0.0);
-  var ordersState = GenericBlocState<Orders>();
+  // var _ordersState = GenericBlocState<Orders>();
   @override
   void initState() {
     orders = widget.orders;
     _totalPrice.value = orders.totalPrice ?? 0.0;
-    context.read<OrderBloc>().add(NewOrdersFecthed());
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    ordersState = context.watch<OrderBloc>().state;
-    return context.read<OrderBloc>().operation == ApiOperation.select
-        ? switch (ordersState.status) {
-            Status.loading => const LoadingScreen(),
-            Status.empty => const EmptyScreen(),
-            Status.failure => ErrorScreen(errorMsg: ordersState.error),
-            Status.success => _buildBody(context, orders),
-          }
-        : _buildBody(context, orders);
+    // _ordersState = context.watch<OrderBloc>().state;
+    return _buildBody(context, orders);
   }
 
   Widget _buildBody(BuildContext context, Orders order) {
@@ -251,12 +237,6 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               onConfirm: () {
                 pop(context, 1);
                 handlePaymentSubmited();
-                if (ordersState.datas!.length <= 1) {
-                  FirebaseFirestore.instance
-                      .collection('table')
-                      .doc(orders.tableID)
-                      .update({'isUse': false});
-                }
               });
         });
   }

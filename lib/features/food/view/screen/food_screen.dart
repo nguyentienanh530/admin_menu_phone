@@ -35,36 +35,35 @@ class _MyWidgetState extends State<FoodScreen>
   Widget build(BuildContext context) {
     super.build(context);
     return BlocProvider(
-      create: (context) => FoodBloc(),
-      child: Scaffold(
-          floatingActionButton: _buildFloatingActionButton(),
-          appBar: _buildAppbar(context),
-          body: BlocBuilder<TextSearchCubit, String>(
-              buildWhen: (previous, current) => previous != current,
-              builder: (context, state) {
-                return Column(children: [
-                  DefaultTabController(
-                      length: 2,
-                      child: TabBar(
-                          labelColor: Colors.white,
-                          unselectedLabelColor: Colors.white.withOpacity(0.3),
-                          indicatorColor: context.colorScheme.secondary,
-                          onTap: (value) => _pageController.jumpToPage(value),
-                          tabs: const [
-                            Tab(text: 'Đang hiển thị'),
-                            Tab(text: 'Đang ẩn')
-                          ])),
-                  Expanded(
-                      child: PageView(
-                          controller: _pageController,
-                          physics: const NeverScrollableScrollPhysics(),
-                          children: [
-                        ListFoodIsShow(textSearch: state),
-                        ListFoodDontShow(textSearch: state)
-                      ]))
-                ]);
-              })),
-    );
+        create: (context) => FoodBloc(),
+        child: Scaffold(
+            floatingActionButton: _buildFloatingActionButton(),
+            appBar: _buildAppbar(context),
+            body: BlocBuilder<TextSearchCubit, String>(
+                buildWhen: (previous, current) => previous != current,
+                builder: (context, state) {
+                  return Column(children: [
+                    DefaultTabController(
+                        length: 2,
+                        child: TabBar(
+                            labelColor: Colors.white,
+                            unselectedLabelColor: Colors.white.withOpacity(0.3),
+                            indicatorColor: context.colorScheme.secondary,
+                            onTap: (value) => _pageController.jumpToPage(value),
+                            tabs: const [
+                              Tab(text: 'Đang hiển thị'),
+                              Tab(text: 'Đang ẩn')
+                            ])),
+                    Expanded(
+                        child: PageView(
+                            controller: _pageController,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                          ListFoodIsShow(textSearch: state),
+                          ListFoodDontShow(textSearch: state)
+                        ]))
+                  ]);
+                })));
   }
 
 // ListFoodIsShow(textSearch: state)

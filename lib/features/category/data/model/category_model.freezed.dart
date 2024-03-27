@@ -14,12 +14,12 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-Categories _$CategoriesFromJson(Map<String, dynamic> json) {
-  return _Categories.fromJson(json);
+CategoryModel _$CategoryModelFromJson(Map<String, dynamic> json) {
+  return _CategoryModel.fromJson(json);
 }
 
 /// @nodoc
-mixin _$Categories {
+mixin _$CategoryModel {
   String? get id => throw _privateConstructorUsedError;
   String? get name => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
@@ -27,23 +27,23 @@ mixin _$Categories {
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $CategoriesCopyWith<Categories> get copyWith =>
+  $CategoryModelCopyWith<CategoryModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $CategoriesCopyWith<$Res> {
-  factory $CategoriesCopyWith(
-          Categories value, $Res Function(Categories) then) =
-      _$CategoriesCopyWithImpl<$Res, Categories>;
+abstract class $CategoryModelCopyWith<$Res> {
+  factory $CategoryModelCopyWith(
+          CategoryModel value, $Res Function(CategoryModel) then) =
+      _$CategoryModelCopyWithImpl<$Res, CategoryModel>;
   @useResult
   $Res call({String? id, String? name, String? image, String? description});
 }
 
 /// @nodoc
-class _$CategoriesCopyWithImpl<$Res, $Val extends Categories>
-    implements $CategoriesCopyWith<$Res> {
-  _$CategoriesCopyWithImpl(this._value, this._then);
+class _$CategoryModelCopyWithImpl<$Res, $Val extends CategoryModel>
+    implements $CategoryModelCopyWith<$Res> {
+  _$CategoryModelCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -80,22 +80,22 @@ class _$CategoriesCopyWithImpl<$Res, $Val extends Categories>
 }
 
 /// @nodoc
-abstract class _$$CategoriesImplCopyWith<$Res>
-    implements $CategoriesCopyWith<$Res> {
-  factory _$$CategoriesImplCopyWith(
-          _$CategoriesImpl value, $Res Function(_$CategoriesImpl) then) =
-      __$$CategoriesImplCopyWithImpl<$Res>;
+abstract class _$$CategoryModelImplCopyWith<$Res>
+    implements $CategoryModelCopyWith<$Res> {
+  factory _$$CategoryModelImplCopyWith(
+          _$CategoryModelImpl value, $Res Function(_$CategoryModelImpl) then) =
+      __$$CategoryModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String? id, String? name, String? image, String? description});
 }
 
 /// @nodoc
-class __$$CategoriesImplCopyWithImpl<$Res>
-    extends _$CategoriesCopyWithImpl<$Res, _$CategoriesImpl>
-    implements _$$CategoriesImplCopyWith<$Res> {
-  __$$CategoriesImplCopyWithImpl(
-      _$CategoriesImpl _value, $Res Function(_$CategoriesImpl) _then)
+class __$$CategoryModelImplCopyWithImpl<$Res>
+    extends _$CategoryModelCopyWithImpl<$Res, _$CategoryModelImpl>
+    implements _$$CategoryModelImplCopyWith<$Res> {
+  __$$CategoryModelImplCopyWithImpl(
+      _$CategoryModelImpl _value, $Res Function(_$CategoryModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -106,7 +106,7 @@ class __$$CategoriesImplCopyWithImpl<$Res>
     Object? image = freezed,
     Object? description = freezed,
   }) {
-    return _then(_$CategoriesImpl(
+    return _then(_$CategoryModelImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -129,11 +129,13 @@ class __$$CategoriesImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
-  _$CategoriesImpl({this.id, this.name, this.image, this.description});
+class _$CategoryModelImpl
+    with DiagnosticableTreeMixin
+    implements _CategoryModel {
+  _$CategoryModelImpl({this.id, this.name, this.image, this.description});
 
-  factory _$CategoriesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CategoriesImplFromJson(json);
+  factory _$CategoryModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CategoryModelImplFromJson(json);
 
   @override
   final String? id;
@@ -146,14 +148,14 @@ class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Categories(id: $id, name: $name, image: $image, description: $description)';
+    return 'CategoryModel(id: $id, name: $name, image: $image, description: $description)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Categories'))
+      ..add(DiagnosticsProperty('type', 'CategoryModel'))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('image', image))
@@ -164,7 +166,7 @@ class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$CategoriesImpl &&
+            other is _$CategoryModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.image, image) || other.image == image) &&
@@ -179,26 +181,26 @@ class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$CategoriesImplCopyWith<_$CategoriesImpl> get copyWith =>
-      __$$CategoriesImplCopyWithImpl<_$CategoriesImpl>(this, _$identity);
+  _$$CategoryModelImplCopyWith<_$CategoryModelImpl> get copyWith =>
+      __$$CategoryModelImplCopyWithImpl<_$CategoryModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CategoriesImplToJson(
+    return _$$CategoryModelImplToJson(
       this,
     );
   }
 }
 
-abstract class _Categories implements Categories {
-  factory _Categories(
+abstract class _CategoryModel implements CategoryModel {
+  factory _CategoryModel(
       {final String? id,
       final String? name,
       final String? image,
-      final String? description}) = _$CategoriesImpl;
+      final String? description}) = _$CategoryModelImpl;
 
-  factory _Categories.fromJson(Map<String, dynamic> json) =
-      _$CategoriesImpl.fromJson;
+  factory _CategoryModel.fromJson(Map<String, dynamic> json) =
+      _$CategoryModelImpl.fromJson;
 
   @override
   String? get id;
@@ -210,6 +212,6 @@ abstract class _Categories implements Categories {
   String? get description;
   @override
   @JsonKey(ignore: true)
-  _$$CategoriesImplCopyWith<_$CategoriesImpl> get copyWith =>
+  _$$CategoryModelImplCopyWith<_$CategoryModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

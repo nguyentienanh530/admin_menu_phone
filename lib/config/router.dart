@@ -1,3 +1,6 @@
+import 'package:admin_menu_mobile/features/category/data/model/category_model.dart';
+import 'package:admin_menu_mobile/features/category/view/screen/categories_screen.dart';
+import 'package:admin_menu_mobile/features/category/view/screen/create_or_update_category.dart';
 import 'package:admin_menu_mobile/features/order/data/model/order_model.dart';
 import 'package:admin_menu_mobile/features/order/view/screen/order_on_table.dart';
 import 'package:admin_menu_mobile/features/print/data/model/print_model.dart';
@@ -43,6 +46,8 @@ class RouteName {
   static const String createOrUpdateFood = '/createOrUpdateFood';
   static const String orderOnTable = '/orderOnTable';
   static const String createOrUpdatePrint = '/createOrUpdatePrint';
+  static const String categoriesScreen = '/categoriesScreen';
+  static const String createOrUpdateCategory = '/createOrUpdateCategory';
 
   static const publicRoutes = [login, register];
 }
@@ -87,6 +92,9 @@ final router = GoRouter(
       GoRoute(
           path: RouteName.printSeting,
           builder: (context, state) => const PrintScreen()),
+      GoRoute(
+          path: RouteName.categoriesScreen,
+          builder: (context, state) => const CategoriesScreen()),
       GoRoute(
           path: RouteName.foodDetail,
           builder: (context, state) {
@@ -137,5 +145,15 @@ final router = GoRouter(
           builder: (context, state) {
             final UserModel user = GoRouterState.of(context).extra as UserModel;
             return UpdateUser(user: user);
-          })
+          }),
+      GoRoute(
+          path: RouteName.createOrUpdateCategory,
+          builder: (context, state) {
+            final data =
+                GoRouterState.of(context).extra as Map<String, dynamic>;
+            final categoryModel = data['categoryModel'] as CategoryModel;
+            final mode = data['mode'] as Mode;
+            return CreateOrUpdateCategory(
+                categoryModel: categoryModel, mode: mode);
+          }),
     ]);

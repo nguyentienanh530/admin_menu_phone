@@ -7,7 +7,7 @@ sealed class CategoryEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchCategories extends CategoryEvent {}
+class CategoriesFetched extends CategoryEvent {}
 
 class CategoryChanged extends CategoryEvent {
   final String category;

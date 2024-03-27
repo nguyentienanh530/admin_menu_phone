@@ -4,13 +4,13 @@ part 'category_model.freezed.dart';
 part 'category_model.g.dart';
 
 @freezed
-class Categories with _$Categories {
-  factory Categories(
+class CategoryModel with _$CategoryModel {
+  factory CategoryModel(
       {String? id,
       String? name,
       String? image,
-      String? description}) = _Categories;
+      String? description}) = _CategoryModel;
 
-  factory Categories.fromJson(Map<String, dynamic> json) =>
-      _$CategoriesFromJson(json);
+  factory CategoryModel.fromJson(Map<String, dynamic> json) =>
+      _$CategoryModelFromJson(json);
 }

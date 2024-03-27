@@ -4,6 +4,7 @@ import 'package:admin_menu_mobile/common/widget/error_screen.dart';
 import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/features/auth/bloc/auth_bloc.dart';
+import 'package:admin_menu_mobile/features/category/view/screen/categories_screen.dart';
 import 'package:admin_menu_mobile/features/order/view/screen/order_screen.dart';
 import 'package:admin_menu_mobile/features/user/bloc/user_bloc.dart';
 import 'package:admin_menu_mobile/features/dashboard/view/screen/dashboard_screen.dart';
@@ -47,7 +48,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void initState() {
-    // _updateToken();
+    _updateToken();
     getUserData();
     getIsUsePrint();
     _handleGetPrint();
@@ -97,6 +98,7 @@ class _HomeViewState extends State<HomeView> {
     const OrderScreen(),
     const FoodScreen(),
     const TableScreen(),
+    const CategoriesScreen(),
     const ProfileScreen()
   ];
 
@@ -213,6 +215,16 @@ class _HomeViewState extends State<HomeView> {
                       colorFilter: const ColorFilter.mode(
                           Colors.white, BlendMode.srcIn))),
               title: "Bàn ăn"),
+          TabItem(
+              icon: SvgPicture.asset('assets/icon/category.svg',
+                  colorFilter:
+                      const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+              activeIcon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset('assets/icon/category.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcIn))),
+              title: "Danh mục"),
           TabItem(
               fontFamily: GoogleFonts.nunito().fontFamily,
               icon: SvgPicture.asset('assets/icon/user.svg',

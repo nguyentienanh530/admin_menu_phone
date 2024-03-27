@@ -1,4 +1,7 @@
 import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/widget/empty_widget.dart';
+import 'package:admin_menu_mobile/common/widget/error_widget.dart';
+import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
 import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
 import 'package:admin_menu_mobile/features/food/data/model/food_model.dart';
 import 'package:admin_menu_mobile/common/dialog/app_alerts.dart';
@@ -25,7 +28,7 @@ class CreateOrUpdateFoodScreen extends StatelessWidget {
         providers: [
           BlocProvider(create: (context) => FoodBloc()),
           BlocProvider(
-              create: (context) => CategoryBloc()..add(FetchCategories())),
+              create: (context) => CategoryBloc()..add(CategoriesFetched())),
         ],
         child: Scaffold(
             appBar: _buildAppbar(context),
@@ -232,25 +235,31 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   Widget _categories() {
     var categoryState = context.watch<CategoryBloc>().state;
 
-    return Wrap(
-        spacing: 4.0,
-        runSpacing: 2.0,
-        children: categoryState.categories
-            .map((e) => SizedBox(
-                height: 25,
-                child: FilledButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
-                            _categoryID == e.id
-                                ? context.colorScheme.errorContainer
-                                : context.colorScheme.primaryContainer)),
-                    onPressed: () {
-                      setState(() {
-                        _categoryID = e.id ?? '';
-                      });
-                    },
-                    child: Text(e.name!))))
-            .toList());
+    return (switch (categoryState.status) {
+      Status.loading => const LoadingScreen(),
+      Status.empty => const EmptyWidget(),
+      Status.failure =>
+        ErrorWidgetCustom(errorMessage: categoryState.error ?? ''),
+      Status.success => Wrap(
+          spacing: 4.0,
+          runSpacing: 2.0,
+          children: categoryState.datas!
+              .map((e) => SizedBox(
+                  height: 25,
+                  child: FilledButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(
+                              _categoryID == e.id
+                                  ? context.colorScheme.errorContainer
+                                  : context.colorScheme.primaryContainer)),
+                      onPressed: () {
+                        setState(() {
+                          _categoryID = e.id ?? '';
+                        });
+                      },
+                      child: Text(e.name!))))
+              .toList())
+    });
   }
 
   Widget _buttonCreateOrUpdateFood() {

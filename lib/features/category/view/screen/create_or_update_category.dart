@@ -104,7 +104,6 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
   _handelCreateCategory() {
     final invalid = _formKey.currentState?.validate() ?? false;
     if (invalid) {
-      print(_nameCtrl.text);
     } else {}
   }
 

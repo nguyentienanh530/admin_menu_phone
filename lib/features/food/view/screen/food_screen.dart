@@ -32,6 +32,16 @@ class _MyWidgetState extends State<FoodScreen>
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  void _getData() {
+    if (!mounted) return;
+    // context.read<FoodBloc>().add(event);
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     return BlocProvider(
@@ -66,7 +76,6 @@ class _MyWidgetState extends State<FoodScreen>
                 })));
   }
 
-// ListFoodIsShow(textSearch: state)
   @override
   bool get wantKeepAlive => true;
 
@@ -77,9 +86,7 @@ class _MyWidgetState extends State<FoodScreen>
         onPressed: () async {
           var result = await context.push(RouteName.createOrUpdateFood,
               extra: {'mode': Mode.create, 'food': Food()});
-          if (result is bool && result) {
-            // getData();
-          }
+          if (result is bool && result) {}
         },
         child: const Icon(Icons.add));
   }

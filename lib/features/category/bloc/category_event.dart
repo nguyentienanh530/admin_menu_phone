@@ -9,8 +9,20 @@ sealed class CategoryEvent extends Equatable {
 
 class CategoriesFetched extends CategoryEvent {}
 
-class CategoryChanged extends CategoryEvent {
-  final String category;
+class CategoryCreated extends CategoryEvent {
+  final CategoryModel categoryModel;
 
-  const CategoryChanged({required this.category});
+  const CategoryCreated({required this.categoryModel});
+}
+
+class CategoryUpdated extends CategoryEvent {
+  final CategoryModel categoryModel;
+
+  const CategoryUpdated({required this.categoryModel});
+}
+
+class CategoryDeleted extends CategoryEvent {
+  final CategoryModel categoryModel;
+
+  const CategoryDeleted({required this.categoryModel});
 }

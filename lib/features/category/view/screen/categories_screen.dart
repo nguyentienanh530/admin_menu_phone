@@ -2,15 +2,18 @@ import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
 import 'package:admin_menu_mobile/common/widget/common_refresh_indicator.dart';
 import 'package:admin_menu_mobile/common/widget/empty_screen.dart';
 import 'package:admin_menu_mobile/common/widget/error_screen.dart';
+import 'package:admin_menu_mobile/common/widget/error_widget.dart';
 import 'package:admin_menu_mobile/common/widget/loading_screen.dart';
 import 'package:admin_menu_mobile/config/router.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
 import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
 import 'package:admin_menu_mobile/features/category/data/model/category_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
+import '../../../../common/dialog/progress_dialog.dart';
+import '../../../../common/widget/common_bottomsheet.dart';
 import '../../../../common/widget/common_icon_button.dart';
 
 class CategoriesScreen extends StatelessWidget {
@@ -18,9 +21,7 @@ class CategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (context) => CategoryBloc(),
-        child: const Scaffold(body: CategoriesView()));
+    return const Scaffold(body: CategoriesView());
   }
 }
 
@@ -54,19 +55,21 @@ class _CategoriesViewState extends State<CategoriesView>
   }
 
   Widget _buildBody() {
-    var categoryState = context.watch<CategoryBloc>().state;
-    return CommonRefreshIndicator(
-        onRefresh: () async {
-          await Future.delayed(const Duration(milliseconds: 500));
-          _getData();
-        },
-        child: switch (categoryState.status) {
-          Status.loading => const LoadingScreen(),
-          Status.empty => const EmptyScreen(),
-          Status.failure => ErrorScreen(errorMsg: categoryState.error),
-          Status.success =>
-            _buildCategories(categoryState.datas ?? <CategoryModel>[])
-        });
+    return Builder(builder: (_) {
+      var categoryState = context.watch<CategoryBloc>().state;
+      return CommonRefreshIndicator(
+          onRefresh: () async {
+            await Future.delayed(const Duration(milliseconds: 500));
+            _getData();
+          },
+          child: switch (categoryState.status) {
+            Status.loading => const LoadingScreen(),
+            Status.empty => const EmptyScreen(),
+            Status.failure => ErrorScreen(errorMsg: categoryState.error),
+            Status.success =>
+              _buildCategories(categoryState.datas ?? <CategoryModel>[])
+          });
+    });
   }
 
   Widget _buildHeader(CategoryModel categoryModel, int index) => Container(
@@ -82,27 +85,76 @@ class _CategoriesViewState extends State<CategoriesView>
               const SizedBox(width: 8),
               CommonIconButton(
                   icon: Icons.edit,
-                  onTap: () => context.push(RouteName.createOrUpdateCategory,
-                          extra: {
-                            'categoryModel': categoryModel,
-                            'mode': Mode.update
-                          })),
+                  onTap: () async {
+                    var result = await context
+                        .push(RouteName.createOrUpdateCategory, extra: {
+                      'categoryModel': categoryModel,
+                      'mode': Mode.update
+                    });
+                    if (result is bool && result) {
+                      _getData();
+                    }
+                  }),
               const SizedBox(width: 8),
-              CommonIconButton(
-                  icon: Icons.delete,
-                  color: context.colorScheme.errorContainer,
-                  onTap: () {})
+              BlocProvider(
+                create: (context) => CategoryBloc(),
+                child: CommonIconButton(
+                    icon: Icons.delete,
+                    color: context.colorScheme.errorContainer,
+                    onTap: () => _buildDeleteFood(categoryModel)),
+              )
             ])
           ])));
+
+  _buildDeleteFood(CategoryModel categoryModel) {
+    showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+              // height: 200,
+              child: CommonBottomSheet(
+                  title: "Bạn có muốn xóa danh mục này không?",
+                  textConfirm: 'Xóa',
+                  textCancel: "Hủy",
+                  textConfirmColor: context.colorScheme.errorContainer,
+                  onConfirm: () => _handleDeleteFood(categoryModel)));
+        });
+  }
+
+  void _handleDeleteFood(CategoryModel categoryModel) {
+    context.pop();
+    context
+        .read<CategoryBloc>()
+        .add(CategoryDeleted(categoryModel: categoryModel));
+    showDialog(
+        context: context,
+        builder: (context) => BlocBuilder<CategoryBloc, GenericBlocState>(
+            builder: (context, state) => switch (state.status) {
+                  Status.empty => const SizedBox(),
+                  Status.loading => const ProgressDialog(
+                      isProgressed: true, descriptrion: 'Đang xóa'),
+                  Status.failure =>
+                    ErrorWidgetCustom(errorMessage: state.error ?? ''),
+                  Status.success => ProgressDialog(
+                      descriptrion: 'Xóa thành công',
+                      onPressed: () {
+                        _getData();
+                        pop(context, 1);
+                      },
+                      isProgressed: false)
+                }));
+  }
 
   @override
   bool get wantKeepAlive => true;
 
   Widget _buildCategories(List<CategoryModel> categories) {
-    return ListView.builder(
-        itemCount: categories.length,
-        itemBuilder: (context, index) =>
-            _buildCategory(categories[index], index));
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+            itemCount: categories.length,
+            itemBuilder: (context, index) =>
+                _buildCategory(categories[index], index)));
   }
 
   Widget _buildCategory(CategoryModel categoryModel, int index) {
@@ -145,18 +197,28 @@ class _CategoriesViewState extends State<CategoriesView>
               Text('Mô tả: ',
                   style: context.textStyleSmall!
                       .copyWith(color: Colors.white.withOpacity(0.5))),
-              Text(
-                  categoryModel.description!.isEmpty
-                      ? '_'
-                      : categoryModel.description!,
-                  style: context.textStyleSmall!
-                      .copyWith(color: Colors.white.withOpacity(0.5)))
+              SizedBox(
+                  width: context.sizeDevice.width -
+                      context.sizeDevice.width * 0.35,
+                  child: Text(
+                      categoryModel.description!.isEmpty
+                          ? '_'
+                          : categoryModel.description!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: context.textStyleSmall!
+                          .copyWith(color: Colors.white.withOpacity(0.5))))
             ])
           ]);
 
   _buildFloadtingButton() => FloatingActionButton(
       backgroundColor: context.colorScheme.secondary,
-      onPressed: () => context.push(RouteName.createOrUpdateCategory,
-          extra: {'categoryModel': CategoryModel(), 'mode': Mode.create}),
+      onPressed: () async {
+        var result = await context.push(RouteName.createOrUpdateCategory,
+            extra: {'categoryModel': CategoryModel(), 'mode': Mode.create});
+        if (result is bool && result) {
+          _getData();
+        }
+      },
       child: const Icon(Icons.add));
 }

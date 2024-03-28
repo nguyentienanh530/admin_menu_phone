@@ -130,16 +130,41 @@ Future pop(BuildContext context, int returnedLevel) async {
   }
 }
 
-Future<String> uploadImage({required String path, required File file}) async {
+// Future<String> uploadImage({required String path, required File file}) async {
+//   var image = '';
+//   Reference storageReference = FirebaseStorage.instance
+//       .ref()
+//       .child('$path/${file.path.split('/').last}');
+//   UploadTask uploadTask = storageReference.putFile(file);
+//   await uploadTask.whenComplete(() async {
+//     var url = await storageReference.getDownloadURL();
+//     image = url.toString();
+//   });
+//   return image;
+// }
+
+Future<String> uploadImage(
+    {required String path,
+    required File file,
+    required ValueNotifier progress}) async {
   var image = '';
   Reference storageReference = FirebaseStorage.instance
       .ref()
       .child('$path/${file.path.split('/').last}');
+
   UploadTask uploadTask = storageReference.putFile(file);
-  await uploadTask.whenComplete(() async {
-    var url = await storageReference.getDownloadURL();
+  uploadTask.snapshotEvents.listen((event) {
+    progress.value =
+        ((event.bytesTransferred.toDouble() / event.totalBytes.toDouble()) *
+                100)
+            .roundToDouble();
+  });
+
+  await uploadTask.then((snap) async {
+    var url = await snap.ref.getDownloadURL();
     image = url.toString();
   });
+
   return image;
 }
 

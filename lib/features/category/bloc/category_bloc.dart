@@ -17,6 +17,9 @@ class CategoryBloc extends Bloc<CategoryEvent, GenericBlocState<CategoryModel>>
     with BlocHelper<CategoryModel> {
   CategoryBloc() : super(GenericBlocState.loading()) {
     on<CategoriesFetched>(_fetchCategories);
+    on<CategoryCreated>(_createCategory);
+    on<CategoryUpdated>(_updateCategory);
+    on<CategoryDeleted>(_deleteCategory);
   }
   final _categoryRepo = CategoryRepo(
       categoryRepository:
@@ -24,5 +27,20 @@ class CategoryBloc extends Bloc<CategoryEvent, GenericBlocState<CategoryModel>>
 
   FutureOr<void> _fetchCategories(CategoriesFetched event, Emit emit) async {
     await getItems(_categoryRepo.getCategories(), emit);
+  }
+
+  FutureOr<void> _createCategory(CategoryCreated event, Emit emit) async {
+    await createItem(
+        _categoryRepo.createCategory(categoryModel: event.categoryModel), emit);
+  }
+
+  FutureOr<void> _updateCategory(CategoryUpdated event, Emit emit) async {
+    await updateItem(
+        _categoryRepo.updateCategory(categoryModel: event.categoryModel), emit);
+  }
+
+  FutureOr<void> _deleteCategory(CategoryDeleted event, Emit emit) async {
+    await deleteItem(
+        _categoryRepo.deleteCategory(categoryModel: event.categoryModel), emit);
   }
 }

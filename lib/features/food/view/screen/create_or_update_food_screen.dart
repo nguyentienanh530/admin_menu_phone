@@ -11,7 +11,6 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:admin_menu_mobile/core/utils/utils.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../common/widget/common_text_field.dart';
@@ -66,8 +65,12 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   var _imageGallery2 = '';
   var _imageGallery3 = '';
   var _isDiscount = false;
-  final _isLoading = ValueNotifier(false);
   final _isShowFood = ValueNotifier(true);
+  final _uploadImageProgress = ValueNotifier(0.0);
+  final _uploadImage1Progress = ValueNotifier(0.0);
+  final _uploadImage2Progress = ValueNotifier(0.0);
+  final _uploadImage3Progress = ValueNotifier(0.0);
+  final _isUploadImage = ValueNotifier(false);
 
   @override
   void initState() {
@@ -263,24 +266,16 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
   }
 
   Widget _buttonCreateOrUpdateFood() {
-    return ValueListenableBuilder(
-        valueListenable: _isLoading,
-        builder: (context, value, child) => Center(
-            child: FilledButton(
-                style: const ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Colors.green)),
-                onPressed: () async => widget.mode == Mode.create
-                    ? _handelCreateFood(widget.food)
-                    : _handleUpdateFood(widget.food),
-                child: value
-                    ? const SizedBox(
-                        height: 30,
-                        width: 30,
-                        child: SpinKitCircle(color: Colors.white, size: 30))
-                    : Text(
-                        widget.mode == Mode.create ? 'Tạo món' : 'Cập nhật món',
-                        style: context.titleStyleMedium!
-                            .copyWith(fontWeight: FontWeight.bold)))));
+    return Center(
+        child: FilledButton(
+            style: const ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll(Colors.green)),
+            onPressed: () async => widget.mode == Mode.create
+                ? _handelCreateFood(widget.food)
+                : _handleUpdateFood(widget.food),
+            child: Text(widget.mode == Mode.create ? 'Tạo món' : 'Cập nhật món',
+                style: context.titleStyleMedium!
+                    .copyWith(fontWeight: FontWeight.bold))));
   }
 
   void _handleUpdateFood(Food food) async {
@@ -288,8 +283,6 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
     var isValid = _formKey.currentState?.validate() ?? false;
 
     if (isValid) {
-      _isLoading.value = true;
-
       // Update the food details
       food = food.copyWith(
         isShowFood: _isShowFood.value,
@@ -303,22 +296,30 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
       );
 
       if (_imageFile != null) {
-        _image = await uploadImage(path: 'food', file: _imageFile);
+        _isUploadImage.value = true;
+        _image = await uploadImage(
+            path: 'food', file: _imageFile, progress: _uploadImageProgress);
         food = food.copyWith(image: _image);
       }
 
       if (_imageFile1 != null) {
-        _imageGallery1 = await uploadImage(path: 'food', file: _imageFile1);
+        _isUploadImage.value = true;
+        _imageGallery1 = await uploadImage(
+            path: 'food', file: _imageFile1, progress: _uploadImage1Progress);
       }
 
       if (_imageFile2 != null) {
-        _imageGallery2 = await uploadImage(path: 'food', file: _imageFile2);
+        _isUploadImage.value = true;
+        _imageGallery2 = await uploadImage(
+            path: 'food', file: _imageFile2, progress: _uploadImage2Progress);
       }
 
       if (_imageFile3 != null) {
-        _imageGallery3 = await uploadImage(path: 'food', file: _imageFile3);
+        _isUploadImage.value = true;
+        _imageGallery3 = await uploadImage(
+            path: 'food', file: _imageFile3, progress: _uploadImage3Progress);
       }
-
+      _isUploadImage.value = false;
       food = food.copyWith(
         photoGallery: [_imageGallery1, _imageGallery2, _imageGallery3],
       );
@@ -340,12 +341,16 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
         _imageFile2 != null &&
         _imageFile3 != null &&
         _categoryID.isNotEmpty) {
-      _isLoading.value = true;
-
-      _image = await uploadImage(path: 'food/', file: _imageFile);
-      _imageGallery1 = await uploadImage(path: 'food', file: _imageFile1);
-      _imageGallery2 = await uploadImage(path: 'food', file: _imageFile2);
-      _imageGallery3 = await uploadImage(path: 'food', file: _imageFile3);
+      _isUploadImage.value = true;
+      _image = await uploadImage(
+          path: 'food', file: _imageFile, progress: _uploadImageProgress);
+      _imageGallery1 = await uploadImage(
+          path: 'food', file: _imageFile1, progress: _uploadImage1Progress);
+      _imageGallery2 = await uploadImage(
+          path: 'food', file: _imageFile2, progress: _uploadImage2Progress);
+      _imageGallery3 = await uploadImage(
+          path: 'food', file: _imageFile3, progress: _uploadImage3Progress);
+      _isUploadImage.value = false;
       var newFood = food.copyWith(
           isShowFood: _isShowFood.value,
           image: _image,
@@ -359,7 +364,6 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
           discount: _isDiscount ? int.tryParse(_discountController.text)! : 0);
       if (!mounted) return;
       context.read<FoodBloc>().add(FoodCreated(food: newFood));
-      _isLoading.value = false;
     } else {
       toast.showToast(
           child: AppAlerts.errorToast(msg: 'Chưa nhập đầy đủ thông tin'));
@@ -368,7 +372,7 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    var buildWidget = SizedBox(
         height: context.sizeDevice.height,
         child: BlocListener<FoodBloc, GenericBlocState<Food>>(
             listener: (context, state) => (switch (state.status) {
@@ -377,15 +381,51 @@ class _UpdateFoodViewState extends State<UpdateFoodView> {
                   Status.failure =>
                     AppAlerts.failureDialog(context, btnOkOnPress: () {
                       context.pop();
-                      _isLoading.value = false;
                     }),
                   Status.success =>
                     AppAlerts.successDialog(context, btnOkOnPress: () {
-                      _isLoading.value = false;
-                      pop(context, 2);
+                      pop(context, 1);
                     })
                 }),
             child: onSuccess(widget.food)));
+    var uploadImageWidget = Scaffold(
+        body: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildProgessUploadImage(_uploadImageProgress),
+                  _buildProgessUploadImage(_uploadImage1Progress),
+                  _buildProgessUploadImage(_uploadImage2Progress),
+                  _buildProgessUploadImage(_uploadImage3Progress),
+                ])));
+    // return uploadImageWidget;
+    return ValueListenableBuilder(
+        valueListenable: _isUploadImage,
+        builder: (context, value, child) =>
+            value ? uploadImageWidget : buildWidget);
+  }
+
+  Widget _buildProgessUploadImage(ValueNotifier valueNotifier) {
+    return ValueListenableBuilder(
+        valueListenable: valueNotifier,
+        builder: (context, value, child) {
+          logger.d(value);
+          return Card(
+              elevation: 10,
+              child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(children: [
+                    LinearProgressIndicator(
+                        value: value / 100,
+                        // value: 0.3,
+                        color: context.colorScheme.secondary,
+                        backgroundColor: context.colorScheme.primary),
+                    const SizedBox(height: 16),
+                    Text('Uploading ${(value).toStringAsFixed(2)}%'),
+                  ])));
+        });
   }
 }
 

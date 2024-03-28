@@ -1,9 +1,17 @@
+import 'package:admin_menu_mobile/common/bloc/generic_bloc_state.dart';
+import 'package:admin_menu_mobile/common/dialog/app_alerts.dart';
+import 'package:admin_menu_mobile/common/dialog/progress_dialog.dart';
+import 'package:admin_menu_mobile/common/dialog/retry_dialog.dart';
 import 'package:admin_menu_mobile/common/widget/common_text_field.dart';
+import 'package:admin_menu_mobile/common/widget/empty_widget.dart';
 import 'package:admin_menu_mobile/core/utils/contants.dart';
 import 'package:admin_menu_mobile/core/utils/extensions.dart';
 import 'package:admin_menu_mobile/core/utils/util.dart';
+import 'package:admin_menu_mobile/features/category/bloc/category_bloc.dart';
 import 'package:admin_menu_mobile/features/category/data/model/category_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CreateOrUpdateCategory extends StatefulWidget {
   const CreateOrUpdateCategory(
@@ -19,11 +27,15 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
   late Mode _mode;
   late CategoryModel _categoryModel;
 
+  // ignore: prefer_typing_uninitialized_variables
   var _imageFile;
   String _image = '';
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _desCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _uploadImageProgress = ValueNotifier(0.0);
+  final _isUploadImage = ValueNotifier(false);
+
   @override
   void initState() {
     _mode = widget.mode;
@@ -42,7 +54,7 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    var buildWidget = Scaffold(
         appBar: _buildAppbar(),
         body: SafeArea(
             child: Padding(
@@ -74,26 +86,49 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
                                   fontStyle: FontStyle.italic,
                                   color: context.colorScheme.error))
                         ])))));
+
+    var uploadImageWidget = ValueListenableBuilder(
+        valueListenable: _uploadImageProgress,
+        builder: (context, value, child) {
+          logger.d(value);
+          return Scaffold(
+              body: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        LinearProgressIndicator(
+                            value: value / 100,
+                            color: context.colorScheme.secondary,
+                            backgroundColor: context.colorScheme.primary),
+                        const SizedBox(height: 16),
+                        Text('Uploading ${(value).toStringAsFixed(2)} %')
+                      ])));
+        });
+
+    return ValueListenableBuilder(
+        valueListenable: _isUploadImage,
+        builder: (context, value, child) =>
+            value ? uploadImageWidget : buildWidget);
   }
 
   _buildTitle(String title) => Text(title,
       style: context.titleStyleMedium!.copyWith(fontWeight: FontWeight.bold));
 
   _buildNameCatagory() => CommonTextField(
-        hintText: 'Tên danh mục',
-        controller: _nameCtrl,
-        prefixIcon: const Icon(Icons.abc),
-        validator: (value) =>
-            value == null || value.isEmpty ? 'Tên danh mục không hợp lệ' : null,
-        onChanged: (p0) {},
-      );
+      hintText: 'Tên danh mục',
+      controller: _nameCtrl,
+      prefixIcon: const Icon(Icons.abc),
+      validator: (value) =>
+          value == null || value.isEmpty ? 'Tên danh mục không hợp lệ' : null,
+      onChanged: (p0) {});
 
   _buildDescriptionCatagory() => CommonTextField(
-        controller: _desCtrl,
-        hintText: 'Mô tả',
-        prefixIcon: const Icon(Icons.description),
-        onChanged: (p0) {},
-      );
+      controller: _desCtrl,
+      hintText: 'Mô tả',
+      prefixIcon: const Icon(Icons.description),
+      onChanged: (p0) {});
 
   _buildButton() => FilledButton(
       onPressed: _mode == Mode.create
@@ -101,16 +136,93 @@ class _CreateOrUpdateCategoryState extends State<CreateOrUpdateCategory> {
           : () => _handelUpdateCategory(),
       child: Text(_mode == Mode.create ? 'Thêm danh mục' : 'Chỉnh sửa'));
 
-  _handelCreateCategory() {
+  _handelCreateCategory() async {
     final invalid = _formKey.currentState?.validate() ?? false;
+    final toast = FToast()..init(context);
     if (invalid) {
-    } else {}
+      if (_imageFile == null) {
+        toast.showToast(child: AppAlerts.errorToast(msg: 'chưa chọn hình'));
+      } else {
+        _isUploadImage.value = true;
+        _image = await uploadImage(
+            path: 'category', file: _imageFile, progress: _uploadImageProgress);
+        _isUploadImage.value = false;
+        var newCategory = CategoryModel(
+            name: _nameCtrl.text, description: _desCtrl.text, image: _image);
+        _createCategory(newCategory);
+      }
+    }
   }
 
-  _handelUpdateCategory() {
+  void _updateCategory(CategoryModel categoryModel) {
+    context
+        .read<CategoryBloc>()
+        .add(CategoryUpdated(categoryModel: categoryModel));
+    showDialog(
+        context: context,
+        builder: (context) => BlocBuilder<CategoryBloc,
+                GenericBlocState<CategoryModel>>(
+            builder: (context, state) => switch (state.status) {
+                  Status.loading => Container(color: Colors.transparent),
+                  Status.empty => const EmptyWidget(),
+                  Status.failure => RetryDialog(
+                      title: state.error ?? '',
+                      onRetryPressed: () => context
+                          .read<CategoryBloc>()
+                          .add(CategoryUpdated(categoryModel: categoryModel))),
+                  Status.success => ProgressDialog(
+                      descriptrion: 'Chỉnh sửa thành công!',
+                      isProgressed: false,
+                      onPressed: () {
+                        pop(context, 2);
+                      })
+                }));
+  }
+
+  void _createCategory(CategoryModel newCategory) {
+    context
+        .read<CategoryBloc>()
+        .add(CategoryCreated(categoryModel: newCategory));
+    showDialog(
+        context: context,
+        builder: (context) =>
+            BlocBuilder<CategoryBloc, GenericBlocState<CategoryModel>>(
+                builder: (context, state) => switch (state.status) {
+                      Status.loading => Container(color: Colors.transparent),
+                      Status.empty => const EmptyWidget(),
+                      Status.failure => RetryDialog(
+                          title: state.error ?? '',
+                          onRetryPressed: () => context
+                              .read<CategoryBloc>()
+                              .add(
+                                  CategoryCreated(categoryModel: newCategory))),
+                      Status.success => ProgressDialog(
+                          descriptrion: 'Tạo danh mục thành công!',
+                          isProgressed: false,
+                          onPressed: () {
+                            pop(context, 2);
+                          })
+                    }));
+  }
+
+  _handelUpdateCategory() async {
     final invalid = _formKey.currentState?.validate() ?? false;
+
     if (invalid) {
-    } else {}
+      if (_imageFile == null) {
+        _categoryModel = _categoryModel.copyWith(
+            image: _image, name: _nameCtrl.text, description: _desCtrl.text);
+        _updateCategory(_categoryModel);
+      } else {
+        _isUploadImage.value = true;
+        _image = await uploadImage(
+            path: 'category', file: _imageFile, progress: _uploadImageProgress);
+        _isUploadImage.value = false;
+        _categoryModel = _categoryModel.copyWith(
+            image: _image, name: _nameCtrl.text, description: _desCtrl.text);
+        _updateCategory(_categoryModel);
+      }
+    }
   }
 
   _buildImageCatagory() {

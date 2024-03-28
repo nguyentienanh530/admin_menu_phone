@@ -39,4 +39,12 @@ class CategoryRepository {
       throw '$e';
     }
   }
+
+  Future<void> deleteCategory({required String categoryID}) async {
+    try {
+      await _firebaseFirestore.collection('category').doc(categoryID).delete();
+    } catch (e) {
+      throw '$e';
+    }
+  }
 }

@@ -20,80 +20,82 @@ import '../../bloc/food_bloc.dart';
 import '../../data/model/food_model.dart';
 import 'item_food.dart';
 
-class ListFoodIsShow extends StatefulWidget {
+class ListFoodIsShow extends StatelessWidget {
   const ListFoodIsShow({super.key, required this.textSearch});
   final String textSearch;
-  @override
-  State<ListFoodIsShow> createState() => _ListFoodIsShowState();
-}
 
-class _ListFoodIsShowState extends State<ListFoodIsShow>
-    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return BlocProvider(
-            create: (context) =>
-                FoodBloc()..add(const FoodsFetched(isShowFood: true)),
-            child: ListFoodIsShowView(textSearch: widget.textSearch))
+            create: (context) => FoodBloc(),
+            child: ListFoodIsShowView(textSearch: textSearch))
         .animate()
         .slideX(
             begin: -0.1, end: 0, curve: Curves.easeInOutCubic, duration: 500.ms)
         .fadeIn(curve: Curves.easeInOutCubic, duration: 500.ms);
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
-class ListFoodIsShowView extends StatelessWidget {
+class ListFoodIsShowView extends StatefulWidget {
   const ListFoodIsShowView({super.key, required this.textSearch});
   final String textSearch;
+  @override
+  State<ListFoodIsShowView> createState() => _ListFoodIsShowViewState();
+}
+
+class _ListFoodIsShowViewState extends State<ListFoodIsShowView>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  void initState() {
+    _getData();
+    super.initState();
+  }
+
+  void _getData() {
+    if (!mounted) return;
+    context.read<FoodBloc>().add(const FoodsFetched(isShowFood: true));
+  }
 
   @override
   Widget build(BuildContext context) {
-    var foodIsShow = context.watch<FoodBloc>().state;
-    return CommonRefreshIndicator(
-        child: (switch (foodIsShow.status) {
-          Status.loading => const LoadingScreen(),
-          Status.empty => const EmptyScreen(),
-          Status.failure => ErrorScreen(errorMsg: foodIsShow.error),
-          Status.success => ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: foodIsShow.datas!.length,
-              itemBuilder: (context, i) {
-                if (foodIsShow.datas![i].name
-                        .toString()
-                        .toLowerCase()
-                        .contains(textSearch.toLowerCase()) ||
-                    TiengViet.parse(
-                            foodIsShow.datas![i].name.toString().toLowerCase())
-                        .contains(textSearch.toLowerCase())) {
-                  return ItemFood(
-                      onTapEditFood: () async =>
-                          await _goToEditFood(context, foodIsShow.datas![i]),
-                      onTapDeleteFood: () =>
-                          _buildDeleteFood(context, foodIsShow.datas![i]),
-                      index: i,
-                      food: foodIsShow.datas![i],
-                      onTapView: () => context.push(RouteName.foodDetail,
-                          extra: foodIsShow.datas![i]));
-                }
-                return const SizedBox();
-              })
-
-          // ListItemFood(
-          //     text: textSearch,
-          //     foods: foodIsShow.datas ?? <Food>[],
-          //     onBack: () => context
-          //         .read<FoodBloc>()
-          //         .add(const FoodsFetched(isShowFood: false)))
-        }),
-        onRefresh: () async {
-          await Future.delayed(const Duration(milliseconds: 500));
-          if (!context.mounted) return;
-          context.read<FoodBloc>().add(const FoodsFetched(isShowFood: true));
-        });
+    super.build(context);
+    return Builder(builder: (context) {
+      var foodIsShow = context.watch<FoodBloc>().state;
+      return CommonRefreshIndicator(
+          child: (switch (foodIsShow.status) {
+            Status.loading => const LoadingScreen(),
+            Status.empty => const EmptyScreen(),
+            Status.failure => ErrorScreen(errorMsg: foodIsShow.error),
+            Status.success => ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: foodIsShow.datas!.length,
+                itemBuilder: (context, i) {
+                  if (foodIsShow.datas![i].name
+                          .toString()
+                          .toLowerCase()
+                          .contains(widget.textSearch.toLowerCase()) ||
+                      TiengViet.parse(foodIsShow.datas![i].name
+                              .toString()
+                              .toLowerCase())
+                          .contains(widget.textSearch.toLowerCase())) {
+                    return ItemFood(
+                        onTapEditFood: () async =>
+                            await _goToEditFood(context, foodIsShow.datas![i]),
+                        onTapDeleteFood: () =>
+                            _buildDeleteFood(context, foodIsShow.datas![i]),
+                        index: i,
+                        food: foodIsShow.datas![i],
+                        onTapView: () => context.push(RouteName.foodDetail,
+                            extra: foodIsShow.datas![i]));
+                  }
+                  return const SizedBox();
+                })
+          }),
+          onRefresh: () async {
+            await Future.delayed(const Duration(milliseconds: 500));
+            _getData();
+          });
+    });
   }
 
   _goToEditFood(BuildContext context, Food food) async =>
@@ -142,8 +144,12 @@ class ListFoodIsShowView extends StatelessWidget {
                               child: AppAlerts.successToast(
                                   msg: 'Xóa thành công!'));
                         pop(context, 2);
+                        _getData();
                       },
                       isProgressed: false)
                 }));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
